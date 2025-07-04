@@ -1,18 +1,36 @@
+"use client"
+
 import type React from "react"
-import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
-import Navbar from "./components/Navbar"
 import Footer from "./components/Footer"
+import Navbar from "./components/Navbar"
+import { ConvexClientProvider } from "./ConvexClientProvider"
+import { usePathname } from "next/navigation"
 
 const inter = Inter({ subsets: ["latin"] })
 
-export const metadata: Metadata = {
-  title: "World Entrepreneurship Day 3.0 - Zazzau Version",
-  description:
-    "Innovate Locally, Impact Globally: Empowering Entrepreneurs for a Sustainable Future - August 24, 2024 at ABU Zaria",
-  keywords: "entrepreneurship, innovation, business, startup, WED, Zaria, ABU, networking",
-    generator: 'v0.dev'
+function LayoutContent({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname()
+  
+  // Hide navigation for dashboard, admin, vendor-dashboard, sponsor-dashboard, and login pages
+  const hideNavigation = pathname?.startsWith('/dashboard') || 
+                         pathname?.startsWith('/admin') || 
+                         pathname?.startsWith('/vendor-dashboard') ||
+                         pathname?.startsWith('/sponsor-dashboard') ||
+                         pathname?.startsWith('/login')
+
+  if (hideNavigation) {
+    return <>{children}</>
+  }
+
+  return (
+    <>
+      <Navbar />
+      {children}
+      <Footer />
+    </>
+  )
 }
 
 export default function RootLayout({
@@ -22,10 +40,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <Navbar />
-        {children}
-        <Footer />
+      <body className={inter.className} suppressHydrationWarning={true}>
+        <ConvexClientProvider>
+          <LayoutContent>{children}</LayoutContent>
+        </ConvexClientProvider>
       </body>
     </html>
   )

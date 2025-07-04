@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convex & Next.js Integration Guide</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: sans-serif;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 960px;
+        }
+        .step {
+            margin-bottom: 2rem;
+        }
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <h1 class="mb-4">Integrating Convex with Your Next.js Application</h1>
+
+        <p class="lead">A step-by-step guide to setting up a Convex backend for your Next.js project, enabling real-time data, serverless functions, and more.</p>
+
+        <div id="toc" class="mb-5"></div>
+
+        <div id="steps">
+            <div class="step" id="step1">
+                <h2>Step 1: Project Setup</h2>
+                <p>Ensure you have a Next.js project ready. If not, create one using:</p>
+                <div class="code-block">npx create-next-app@latest my-next-app</div>
+            </div>
+
+            <div class="step" id="step2">
+                <h2>Step 2: Install Convex</h2>
+                <p>Add the Convex CLI to your project as a dev dependency:</p>
+                <div class="code-block">npm install --save-dev convex</div>
+            </div>
+
+            <div class="step" id="step3">
+                <h2>Step 3: Initialize Convex</h2>
+                <p>Run the following command to initialize Convex in your project. This will create a `convex` directory with some example files.</p>
+                <div class="code-block">npx convex init</div>
+            </div>
+
+            <div class="step" id="step4">
+                <h2>Step 4: Set Up Environment Variables</h2>
+                <p>After running `npx convex dev`, you will get a `CONVEX_URL`. Add this to a `.env.local` file in your project root:</p>
+                <div class="code-block">CONVEX_URL=your-convex-url</div>
+            </div>
+
+            <div class="step" id="step5">
+                <h2>Step 5: Configure the Convex Client</h2>
+                <p>Create a file, for example, `convex/client.ts`, to configure your Convex client:</p>
+                <div class="code-block">
+import { ConvexReactClient } from "convex/react";
+
+export const convex = new ConvexReactClient(process.env.CONVEX_URL!);
+                </div>
+            </div>
+
+            <div class="step" id="step6">
+                <h2>Step 6: Wrap Your App with ConvexProvider</h2>
+                <p>In your `app/layout.tsx`, wrap your application with the `ConvexProvider`:</p>
+                <div class="code-block">
+'''javascript
+"use client";
+
+import { ConvexProvider, ConvexReactClient } from "convex/react";
+import { convex } from "../convex/client"; // Adjust the path as needed
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <ConvexProvider client={convex}>
+          {children}
+        </ConvexProvider>
+      </body>
+    </html>
+  );
+}
+'''
+                </div>
+            </div>
+
+            <div class="step" id="step7">
+                <h2>Step 7: Create Your First Convex Function</h2>
+                <p>In the `convex` directory, create a file like `messages.ts` and define a query:</p>
+                <div class="code-block">
+import { query } from "./_generated/server";
+
+export const get = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db.query("messages").collect();
+  },
+});
+                </div>
+            </div>
+
+            <div class="step" id="step8">
+                <h2>Step 8: Use the Convex Function in a Component</h2>
+                <p>Now you can use your Convex function in any Next.js component:</p>
+                <div class="code-block">
+'''javascript
+"use client";
+
+import { useQuery } from "convex/react";
+import { api } from "../convex/_generated/api";
+
+export default function Messages() {
+  const messages = useQuery(api.messages.get);
+
+  return (
+    <div>
+      {messages?.map((message) => (
+        <div key={message._id}>{message.text}</div>
+      ))}
+    </div>
+  );
+}
+'''
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toc = document.getElementById('toc');
+            const steps = document.querySelectorAll('.step');
+            let tocHTML = '<h3>Table of Contents</h3><ul class="list-group">';
+
+            steps.forEach((step, index) => {
+                const title = step.querySelector('h2').textContent;
+                const id = step.id;
+                tocHTML += `<li class="list-group-item"><a href="#${id}">${index + 1}. ${title}</a></li>`;
+            });
+
+            tocHTML += '</ul>';
+            toc.innerHTML = tocHTML;
+        });
+    </script>
+</body>
+</html>

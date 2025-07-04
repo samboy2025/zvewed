@@ -42,19 +42,19 @@ export default function SpeakersPage() {
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <Badge className="mb-4">Speakers</Badge>
+            <Badge className="mb-4 bg-red-600 text-white">WED 4.0 Speakers</Badge>
             <h1 className="text-4xl font-bold mb-6">Meet Our Inspiring Speakers</h1>
             <p className="text-xl text-gray-600">
-              Learn from successful entrepreneurs who have built impactful businesses and are committed to sharing their
-              knowledge with the next generation.
+              Learn from successful entrepreneurs who have navigated economic challenges and built resilient businesses. 
+              Discover strategies to rebuild, reinvent, and rise in today's economy.
             </p>
           </div>
 
           <Card className="mb-12">
             <CardHeader>
-              <CardTitle className="text-center">Speaker Selection Criteria</CardTitle>
+              <CardTitle className="text-center">WED 4.0 Speaker Selection Criteria</CardTitle>
               <CardDescription className="text-center">
-                We carefully select speakers based on their ability to inspire, influence, and provide valuable insights
+                We select speakers who exemplify resilience and have successfully navigated economic challenges while building sustainable businesses
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -134,7 +134,8 @@ export default function SpeakersPage() {
               </p>
               <div className="bg-white p-6 rounded-lg shadow-sm">
                 <h4 className="font-semibold mb-4">Contact Information</h4>
-                <p className="text-sm text-gray-600 mb-2">Email: speakers@wed3zazzau.com</p>
+                <p className="text-sm text-gray-600 mb-2">Email: speakers@wed4zazzau.com</p>
+                <p className="text-sm text-gray-600 mb-2">General Info: info@zve-nigeria.org</p>
                 <p className="text-sm text-gray-600">Phone: +234 XXX XXX XXXX</p>
               </div>
             </CardContent>

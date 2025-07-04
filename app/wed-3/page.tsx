@@ -5,7 +5,8 @@ import { Calendar, Users, Target, Globe, Award, ArrowRight, Lightbulb } from "lu
 import Link from "next/link"
 import Image from "next/image"
 import EventGallery from "../components/EventGallery"
-import EventSpeakers from "../components/EventSpeakers"
+import { EventSpeakers, Speaker } from "@/app/components/EventSpeakers"
+import BackToTopButton from "../components/BackToTopButton"
 
 export default function WED3Page() {
   const innovations = [
@@ -61,105 +62,134 @@ export default function WED3Page() {
 
   const wed3Gallery = [
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "WED 3.0 Innovation Showcase",
-      title: "Innovation Showcase Opening",
-      category: "ceremony",
+      src: "/WED 3.0/WED 3.0/IMG_7801.JPG",
+      alt: "Networking at WED 3.0",
+      title: "Networking",
+      category: "Networking",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "International Speaker",
-      title: "International Keynote Speaker",
-      category: "speakers",
+      src: "/WED 3.0/WED 3.0/IMG_7819.JPG",
+      alt: "Speaker session at WED 3.0",
+      title: "Speaker Session",
+      category: "Speakers",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Sustainability Workshop",
-      title: "Sustainable Business Workshop",
-      category: "workshops",
+      src: "/WED 3.0/WED 3.0/IMG_7843.JPG",
+      alt: "Audience at WED 3.0",
+      title: "Audience",
+      category: "Audience",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Global Networking",
-      title: "Global Networking Session",
-      category: "networking",
+      src: "/WED 3.0/WED 3.0/IMG_7865.JPG",
+      alt: "Panel discussion at WED 3.0",
+      title: "Panel Discussion",
+      category: "Panels",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Innovation Challenge",
-      title: "Innovation Challenge Finals",
-      category: "exhibition",
+      src: "/WED 3.0/WED 3.0/IMG_7888.JPG",
+      alt: "Workshop at WED 3.0",
+      title: "Workshop",
+      category: "Workshops",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Partnership Announcement",
-      title: "Global Partnership Signing",
-      category: "ceremony",
+      src: "/WED 3.0/WED 3.0/IMG_7922.JPG",
+      alt: "Group photo at WED 3.0",
+      title: "Group Photo",
+      category: "Networking",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Tech Exhibition",
-      title: "Technology Exhibition",
-      category: "exhibition",
+      src: "/WED 3.0/WED 3.0/IMG_7951.JPG",
+      alt: "Award ceremony at WED 3.0",
+      title: "Award Ceremony",
+      category: "Awards",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Youth Panel",
-      title: "Next Generation Panel",
-      category: "speakers",
+      src: "/WED 3.0/WED 3.0/IMG_8001.JPG",
+      alt: "Exhibition booth at WED 3.0",
+      title: "Exhibition Booth",
+      category: "Exhibition",
     },
   ]
 
-  const wed3Speakers = [
+  const wed3Speakers: Speaker[] = [
     {
-      name: "Dr. Sarah Johnson",
-      role: "Global Innovation Expert",
-      company: "Innovation Labs International",
-      topic: "Global Innovation Trends",
-      bio: "Dr. Johnson is an internationally recognized expert in innovation and has advised governments and corporations across 5 continents.",
-      image: "/placeholder.svg?height=300&width=400",
-      expertise: ["Global Innovation", "Technology Trends", "Strategic Planning"],
+      name: "Dr. Aminu Yusuf",
+      role: "Lead, ZVE",
+      company: "Zazzau Version Entrepreneurs",
+      topic: "The Future of Entrepreneurship in Northern Nigeria",
+      bio: "Dr. Aminu Yusuf is the visionary leader behind ZVE, driving the mission to empower entrepreneurs across the region.",
+      image: "/WED 3.0/WED 3.0/IMG_8075.JPG",
+      expertise: ["Leadership", "Community Building", "Ecosystem Development"],
     },
     {
-      name: "Ahmed Al-Rashid",
-      role: "Sustainability Entrepreneur",
-      company: "Green Future Ventures",
-      topic: "Sustainable Business Models",
-      bio: "Ahmed is a pioneer in sustainable entrepreneurship and has built multiple successful green businesses across Africa and the Middle East.",
-      image: "/placeholder.svg?height=300&width=400",
-      expertise: ["Sustainability", "Green Business", "Impact Investing"],
+      name: "Hajiya Fatima Bello",
+      role: "Founder",
+      company: "Sustainable Futures",
+      topic: "Building Socially Responsible Businesses",
+      bio: "Hajiya Fatima Bello is a renowned social entrepreneur dedicated to creating sustainable and impactful ventures.",
+      image: "/WED 3.0/WED 3.0/IMG_7916.JPG",
+      expertise: ["Social Entrepreneurship", "Sustainability", "Impact Investment"],
     },
     {
-      name: "Dr. Kemi Adebayo",
-      role: "FinTech Pioneer",
-      company: "African Financial Solutions",
-      topic: "Financial Inclusion Through Technology",
-      bio: "Dr. Adebayo has revolutionized financial services in Africa and her platforms serve over 2 million users across 15 countries.",
-      image: "/placeholder.svg?height=300&width=400",
-      expertise: ["FinTech", "Financial Inclusion", "Technology Innovation"],
+      name: "Mr. David Adekunle",
+      role: "CEO",
+      company: "TechGen Africa",
+      topic: "Leveraging Technology for Growth",
+      bio: "Mr. David Adekunle is a leading figure in the African tech scene, helping startups scale through technology.",
+      image: "/WED 3.0/WED 3.0/IMG_7992.JPG",
+      expertise: ["Technology", "Startups", "Venture Capital"],
     },
     {
-      name: "James Chen",
-      role: "International Investor",
-      company: "Global Venture Partners",
-      topic: "Cross-Border Investment Opportunities",
-      bio: "James has facilitated over $500 million in cross-border investments and specializes in emerging market opportunities.",
-      image: "/placeholder.svg?height=300&width=400",
-      expertise: ["International Investment", "Emerging Markets", "Cross-Border Business"],
+      name: "Aisha Ibrahim",
+      role: "Innovation Hub Manager",
+      company: "Zaria Innovation Hub",
+      topic: "Fostering Local Innovation",
+      bio: "Aisha Ibrahim is passionate about creating spaces for innovators to collaborate and thrive.",
+      image: "/WED 3.0/WED 3.0/IMG_7930.JPG",
+      expertise: ["Innovation Management", "Community Management", "Startups"],
     },
     {
-      name: "Fatima Al-Zahra",
-      role: "Social Impact Leader",
-      company: "Impact Ventures Africa",
-      topic: "Building Businesses for Social Good",
-      bio: "Fatima leads one of Africa's largest social impact investment funds and has supported over 100 social enterprises.",
-      image: "/placeholder.svg?height=300&width=400",
-      expertise: ["Social Impact", "Impact Investing", "Social Entrepreneurship"],
+      name: "Chinedu Okoro",
+      role: "Investment Analyst",
+      company: "Savannah Capital",
+      topic: "Investor Readiness for Startups",
+      bio: "Chinedu Okoro helps startups understand the investment landscape and prepare for funding.",
+      image: "/WED 3.0/WED 3.0/IMG_7840.JPG",
+      expertise: ["Investment", "Financial Modeling", "Venture Capital"],
+    },
+  ]
+
+  const keyTopics = [
+    {
+      title: "Global Entrepreneurship",
+      description: "Featuring an international speaker lineup from over 5 countries, bringing diverse perspectives.",
+      image: "/WED 3.0/WED 3.0/IMG_7934.JPG",
+    },
+    {
+      title: "Innovation and Technology",
+      description: "Driving discussions on how technology is reshaping industries and creating new opportunities.",
+      image: "/WED 3.0/WED 3.0/IMG_7962.JPG",
+    },
+    {
+      title: "Startup Funding and Investment",
+      description: "Connecting startups with potential investors and providing insights into securing funding.",
+      image: "/WED 3.0/WED 3.0/IMG_7989.JPG",
+    },
+    {
+      title: "Sustainable Business Practices",
+      description: "Promoting environmentally and socially responsible entrepreneurship for long-term success.",
+      image: "/WED 3.0/WED 3.0/IMG_8021.JPG",
+    },
+    {
+      title: "Policy and Advocacy",
+      description: "Engaging with policymakers to create a more favorable environment for entrepreneurs.",
+      image: "/WED 3.0/WED 3.0/IMG_8055.JPG",
     },
   ]
 
   return (
     <div className="min-h-screen">
+      <BackToTopButton />
       {/* Hero Section */}
       <section className="gradient-red text-white py-24">
         <div className="container mx-auto px-4">
@@ -182,18 +212,9 @@ export default function WED3Page() {
               </div>
               <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3">
                 <Users className="h-6 w-6" />
-                <span className="text-xl font-medium">300+ Expected</span>
+                <span className="text-xl font-medium">300+ Attended</span>
               </div>
             </div>
-            <Button
-              asChild
-              size="lg"
-              className="bg-white text-red-600 hover:bg-red-50 font-semibold text-lg px-8 py-4 rounded-full"
-            >
-              <Link href="/register" className="flex items-center gap-2">
-                Register Now <ArrowRight className="h-5 w-5" />
-              </Link>
-            </Button>
           </div>
         </div>
       </section>
@@ -204,15 +225,15 @@ export default function WED3Page() {
           <div className="max-w-6xl mx-auto">
             <div className="grid lg:grid-cols-2 gap-16 items-center">
               <div>
-                <h2 className="text-4xl font-bold mb-8 text-black">The Future is Now</h2>
+                <h2 className="text-4xl font-bold mb-8 text-black">Innovation Achieved</h2>
                 <p className="text-lg text-gray-700 mb-8 leading-relaxed">
-                  WED 3.0 represents the culmination of our journey towards creating a truly global platform for
-                  entrepreneurial excellence. Building on the success of previous events, WED 3.0 focuses on sustainable
+                  WED 3.0 successfully represented the culmination of our journey towards creating a truly global platform for
+                  entrepreneurial excellence. Building on the success of previous events, WED 3.0 focused on sustainable
                   innovation that creates local impact while addressing global challenges.
                 </p>
                 <p className="text-lg text-gray-700 mb-8 leading-relaxed">
-                  This year's theme emphasizes the power of local innovation to create global change. We're bringing
-                  together entrepreneurs, investors, and thought leaders from around the world to share insights on
+                  The theme "Innovate Locally, Impact Globally" successfully demonstrated the power of local innovation to create global change. 
+                  We successfully brought together 300+ entrepreneurs, investors, and thought leaders to share insights on
                   building sustainable businesses that make a lasting positive impact.
                 </p>
                 <div className="bg-red-50 p-6 rounded-2xl">
@@ -228,15 +249,15 @@ export default function WED3Page() {
               </div>
               <div className="relative">
                 <Image
-                  src="/placeholder.svg?height=500&width=600"
-                  alt="WED 3.0 Innovation"
+                  src="/WED 3.0/WED 3.0/IMG_7902.JPG"
+                  alt="WED 3.0 Event Highlights"
                   width={600}
                   height={500}
-                  className="rounded-3xl shadow-2xl"
+                  className="rounded-2xl shadow-2xl"
                 />
                 <div className="absolute -bottom-6 -right-6 bg-black text-white p-6 rounded-2xl">
                   <div className="text-3xl font-bold text-red-400">300+</div>
-                  <div className="text-gray-300">Expected</div>
+                  <div className="text-gray-300">Achieved</div>
                 </div>
               </div>
             </div>
@@ -303,8 +324,35 @@ export default function WED3Page() {
         </div>
       </section>
 
-      {/* Event Gallery */}
-      <EventGallery eventName="WED 3.0" images={wed3Gallery} />
+      {/* Key Topics */}
+      <div className="mb-16">
+        <h2 className="text-4xl font-bold text-center mb-12 text-black">Key Topics Covered</h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          {keyTopics.map((topic, index) => (
+            <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+              <CardHeader className="p-0">
+                <Image
+                  src={topic.image}
+                  alt={topic.title}
+                  width={400}
+                  height={250}
+                  className="rounded-t-lg w-full h-48 object-cover"
+                />
+              </CardHeader>
+              <CardContent className="p-6">
+                <CardTitle className="text-xl mb-3">{topic.title}</CardTitle>
+                <p className="text-gray-600">{topic.description}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      {/* Gallery */}
+      <div>
+        <h2 className="text-4xl font-bold text-center mb-12 text-black">Event Gallery</h2>
+        <EventGallery eventName="WED 3.0" images={wed3Gallery} />
+      </div>
 
       {/* Event Speakers */}
       <EventSpeakers eventName="WED 3.0" speakers={wed3Speakers} />
@@ -312,7 +360,7 @@ export default function WED3Page() {
       {/* Expected Outcomes */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center mb-16 text-black">Expected Impact</h2>
+          <h2 className="text-4xl font-bold text-center mb-16 text-black">Achieved Impact</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             {expectedOutcomes.map((outcome, index) => (
               <Card key={index} className="text-center hover-lift border-0 shadow-lg">
@@ -326,38 +374,27 @@ export default function WED3Page() {
         </div>
       </section>
 
-      {/* Registration CTA */}
-      <section className="py-24 gradient-red text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-8">Be Part of WED 3.0</h2>
-          <p className="text-xl mb-12 max-w-3xl mx-auto font-light leading-relaxed">
-            Join us for the most ambitious WED event yet. Register now and be part of the movement that's shaping the
-            future of entrepreneurship in Nigeria and beyond.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button
-              asChild
-              size="lg"
-              className="bg-white text-red-600 hover:bg-red-50 font-semibold text-lg px-8 py-4 rounded-full"
-            >
-              <Link href="/register">Register as Participant</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-red-600 font-semibold text-lg px-8 py-4 rounded-full"
-            >
-              <Link href="/vendor-registration">Register as Vendor</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-red-600 font-semibold text-lg px-8 py-4 rounded-full"
-            >
-              <Link href="/sponsor-registration">Become a Sponsor</Link>
-            </Button>
+      {/* Success & Next Event CTA */}
+      <section className="py-24 bg-red-50">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-4xl font-bold mb-8 text-black">Ready for the Next Chapter?</h2>
+            <p className="text-xl text-gray-700 mb-12 leading-relaxed">
+              The journey of innovation and impact continues with WED 4.0. Join us as we build on this legacy and
+              tackle new challenges in the entrepreneurial landscape.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild className="bg-red-600 hover:bg-red-700 text-white rounded-full px-8 py-4 text-lg">
+                <Link href="/gallery">View WED 3.0 Gallery</Link>
+              </Button>
+              <Button
+                asChild
+                variant="outline"
+                className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white rounded-full px-8 py-4 text-lg"
+              >
+                <Link href="/about">Learn About ZVE</Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>

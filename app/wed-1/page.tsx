@@ -1,11 +1,14 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Calendar, Users, Target, Lightbulb, Award, ArrowRight } from "lucide-react"
+import { Calendar, Users, Target, Lightbulb, Award, ArrowRight, MapPin } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import EventGallery from "../components/EventGallery"
-import EventSpeakers from "../components/EventSpeakers"
+import { EventSpeakers, Speaker } from "../components/EventSpeakers"
+import BackToTopButton from "../components/BackToTopButton"
 
 export default function WED1Page() {
   const highlights = [
@@ -59,99 +62,178 @@ export default function WED1Page() {
 
   const wed1Gallery = [
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "WED 1.0 Opening Ceremony",
-      title: "Opening Ceremony",
-      category: "ceremony",
+      src: "/WED 1.0/Pictures WED 1.0/DSC_2287_Original.jpg",
+      alt: "Networking at WED 1.0",
+      title: "Networking at WED 1.0",
+      category: "Networking",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Digital Marketing Workshop",
-      title: "Digital Marketing Workshop",
-      category: "workshops",
+      src: "/WED 1.0/Pictures WED 1.0/DSC_2322_Original.jpg",
+      alt: "Speaker session at WED 1.0",
+      title: "Speaker session at WED 1.0",
+      category: "Speakers",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Networking Session",
-      title: "Entrepreneurs Networking",
-      category: "networking",
+      src: "/WED 1.0/Pictures WED 1.0/DSC_2396_Original.jpg",
+      alt: "Audience at WED 1.0",
+      title: "Audience at WED 1.0",
+      category: "Audience",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Panel Discussion",
-      title: "Industry Panel Discussion",
-      category: "speakers",
+      src: "/WED 1.0/Pictures WED 1.0/DSC_2419_Original.jpg",
+      alt: "Panel discussion at WED 1.0",
+      title: "Panel discussion at WED 1.0",
+      category: "Panels",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Business Consultation",
-      title: "One-on-One Consultations",
-      category: "networking",
+      src: "/WED 1.0/Pictures WED 1.0/DSC_2500_Original.JPG",
+      alt: "Workshop at WED 1.0",
+      title: "Workshop at WED 1.0",
+      category: "Workshops",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Group Photo",
-      title: "WED 1.0 Participants",
-      category: "ceremony",
+      src: "/WED 1.0/Pictures WED 1.0/DSC_2573_Original.JPG",
+      alt: "Group photo at WED 1.0",
+      title: "Group photo at WED 1.0",
+      category: "Networking",
+    },
+    {
+      src: "/WED 1.0/Pictures WED 1.0/IMG_1285.PNG",
+      alt: "Award ceremony at WED 1.0",
+      title: "Award ceremony at WED 1.0",
+      category: "Awards",
+    },
+    {
+      src: "/WED 1.0/Pictures WED 1.0/IMG_1357.JPG",
+      alt: "Exhibition booth at WED 1.0",
+      title: "Exhibition booth at WED 1.0",
+      category: "Exhibition",
     },
   ]
 
-  const wed1Speakers = [
+  const keyTopics = [
     {
-      name: "Dr. Aminu Kano",
-      role: "Entrepreneurship Expert",
-      company: "ABU Business School",
-      topic: "Digital Transformation in Business",
-      bio: "Dr. Kano is a renowned expert in digital business transformation with over 15 years of experience helping businesses adapt to the digital age.",
-      image: "/placeholder.svg?height=300&width=400",
-      expertise: ["Digital Marketing", "Business Strategy", "Innovation"],
+      title: "Community Building",
+      description: "Building the foundation for entrepreneurship awareness and community building in Northern Nigeria.",
+      image: "/WED 1.0/Pictures WED 1.0/DSC_2299_Original.jpg",
     },
     {
-      name: "Fatima Abdullahi",
-      role: "Tech Entrepreneur",
-      company: "InnovateTech Solutions",
-      topic: "Building Sustainable Startups",
-      bio: "Fatima is the founder of a successful tech startup and passionate advocate for sustainable business practices in the technology sector.",
-      image: "/placeholder.svg?height=300&width=400",
-      expertise: ["Startup Development", "Sustainability", "Technology"],
+      title: "Exploring Opportunities",
+      description: "Providing a platform for entrepreneurs to explore new business opportunities, ideas, and collaborations.",
+      image: "/WED 1.0/Pictures WED 1.0/DSC_2425_Original.jpg",
     },
     {
-      name: "Ibrahim Musa",
-      role: "Business Consultant",
-      company: "Northern Business Advisors",
-      topic: "Market Research and Validation",
-      bio: "Ibrahim specializes in helping entrepreneurs validate their business ideas and conduct effective market research for successful launches.",
-      image: "/placeholder.svg?height=300&width=400",
-      expertise: ["Market Research", "Business Validation", "Consulting"],
+      title: "Building Networks",
+      description: "Connecting entrepreneurs, mentors, investors, and industry experts to foster a supportive ecosystem.",
+      image: "/WED 1.0/Pictures WED 1.0/DSC_2585_Original.JPG",
+    },
+  ]
+
+  const wed1Speakers: Speaker[] = [
+    {
+      name: "Bello Yusuf Yusuf",
+      role: "Convener",
+      company: "ZVE",
+      topic: "The Vision for Entrepreneurship in Zazzau",
+      bio: "The foundational speech setting the stage for the WED movement.",
+      image: "/WED 1.0/Pictures WED 1.0/DSC_2368_Original.jpg",
+      expertise: ["Vision", "Community", "Entrepreneurship"],
+    },
+    {
+      name: "Amina Ahmed",
+      role: "Panelist",
+      company: "Local Artisan Cooperative",
+      topic: "From Local Craft to Business",
+      bio: "Shared insights on turning local skills into viable businesses.",
+      image: "/WED 1.0/Pictures WED 1.0/DSC_2502_Original.jpg",
+      expertise: ["Artisan Business", "Local Economy", "Craftsmanship"],
+    },
+    {
+      name: "Dr. Suleiman Ibrahim",
+      role: "Keynote Speaker",
+      company: "Ahmadu Bello University",
+      topic: "The Role of Education in Entrepreneurship",
+      bio: "An inspiring talk on how academic knowledge can fuel innovation.",
+      image: "/WED 1.0/Pictures WED 1.0/DSC_2568_Original.jpg",
+      expertise: ["Education", "Innovation", "Academia"],
     },
   ]
 
   return (
     <div className="min-h-screen">
+      <BackToTopButton />
       {/* Hero Section */}
-      <section className="gradient-red text-white py-24">
+      <section className="py-24 bg-gradient-to-br from-black via-gray-900 to-black text-white">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <Badge className="mb-6 bg-white/20 text-white border-white/30 backdrop-blur-sm text-lg px-6 py-2">
-              WED 1.0 - 2022
+            <Badge className="mb-6 bg-red-600 text-white text-lg px-6 py-2">
+              WED 1.0 - Foundation (2022)
             </Badge>
-            <h1 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight">
-              WED 1.0
-              <br />
-              <span className="text-red-200">Foundation</span>
+            <h1 className="text-5xl md:text-6xl font-bold mb-6">
+              Transition in the Entrepreneurship Landscape
             </h1>
-            <p className="text-xl md:text-2xl mb-12 text-red-100 font-light leading-relaxed">
-              "Transition in the Entrepreneurship Landscape: Exploring Opportunities and Network"
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto mb-8">
+              Exploring Opportunities and Networks to Build a Sustainable Future
             </p>
-            <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
-              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3">
-                <Calendar className="h-6 w-6" />
-                <span className="text-xl font-medium">August 2022</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content */}
+      <section className="py-24 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
+              <div>
+                <h2 className="text-4xl font-bold mb-6 text-black">About WED 1.0</h2>
+                <div className="prose prose-lg max-w-none text-gray-700">
+                  <p>
+                    World Entrepreneurship Day (WED) 1.0, held in 2022, marked the beginning of a transformative journey for the entrepreneurial ecosystem in Zazzau and beyond. With the theme "Transition in the Entrepreneurship Landscape: Exploring Opportunities and Network," the event brought together 70 pioneering entrepreneurs, students, and thought leaders.
+                  </p>
+                  <p>
+                    This foundational event focused on building awareness, fostering a community of innovators, and providing a platform for exploring emerging business opportunities. It successfully laid the groundwork for what would become Northern Nigeria's premier entrepreneurship platform, creating a strong foundation for collaboration and growth in the years to follow.
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3">
-                <Users className="h-6 w-6" />
-                <span className="text-xl font-medium">70 Participants</span>
+              <div className="relative">
+                <Image
+                  src="/WED 1.0/Pictures WED 1.0/IMG_1667.JPG"
+                  alt="WED 1.0 Group Photo"
+                  width={600}
+                  height={500}
+                  className="rounded-2xl shadow-2xl"
+                />
               </div>
+            </div>
+
+            {/* Key Topics */}
+            <div className="mb-16">
+              <h2 className="text-4xl font-bold text-center mb-12 text-black">Key Topics Covered</h2>
+              <div className="grid md:grid-cols-3 gap-8">
+                {keyTopics.map((topic, index) => (
+                  <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <CardHeader className="p-0">
+                      <Image
+                        src={topic.image}
+                        alt={topic.title}
+                        width={400}
+                        height={250}
+                        className="rounded-t-lg w-full h-48 object-cover"
+                      />
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <CardTitle className="text-xl mb-3">{topic.title}</CardTitle>
+                      <p className="text-gray-600">{topic.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Gallery */}
+            <div>
+              <h2 className="text-4xl font-bold text-center mb-12 text-black">Event Gallery</h2>
+              <EventGallery eventName="WED 1.0" images={wed1Gallery} />
             </div>
           </div>
         </div>
@@ -182,7 +264,7 @@ export default function WED1Page() {
               </div>
               <div className="relative">
                 <Image
-                  src="/placeholder.svg?height=500&width=600"
+                  src="/WED 1.0/Pictures WED 1.0/DSC_2299_Original.jpg"
                   alt="WED 1.0 Event Highlights"
                   width={600}
                   height={500}
@@ -242,9 +324,6 @@ export default function WED1Page() {
           </div>
         </div>
       </section>
-
-      {/* Event Gallery */}
-      <EventGallery eventName="WED 1.0" images={wed1Gallery} />
 
       {/* Event Speakers */}
       <EventSpeakers eventName="WED 1.0" speakers={wed1Speakers} />

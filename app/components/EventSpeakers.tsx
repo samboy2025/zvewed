@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import Image from "next/image"
 
-interface Speaker {
+export interface Speaker {
   name: string
   role: string
   company: string
@@ -17,7 +17,7 @@ interface EventSpeakersProps {
   speakers: Speaker[]
 }
 
-export default function EventSpeakers({ eventName, speakers }: EventSpeakersProps) {
+export const EventSpeakers = ({ eventName, speakers }: EventSpeakersProps) => {
   return (
     <section className="py-16 bg-white">
       <div className="container mx-auto px-4">
@@ -33,11 +33,14 @@ export default function EventSpeakers({ eventName, speakers }: EventSpeakersProp
             <Card key={index} className="hover-lift border-0 shadow-lg overflow-hidden">
               <div className="relative">
                 <Image
-                  src={speaker.image || "/placeholder.svg?height=300&width=400"}
                   alt={speaker.name}
-                  width={400}
-                  height={300}
-                  className="w-full h-64 object-cover"
+                  className="mx-auto h-32 w-32 rounded-full object-cover"
+                  height={128}
+                  src={speaker.image || "/placeholder-user.jpg"}
+                  style={{
+                    aspectRatio: "128/128",
+                  }}
+                  width={128}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
                 <div className="absolute bottom-4 left-4 right-4">

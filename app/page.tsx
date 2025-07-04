@@ -1,91 +1,85 @@
+import type { Metadata } from "next"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+
+export const metadata: Metadata = {
+  title: "Zazzau Version Entrepreneurs (ZVE) - Empowering Northern Nigeria's Innovators",
+  description:
+    "ZVE is a transformative entrepreneurship organization. Join us for our flagship event, WED 4.0, on October 4th, 2025: 'Rebuild, Reinvent, Rise'.",
+  keywords: "ZVE, Zazzau Version Entrepreneurs, entrepreneurship, innovation, business, startup, WED 4.0, Zaria, Northern Nigeria, networking",
+  generator: 'v0.dev'
+}
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, MapPin, Users, Target, Lightbulb, Handshake, ArrowRight, Play } from "lucide-react"
+import { Calendar, MapPin, Users, Target, Lightbulb, Handshake, ArrowRight, Play, Store } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import TestimonialsSection from "./components/TestimonialsSection"
-import ImageGallery from "./components/ImageGallery"
+import { TestimonialsSection } from "@/components/ui/testimonials-demo"
+import BackToTopButton from "./components/BackToTopButton"
 
 export default function HomePage() {
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative gradient-red text-white py-32 overflow-hidden min-h-screen flex items-center">
-        <div className="absolute inset-0">
-          <div className="absolute inset-0 bg-black/40"></div>
-          <Image
-            src="/placeholder.svg?height=1080&width=1920"
-            alt="WED 3.0 Hero Background"
-            fill
-            className="object-cover"
-            priority
-          />
-          {/* Animated background elements */}
-          <div className="absolute top-20 left-10 w-32 h-32 bg-white/10 rounded-full blur-xl animate-pulse"></div>
-          <div className="absolute bottom-20 right-10 w-48 h-48 bg-red-300/20 rounded-full blur-2xl animate-pulse delay-1000"></div>
-          <div className="absolute top-1/2 left-1/4 w-24 h-24 bg-white/5 rounded-full blur-lg animate-pulse delay-500"></div>
+      <BackToTopButton />
+      {/* Hero Section - Emphasizing ZVE */}
+      <section className="relative bg-black text-white py-24 md:py-32 overflow-hidden">
+        {/* Background Image Slideshow with Dark Overlay */}
+        <div className="absolute inset-0 z-0">
+          <div className="relative w-full h-full">
+            {[
+              "/WED 2.0/Pictures WED 2.0/IMG_6247.JPG",
+              "/WED 1.0/Pictures WED 1.0/DSC_2272_Original.jpg",
+              "/WED 2.0/Pictures WED 2.0/IMG_6193.JPG",
+              "/WED 3.0/WED 3.0/IMG_7833.JPG",
+              "/WED 1.0/Pictures WED 1.0/DSC_2287_Original.jpg",
+              "/WED 2.0/Pictures WED 2.0/IMG_6215.JPG",
+            ].map((src, index) => (
+              <Image
+                key={index}
+                src={src}
+                alt={`WED Event Background ${index + 1}`}
+                fill
+                className={`object-cover transition-opacity duration-1000 ${
+                  index === 0 ? 'animate-slideshow-1' : 
+                  index === 1 ? 'animate-slideshow-2' :
+                  index === 2 ? 'animate-slideshow-3' :
+                  index === 3 ? 'animate-slideshow-4' :
+                  index === 4 ? 'animate-slideshow-5' :
+                  'animate-slideshow-6'
+                }`}
+                priority={index === 0}
+              />
+            ))}
+          </div>
+          <div className="absolute inset-0 bg-black/85"></div>
         </div>
+
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-6xl mx-auto text-center">
-            <div className="animate-fade-in">
-              <Badge className="mb-8 bg-white/20 text-white border-white/30 backdrop-blur-sm text-xl px-8 py-3 font-semibold">
-                WED 3.0 - Zazzau Version
-              </Badge>
-              <h1 className="text-7xl md:text-9xl font-bold mb-12 tracking-tight leading-none">
-                <span className="block">World</span>
-                <span className="block text-red-200 text-6xl md:text-8xl">Entrepreneurship</span>
-                <span className="block">Day</span>
-              </h1>
-              <p className="text-2xl md:text-4xl mb-16 text-red-100 font-light max-w-5xl mx-auto leading-relaxed">
-                "Innovate Locally, Impact Globally: Empowering Entrepreneurs for a Sustainable Future"
-              </p>
-            </div>
-
-            <div className="flex flex-col lg:flex-row gap-8 justify-center items-center mb-16 animate-slide-in">
-              <div className="flex items-center gap-4 bg-white/15 backdrop-blur-md rounded-2xl px-8 py-4 border border-white/20">
-                <Calendar className="h-8 w-8" />
-                <div className="text-left">
-                  <div className="text-2xl font-bold">August 24, 2024</div>
-                  <div className="text-red-200 text-sm">Save the Date</div>
-                </div>
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-xl md:text-2xl font-semibold text-red-400 mb-4 tracking-wider">
+              Zazzau Version Entrepreneurs (ZVE) Presents
+            </h1>
+            <h2 className="text-4xl md:text-6xl font-bold mb-6 drop-shadow-lg">
+              World Entrepreneurship Day 4.0
+            </h2>
+            <p className="text-lg md:text-xl mb-12 max-w-3xl mx-auto text-gray-300 drop-shadow-lg">
+              Theme: Rebuild, Reinvent, Rise - Navigating Nigeria's Economy with Resilience
+            </p>
+            <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-12">
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-red-400/50">
+                <Calendar className="h-5 w-5 text-red-400" />
+                <span className="font-medium">October 4th, 2025</span>
               </div>
-              <div className="flex items-center gap-4 bg-white/15 backdrop-blur-md rounded-2xl px-8 py-4 border border-white/20">
-                <MapPin className="h-8 w-8" />
-                <div className="text-left">
-                  <div className="text-2xl font-bold">ABU Zaria</div>
-                  <div className="text-red-200 text-sm">Business School</div>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 bg-white/15 backdrop-blur-md rounded-2xl px-8 py-4 border border-white/20">
-                <Users className="h-8 w-8" />
-                <div className="text-left">
-                  <div className="text-2xl font-bold">300+</div>
-                  <div className="text-red-200 text-sm">Expected Participants</div>
-                </div>
+              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3 border border-red-400/50">
+                <Users className="h-5 w-5 text-red-400" />
+                <span className="font-medium">400+ Participants Expected</span>
               </div>
             </div>
-
-            <div className="flex flex-col sm:flex-row gap-8 justify-center animate-fade-in">
-              <Button
-                asChild
-                size="lg"
-                className="bg-white text-red-600 hover:bg-red-50 font-bold text-xl px-12 py-6 rounded-full shadow-2xl hover:shadow-red-500/25 transition-all duration-300"
-              >
-                <Link href="/register" className="flex items-center gap-3">
-                  Register Now <ArrowRight className="h-6 w-6" />
-                </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button asChild size="lg" className="bg-red-600 hover:bg-red-700 text-white rounded-full px-10 py-4 font-semibold">
+                <Link href="/register">Register for WED 4.0</Link>
               </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-2 border-white text-white hover:bg-white hover:text-red-600 font-bold text-xl px-12 py-6 rounded-full backdrop-blur-sm transition-all duration-300"
-              >
-                <Link href="/wed-overview" className="flex items-center gap-3">
-                  <Play className="h-6 w-6" />
-                  Explore WED Journey
-                </Link>
+              <Button asChild size="lg" variant="outline" className="border-white bg-transparent text-white hover:bg-white hover:text-black hover:border-white rounded-full px-10 py-4 font-semibold">
+                <Link href="/sponsorship">Become a Sponsor</Link>
               </Button>
             </div>
           </div>
@@ -93,15 +87,15 @@ export default function HomePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-20 bg-black text-white">
+      <section className="py-12 bg-black text-white">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-4 gap-8 text-center">
             <div className="animate-fade-in">
-              <div className="text-5xl font-bold text-red-500 mb-2">3</div>
-              <div className="text-xl text-gray-300">Successful Events</div>
+              <div className="text-5xl font-bold text-red-500 mb-2">4</div>
+              <div className="text-xl text-gray-300">WED Events Planned</div>
             </div>
             <div className="animate-fade-in">
-              <div className="text-5xl font-bold text-red-500 mb-2">500+</div>
+              <div className="text-5xl font-bold text-red-500 mb-2">600+</div>
               <div className="text-xl text-gray-300">Entrepreneurs Reached</div>
             </div>
             <div className="animate-fade-in">
@@ -109,26 +103,36 @@ export default function HomePage() {
               <div className="text-xl text-gray-300">Expert Speakers</div>
             </div>
             <div className="animate-fade-in">
-              <div className="text-5xl font-bold text-red-500 mb-2">₦5M+</div>
-              <div className="text-xl text-gray-300">Investment Facilitated</div>
+              <div className="text-5xl font-bold text-red-500 mb-2">₦3.37M+</div>
+              <div className="text-xl text-gray-300">Sponsorship Target</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* About Section */}
-      <section className="py-24 bg-gray-50">
+      <section className="py-12 bg-gray-50">
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-16">
-              <h2 className="text-5xl font-bold mb-6 text-black">About WED 3.0</h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
-                The World Entrepreneurship Day (WED) 3.0 is set to be an extraordinary event designed to foster
-                innovation, growth, and collaboration among entrepreneurs.
+            <div className="text-center mb-12">
+              <Badge className="mb-4 bg-red-600 text-white">Organized by ZVE</Badge>
+              <h2 className="text-5xl font-bold mb-6 text-black">About WED 4.0</h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed mb-6">
+                World Entrepreneurship Day (WED) 4.0: "Rebuild, Reinvent, Rise" - Empowering entrepreneurs to navigate 
+                current economic challenges through strategic rebuilding, innovative reinvention, and sustainable growth.
               </p>
+              <div className="bg-white rounded-2xl p-8 shadow-lg max-w-4xl mx-auto border border-gray-200">
+                <h3 className="text-2xl font-bold text-black mb-4">Organized by Zazzau Version Entrepreneurs (ZVE)</h3>
+                <p className="text-gray-700 leading-relaxed">
+                  ZVE is a transformative entrepreneurship organization founded by <strong>Bello Yusuf Yusuf</strong> with the mission to 
+                  unite, empower, and support entrepreneurs across Northern Nigeria and beyond. What began as a simple vision has 
+                  evolved into a powerful movement that is redefining the entrepreneurship narrative in the region through 
+                  innovation, collaboration, and sustainable impact.
+                </p>
+              </div>
             </div>
 
-            <div className="grid lg:grid-cols-2 gap-16 items-center">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
               <div className="space-y-8">
                 <div className="space-y-6">
                   <div className="flex items-center gap-4">
@@ -155,13 +159,27 @@ export default function HomePage() {
                     </div>
                     <div>
                       <h3 className="text-xl font-semibold">WED 3.0: Innovation</h3>
-                      <p className="text-gray-600">300+ expected - Global impact focus</p>
+                      <p className="text-gray-600">300+ participants - Global impact achieved</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-red-600 rounded-full flex items-center justify-center">
+                      <Target className="h-6 w-6 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-semibold">WED 4.0: Resilience</h3>
+                      <p className="text-gray-600">400+ expected - Economic resilience focus</p>
                     </div>
                   </div>
                 </div>
-                <Button asChild className="bg-red-600 hover:bg-red-700 text-white rounded-full px-8 py-3">
-                  <Link href="/about">Learn More About Our Journey</Link>
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button asChild className="bg-red-600 hover:bg-red-700 text-white rounded-full px-8 py-3">
+                    <Link href="/about">Learn More About ZVE</Link>
+                  </Button>
+                  <Button asChild variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white rounded-full px-8 py-3">
+                    <Link href="/wed-4">Explore WED 4.0</Link>
+                  </Button>
+                </div>
               </div>
 
               <div className="relative">
@@ -212,8 +230,14 @@ export default function HomePage() {
             <div className="bg-gray-900 rounded-3xl p-12 border border-gray-800 shadow-2xl">
               <div className="flex flex-col lg:flex-row gap-12 items-start">
                 <div className="lg:w-1/3 text-center lg:text-left">
-                  <div className="w-48 h-48 bg-red-600 rounded-full mx-auto lg:mx-0 mb-6 flex items-center justify-center">
-                    <span className="text-6xl font-bold text-white">BY</span>
+                  <div className="w-48 h-48 rounded-full mx-auto lg:mx-0 mb-6 overflow-hidden border-4 border-red-600 shadow-2xl">
+                    <Image
+                      src="/FOUNDER.JPG"
+                      alt="Bello Yusuf Yusuf - Founder of ZVE"
+                      width={192}
+                      height={192}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <h3 className="text-2xl font-bold mb-2 text-white">Bello Yusuf Yusuf</h3>
                   <p className="text-red-400 text-lg mb-2">Founder, ZVE</p>
@@ -236,48 +260,26 @@ export default function HomePage() {
                     </p>
 
                     <p className="mb-6">
-                      ZVE was founded to promote entrepreneurship as a tool for solving youth unemployment, promoting
-                      self-reliance, and driving inclusive development. Through WED, we've built a platform where
-                      entrepreneurs, thought leaders, policymakers, and aspiring change-makers come together to share
-                      knowledge, inspire innovation, and create long-lasting impact.
-                    </p>
-
-                    <p className="mb-6">
-                      Over the past editions of WED—WED 1.0, WED 2.0, and WED 3.0—we have witnessed overwhelming
-                      participation, with over{" "}
+                      Over the past editions of WED, we have witnessed overwhelming participation, with over{" "}
                       <span className="text-red-400 font-bold">600 entrepreneurs and attendees</span> collectively,
-                      engaging in workshops, exhibitions, panel discussions, and networking opportunities. The feedback
-                      and success stories have been overwhelming, with participants gaining access to funding
-                      opportunities, mentorship, partnerships, and business visibility.
+                      engaging in workshops, exhibitions, panel discussions, and networking opportunities.
                     </p>
 
-                    <p className="mb-6">
-                      As we move forward with WED 4.0, themed{" "}
-                      <span className="text-red-400 font-semibold">
-                        "Rebuild, Reinvent, Rise: Navigating the Current Economy with Resilience"
-                      </span>
-                      , we're focusing on helping entrepreneurs weather the storms of the current economic climate by
-                      rebuilding systems, reinventing models, and rising stronger.
-                    </p>
+                    <div className="flex flex-col sm:flex-row gap-4 mt-8">
+                      <Button
+                        asChild
+                        className="bg-red-600 hover:bg-red-700 text-white rounded-full px-8 py-3">
+                        <Link href="/leadership">Read Full Message</Link>
+                      </Button>
+                      <Button
+                        asChild
+                        variant="outline"
+                        className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white rounded-full px-8 py-3">
+                        <Link href="/about">Learn About ZVE</Link>
+                      </Button>
+                    </div>
 
-                    <p className="mb-6">
-                      But ZVE is more than just an event-based platform. It's a movement. We are now expanding into
-                      entrepreneurship-focused digital platforms, entrepreneur profiling, online courses, webinars, and
-                      local incubation projects to ensure that the impact continues beyond one day.
-                    </p>
-
-                    <p className="mb-6">
-                      I believe in the power of collaboration, and I appreciate every single volunteer, partner,
-                      sponsor, speaker, and supporter who has walked this journey with us. Your contribution has shaped
-                      this vision and empowered hundreds of lives.
-                    </p>
-
-                    <p className="mb-8">
-                      To those visiting us for the first time—welcome to the community of changemakers. Together, let's
-                      build, grow, and leave a legacy of impact.
-                    </p>
-
-                    <div className="border-t border-gray-700 pt-6">
+                    <div className="border-t border-gray-700 pt-6 mt-8">
                       <p className="text-lg">
                         <span className="text-white font-semibold">With gratitude,</span>
                         <br />
@@ -297,32 +299,23 @@ export default function HomePage() {
       {/* Objectives Section */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-5xl font-bold text-center mb-16 text-black">Our Objectives</h2>
+          <h2 className="text-5xl font-bold text-center mb-16 text-black">WED 4.0 Objectives</h2>
+          <div className="text-center mb-12">
+            <p className="text-xl text-gray-600 max-w-4xl mx-auto">
+              Our objectives align with the "Rebuild, Reinvent, Rise" theme, focusing on economic resilience and sustainable growth
+            </p>
+          </div>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-7xl mx-auto">
-            <Card className="text-center hover-lift border-0 shadow-lg">
-              <CardHeader className="pb-4">
-                <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
-                  <Lightbulb className="h-8 w-8 text-white" />
-                </div>
-                <CardTitle className="text-xl text-black">Innovation Platform</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 leading-relaxed">
-                  Provide a platform for entrepreneurs to network and share innovative ideas
-                </p>
-              </CardContent>
-            </Card>
-
             <Card className="text-center hover-lift border-0 shadow-lg">
               <CardHeader className="pb-4">
                 <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Target className="h-8 w-8 text-white" />
                 </div>
-                <CardTitle className="text-xl text-black">Skill Development</CardTitle>
+                <CardTitle className="text-xl text-black">Business Resilience</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 leading-relaxed">
-                  Equip participants with practical skills through workshops and sessions
+                  Provide practical strategies for navigating economic challenges and building resilient businesses
                 </p>
               </CardContent>
             </Card>
@@ -332,11 +325,25 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Handshake className="h-8 w-8 text-white" />
                 </div>
-                <CardTitle className="text-xl text-black">Partnerships</CardTitle>
+                <CardTitle className="text-xl text-black">Network Building</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 leading-relaxed">
-                  Facilitate collaborations among stakeholders in the ecosystem
+                  Connect entrepreneurs with investors, mentors, and peers for sustainable partnerships
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover-lift border-0 shadow-lg">
+              <CardHeader className="pb-4">
+                <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <Lightbulb className="h-8 w-8 text-white" />
+                </div>
+                <CardTitle className="text-xl text-black">Resource Access</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 leading-relaxed">
+                  Facilitate access to funding, markets, and business support services for growth
                 </p>
               </CardContent>
             </Card>
@@ -346,20 +353,17 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
                   <Users className="h-8 w-8 text-white" />
                 </div>
-                <CardTitle className="text-xl text-black">Empowerment</CardTitle>
+                <CardTitle className="text-xl text-black">Policy Influence</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 leading-relaxed">
-                  Inspire the next generation through success stories and interactions
+                  Engage policymakers on creating entrepreneurship-friendly policies and frameworks
                 </p>
               </CardContent>
             </Card>
           </div>
         </div>
       </section>
-
-      {/* Image Gallery Section */}
-      <ImageGallery />
 
       {/* Testimonials Section */}
       <TestimonialsSection />
@@ -439,37 +443,112 @@ export default function HomePage() {
       </section>
 
       {/* Call to Action */}
-      <section className="py-24 gradient-red text-white">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-5xl font-bold mb-8">Ready to Join WED 3.0?</h2>
-          <p className="text-2xl mb-12 max-w-3xl mx-auto font-light leading-relaxed">
-            Be part of this transformative experience that will foster innovation and collaboration in the
-            entrepreneurial ecosystem.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-6 justify-center">
-            <Button
-              asChild
-              size="lg"
-              className="bg-white text-red-600 hover:bg-red-50 font-semibold text-lg px-8 py-4 rounded-full"
-            >
-              <Link href="/register">Register as Participant</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-red-600 font-semibold text-lg px-8 py-4 rounded-full"
-            >
-              <Link href="/vendor-registration">Register as Vendor</Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white hover:text-red-600 font-semibold text-lg px-8 py-4 rounded-full"
-            >
-              <Link href="/sponsor-registration">Become a Sponsor</Link>
-            </Button>
+      <section className="py-24 bg-gradient-to-br from-red-600 via-red-700 to-red-800 text-white relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-20 w-32 h-32 bg-white rounded-full"></div>
+          <div className="absolute bottom-20 right-20 w-24 h-24 bg-white rounded-full"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-40 h-40 bg-white rounded-full"></div>
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-5xl mx-auto text-center">
+            <Badge className="mb-6 bg-white/20 text-white text-lg px-6 py-2 border-white/30">
+              Join the Movement
+            </Badge>
+            <h2 className="text-5xl md:text-6xl font-bold mb-6">Ready to Join WED 4.0?</h2>
+            <p className="text-xl md:text-2xl mb-12 max-w-4xl mx-auto font-light leading-relaxed opacity-90">
+              Be part of this transformative experience focused on rebuilding, reinventing, and rising above economic 
+              challenges. Navigate current realities with resilience. Join us on October 4th, 2025.
+            </p>
+
+            {/* Registration Options Grid */}
+            <div className="grid md:grid-cols-3 gap-8 mb-12 max-w-4xl mx-auto">
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Users className="h-8 w-8 text-red-600" />
+                  </div>
+                  <CardTitle className="text-white text-xl mb-2">Participant</CardTitle>
+                  <CardDescription className="text-white/80">
+                    Join as an attendee to learn, network, and grow your entrepreneurial journey
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full border-white bg-transparent text-white hover:bg-white hover:text-red-600 hover:border-white font-semibold text-lg py-3 rounded-full transition-all duration-300 hover:shadow-lg"
+                  >
+                    <Link href="/register">Register Now</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Store className="h-8 w-8 text-red-600" />
+                  </div>
+                  <CardTitle className="text-white text-xl mb-2">Vendor</CardTitle>
+                  <CardDescription className="text-white/80">
+                    Showcase your products and services to 500+ entrepreneurs and industry leaders
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full border-white bg-transparent text-white hover:bg-white hover:text-red-600 hover:border-white font-semibold text-lg py-3 rounded-full transition-all duration-300 hover:shadow-lg"
+                  >
+                    <Link href="/vendor-registration">Join as Vendor</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-white/10 backdrop-blur-sm border-white/20 hover:bg-white/20 transition-all duration-300 hover:scale-105">
+                <CardHeader className="text-center pb-4">
+                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-4">
+                    <Handshake className="h-8 w-8 text-red-600" />
+                  </div>
+                  <CardTitle className="text-white text-xl mb-2">Sponsor</CardTitle>
+                  <CardDescription className="text-white/80">
+                    Partner with us to support entrepreneurship and gain brand visibility
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="text-center">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full border-white bg-transparent text-white hover:bg-white hover:text-red-600 hover:border-white font-semibold text-lg py-3 rounded-full transition-all duration-300 hover:shadow-lg"
+                  >
+                    <Link href="/sponsor-registration">Become a Sponsor</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Additional CTA */}
+            <div className="border-t border-white/20 pt-8">
+              <p className="text-white/80 mb-6 text-lg">
+                Have questions? Want to learn more about sponsorship packages?
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button
+                  asChild
+                  variant="outline"
+                  className="border-white bg-transparent text-white hover:bg-white hover:text-red-600 hover:border-white font-semibold rounded-full px-8 py-3"
+                >
+                  <Link href="/about">Learn More About WED</Link>
+                </Button>
+                <Button
+                  asChild
+                  className="bg-white text-red-600 hover:bg-red-50 hover:text-red-700 font-semibold rounded-full px-8 py-3"
+                >
+                  <Link href="/sponsorship">View Sponsorship Packages</Link>
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

@@ -1,11 +1,12 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Calendar, Users, Target, Trophy, Handshake } from "lucide-react"
+import { Calendar, Users, Target, Trophy, Handshake, ArrowRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 import EventGallery from "../components/EventGallery"
-import EventSpeakers from "../components/EventSpeakers"
+import { EventSpeakers, Speaker } from "../components/EventSpeakers"
+import BackToTopButton from "../components/BackToTopButton"
 
 export default function WED2Page() {
   const highlights = [
@@ -63,96 +64,106 @@ export default function WED2Page() {
 
   const wed2Gallery = [
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "WED 2.0 Grand Opening",
-      title: "Grand Opening Ceremony",
-      category: "ceremony",
+      src: "/WED 2.0/Pictures WED 2.0/IMG_6193.JPG",
+      alt: "Networking at WED 2.0",
+      title: "Networking",
+      category: "Networking",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Keynote Speaker",
-      title: "Inspiring Keynote Address",
-      category: "speakers",
+      src: "/WED 2.0/Pictures WED 2.0/IMG_6198.JPG",
+      alt: "Speaker session at WED 2.0",
+      title: "Speaker Session",
+      category: "Speakers",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Pitch Competition",
-      title: "Startup Pitch Competition",
-      category: "exhibition",
+      src: "/WED 2.0/Pictures WED 2.0/IMG_6209.JPG",
+      alt: "Audience at WED 2.0",
+      title: "Audience",
+      category: "Audience",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Mentorship Session",
-      title: "Mentorship Program Launch",
-      category: "workshops",
+      src: "/WED 2.0/Pictures WED 2.0/IMG_6226.JPG",
+      alt: "Panel discussion at WED 2.0",
+      title: "Panel Discussion",
+      category: "Panels",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Youth Entrepreneurs",
-      title: "Youth Entrepreneurship Track",
-      category: "networking",
+      src: "/WED 2.0/Pictures WED 2.0/IMG_6244.JPG",
+      alt: "Workshop at WED 2.0",
+      title: "Workshop",
+      category: "Workshops",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Award Ceremony",
-      title: "Winners Award Ceremony",
-      category: "ceremony",
+      src: "/WED 2.0/Pictures WED 2.0/IMG_6262.JPG",
+      alt: "Group photo at WED 2.0",
+      title: "Group Photo",
+      category: "Networking",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Vendor Exhibition",
-      title: "Innovation Showcase",
-      category: "exhibition",
+      src: "/WED 2.0/Pictures WED 2.0/IMG_6285.JPG",
+      alt: "Award ceremony at WED 2.0",
+      title: "Award Ceremony",
+      category: "Awards",
     },
     {
-      src: "/placeholder.svg?height=400&width=600",
-      alt: "Panel Discussion",
-      title: "Industry Leaders Panel",
-      category: "speakers",
+      src: "/WED 2.0/Pictures WED 2.0/IMG_6291.JPG",
+      alt: "Exhibition booth at WED 2.0",
+      title: "Exhibition Booth",
+      category: "Exhibition",
     },
   ]
 
-  const wed2Speakers = [
+  const keyTopics = [
     {
-      name: "Dr. Aisha Mohammed",
-      role: "Investment Expert",
-      company: "Northern Venture Capital",
-      topic: "Funding Strategies for Startups",
-      bio: "Dr. Mohammed is a leading investment expert who has facilitated over ₦2 billion in startup funding across Northern Nigeria.",
-      image: "/placeholder.svg?height=300&width=400",
-      expertise: ["Investment", "Venture Capital", "Startup Funding"],
+      title: "Youth Empowerment",
+      description: "Focusing on empowering the next generation of young entrepreneurs with skills and opportunities.",
+      image: "/WED 2.0/Pictures WED 2.0/IMG_6203.JPG",
     },
     {
-      name: "Musa Abdullahi",
-      role: "Serial Entrepreneur",
-      company: "Multiple Ventures",
-      topic: "Building Multiple Revenue Streams",
-      bio: "Musa has successfully built and exited three companies and now mentors the next generation of entrepreneurs.",
-      image: "/placeholder.svg?height=300&width=400",
-      expertise: ["Serial Entrepreneurship", "Business Development", "Mentoring"],
+      title: "Building Bridges to Success",
+      description: "Creating pathways for entrepreneurs to connect with mentors, investors, and resources.",
+      image: "/WED 2.0/Pictures WED 2.0/IMG_6240.JPG",
     },
     {
-      name: "Zainab Hassan",
-      role: "Digital Marketing Expert",
-      company: "Digital Growth Agency",
-      topic: "Social Media Marketing for Businesses",
-      bio: "Zainab has helped over 500 businesses grow their online presence and increase revenue through strategic digital marketing.",
-      image: "/placeholder.svg?height=300&width=400",
-      expertise: ["Digital Marketing", "Social Media", "Brand Building"],
+      title: "Startup Pitch Competition",
+      description: "Introducing the first-ever pitch competition to showcase and fund innovative startup ideas.",
+      image: "/WED 2.0/Pictures WED 2.0/IMG_6278.JPG",
+    },
+  ]
+
+  const wed2Speakers: Speaker[] = [
+    {
+      name: "Bello Yusuf Yusuf",
+      role: "Founder, ZVE",
+      company: "Zazzau Version Entrepreneurs",
+      topic: "Empowering the Next Generation of Entrepreneurs",
+      bio: "Bello Yusuf Yusuf is the visionary founder of ZVE, dedicated to fostering youth entrepreneurship.",
+      image: "/WED 2.0/Pictures WED 2.0/IMG_6213.JPG",
+      expertise: ["Youth Empowerment", "Community Building", "Leadership"],
     },
     {
-      name: "Prof. Garba Aliyu",
-      role: "Academic & Researcher",
-      company: "University of Abuja",
-      topic: "Innovation in African Entrepreneurship",
-      bio: "Professor Aliyu is a renowned researcher in African entrepreneurship and innovation ecosystems.",
-      image: "/placeholder.svg?height=300&width=400",
-      expertise: ["Research", "Innovation", "Academic Leadership"],
+      name: "Aisha Dantata",
+      role: "CEO",
+      company: "Dantata Enterprises",
+      topic: "Building Bridges to Success for Young Founders",
+      bio: "Aisha Dantata is a seasoned entrepreneur with a passion for mentoring young business leaders.",
+      image: "/WED 2.0/Pictures WED 2.0/IMG_6234.JPG",
+      expertise: ["Mentorship", "Business Strategy", "Scaling"],
+    },
+    {
+      name: "Dr. Nneka Eze",
+      role: "Director",
+      company: "VGG",
+      topic: "Securing Your First Investment",
+      bio: "Dr. Nneka Eze is an experienced venture capitalist focused on early-stage startups in Africa.",
+      image: "/WED 2.0/Pictures WED 2.0/IMG_6250.JPG",
+      expertise: ["Venture Capital", "Investment", "Pitching"],
     },
   ]
 
   return (
     <div className="min-h-screen">
+      <BackToTopButton />
       {/* Hero Section */}
       <section className="gradient-red text-white py-24">
         <div className="container mx-auto px-4">
@@ -168,7 +179,7 @@ export default function WED2Page() {
             <p className="text-xl md:text-2xl mb-12 text-red-100 font-light leading-relaxed">
               "Empowering the Next Generation of Entrepreneurs: Building Bridges to Success"
             </p>
-            <div className="flex flex-col md:flex-row gap-6 justify-center items-center">
+            <div className="flex flex-col md:flex-row gap-6 justify-center items-center mb-8">
               <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3">
                 <Calendar className="h-6 w-6" />
                 <span className="text-xl font-medium">August 2023</span>
@@ -209,17 +220,43 @@ export default function WED2Page() {
               </div>
               <div className="relative">
                 <Image
-                  src="/placeholder.svg?height=500&width=600"
-                  alt="WED 2.0 Event Highlights"
+                  src="/WED 2.0/Pictures WED 2.0/IMG_6195.JPG"
+                  alt="WED 2.0 Group Photo"
                   width={600}
                   height={500}
-                  className="rounded-3xl shadow-2xl"
+                  className="rounded-2xl shadow-2xl"
                 />
-                <div className="absolute -bottom-6 -right-6 bg-black text-white p-6 rounded-2xl">
-                  <div className="text-3xl font-bold text-red-400">200</div>
-                  <div className="text-gray-300">Participants</div>
-                </div>
               </div>
+            </div>
+
+            {/* Key Topics */}
+            <div className="mb-16">
+              <h2 className="text-4xl font-bold text-center mb-12 text-black">Key Topics Covered</h2>
+              <div className="grid md:grid-cols-3 gap-8">
+                {keyTopics.map((topic, index) => (
+                  <Card key={index} className="border-0 shadow-lg hover:shadow-xl transition-all duration-300">
+                    <CardHeader className="p-0">
+                      <Image
+                        src={topic.image}
+                        alt={topic.title}
+                        width={400}
+                        height={250}
+                        className="rounded-t-lg w-full h-48 object-cover"
+                      />
+                    </CardHeader>
+                    <CardContent className="p-6">
+                      <CardTitle className="text-xl mb-3">{topic.title}</CardTitle>
+                      <p className="text-gray-600">{topic.description}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Gallery */}
+            <div>
+              <h2 className="text-4xl font-bold text-center mb-12 text-black">Event Gallery</h2>
+              <EventGallery eventName="WED 2.0" images={wed2Gallery} />
             </div>
           </div>
         </div>
@@ -278,9 +315,6 @@ export default function WED2Page() {
           </div>
         </div>
       </section>
-
-      {/* Event Gallery */}
-      <EventGallery eventName="WED 2.0" images={wed2Gallery} />
 
       {/* Event Speakers */}
       <EventSpeakers eventName="WED 2.0" speakers={wed2Speakers} />
@@ -363,9 +397,12 @@ export default function WED2Page() {
             <Button
               asChild
               size="lg"
-              className="bg-white text-red-600 hover:bg-red-50 font-semibold text-lg px-8 py-4 rounded-full"
+              variant="outline"
+              className="border-white text-white hover:bg-white hover:text-red-600 font-semibold text-lg px-8 py-4 rounded-full"
             >
-              <Link href="/wed-3">Explore WED 3.0</Link>
+              <Link href="/wed-3" className="flex items-center gap-2">
+                Explore WED 3.0 <ArrowRight className="h-5 w-5" />
+              </Link>
             </Button>
             <Button
               asChild
@@ -373,7 +410,7 @@ export default function WED2Page() {
               variant="outline"
               className="border-white text-white hover:bg-white hover:text-red-600 font-semibold text-lg px-8 py-4 rounded-full"
             >
-              <Link href="/register">Register for WED 3.0</Link>
+              <Link href="/register">Register for WED 4.0</Link>
             </Button>
           </div>
         </div>

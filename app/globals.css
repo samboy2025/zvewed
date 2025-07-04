@@ -95,3 +95,59 @@ html {
   background-color: #dc2626;
   color: white;
 }
+
+/* Slideshow Animation - Each image shows for 3 seconds, total cycle 18 seconds */
+@keyframes slideshow {
+  0%, 16.66% {
+    opacity: 1;
+  }
+  18.66%, 100% {
+    opacity: 0;
+  }
+}
+
+.animate-slideshow-1 {
+  animation: slideshow 18s infinite;
+  animation-delay: 0s;
+}
+
+.animate-slideshow-2 {
+  animation: slideshow 18s infinite;
+  animation-delay: 3s;
+}
+
+.animate-slideshow-3 {
+  animation: slideshow 18s infinite;
+  animation-delay: 6s;
+}
+
+.animate-slideshow-4 {
+  animation: slideshow 18s infinite;
+  animation-delay: 9s;
+}
+
+.animate-slideshow-5 {
+  animation: slideshow 18s infinite;
+  animation-delay: 12s;
+}
+
+.animate-slideshow-6 {
+  animation: slideshow 18s infinite;
+  animation-delay: 15s;
+}
+
+/* Fade in animation */
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.8s ease-out;
+}

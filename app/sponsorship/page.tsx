@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Crown, Award, Medal, CheckCircle, Users, Megaphone, Handshake } from "lucide-react"
+import { Crown, Award, Medal, CheckCircle, Users, Megaphone, Handshake, Banknote, Mail, MapPin, Calendar, Phone } from "lucide-react"
 import Link from "next/link"
 
 export default function SponsorshipPage() {
@@ -9,82 +9,69 @@ export default function SponsorshipPage() {
     {
       title: "Platinum Sponsor",
       icon: Crown,
-      price: "₦500,000+",
+      price: "₦1,000,000+",
       color: "text-purple-600",
       bgColor: "bg-purple-50",
       borderColor: "border-purple-200",
       benefits: [
-        "Exclusive naming rights",
-        "Prominent logo placement on all materials",
-        "Speaking opportunities",
-        "Premium booth location",
-        "10 complimentary tickets",
-        "Social media mentions",
-        "Press release inclusion",
+        "Logo on banner & all materials",
+        "Full booth",
+        "Speaking slot",
+        "Official recognition at event",
       ],
     },
     {
       title: "Gold Sponsor",
       icon: Award,
-      price: "₦300,000+",
+      price: "₦500,000 – ₦999,999",
       color: "text-yellow-600",
       bgColor: "bg-yellow-50",
       borderColor: "border-yellow-200",
       benefits: [
-        "Logo placement on materials",
-        "5 complimentary event tickets",
-        "Recognition during event",
-        "Standard booth space",
-        "Social media mentions",
-        "Networking opportunities",
+        "Logo visibility",
+        "Booth space",
+        "Recognition in media & program",
       ],
     },
     {
       title: "Silver Sponsor",
       icon: Medal,
-      price: "₦150,000+",
+      price: "₦250,000 – ₦499,999",
       color: "text-gray-600",
       bgColor: "bg-gray-50",
       borderColor: "border-gray-200",
       benefits: [
-        "Logo placement in event materials",
-        "2 complimentary tickets",
+        "Social media mention",
+        "Branded materials",
         "Recognition in program",
-        "Basic networking access",
+        "Certificate of recognition",
+      ],
+    },
+    {
+      title: "In-Kind Partner",
+      icon: Handshake,
+      price: "Value-based",
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-200",
+      benefits: [
+        "Provide services/products",
+        "Customized branding benefits",
+        "Official partnership recognition",
+        "Certificate of recognition",
       ],
     },
   ]
 
-  const partnershipAreas = [
-    {
-      icon: Users,
-      title: "Event Planning and Logistics",
-      description: "Assisting with venue setup, equipment, and coordination",
-    },
-    {
-      icon: Megaphone,
-      title: "Marketing and Promotion",
-      description: "Helping to promote the event through various channels",
-    },
-    {
-      icon: Handshake,
-      title: "Content and Speakers",
-      description: "Providing experts and speakers to share insights and knowledge",
-    },
-  ]
-
   const budgetItems = [
-    { item: "Venue Rental", cost: "₦300,000" },
-    { item: "Catering (Breakfast, Lunch, Coffee Breaks)", cost: "₦500,000" },
-    { item: "Speaker Honorariums and Travel Expenses", cost: "₦400,000" },
-    { item: "Marketing and Promotions", cost: "₦200,000" },
-    { item: "Materials and Supplies", cost: "₦100,000" },
-    { item: "Technical Equipment (Sound, Projectors)", cost: "₦150,000" },
-    { item: "Vendor Booth Setup", cost: "₦50,000" },
-    { item: "Volunteer Stipends and T-shirts", cost: "₦170,000" },
-    { item: "Security", cost: "₦50,000" },
-    { item: "Photography", cost: "₦100,000" },
-    { item: "Miscellaneous Expenses", cost: "₦100,000" },
+    { item: "Event logistics and venue management", cost: "-" },
+    { item: "Vendor stalls for 30+ small businesses", cost: "-" },
+    { item: "Branding & marketing (banners, media, shirts)", cost: "-" },
+    { item: "Refreshments for participants", cost: "₦500,000" },
+    { item: "Kits and materials", cost: "₦400,000" },
+    { item: "Speaker & guest hospitality", cost: "₦300,000" },
+    { item: "Special support for PLWDs and disadvantaged entrepreneurs", cost: "-" },
+    { item: "Total Target", cost: "₦3,370,000" },
   ]
 
   return (
@@ -92,131 +79,149 @@ export default function SponsorshipPage() {
       <div className="container mx-auto px-4">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <Badge className="mb-4">Sponsorship & Partnership</Badge>
-            <h1 className="text-4xl font-bold mb-6">Partner with WED 3.0</h1>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Join us in empowering entrepreneurs and fostering innovation. Your support will help create a
-              transformative experience for the entrepreneurial community.
+            <Badge className="mb-4 bg-red-600 text-white">WED 4.0 Sponsorship</Badge>
+            <h1 className="text-4xl font-bold mb-6">Sponsorship Deck for WED 4.0</h1>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto mb-4">
+              Explore the exciting opportunities to sponsor World Entrepreneurship Day (WED) 4.0 – a premier platform for empowering local innovation and global impact.
             </p>
+            <div className="flex flex-col md:flex-row gap-4 justify-center items-center mb-4">
+              <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-red-100 shadow-sm">
+                <Calendar className="h-5 w-5 text-red-600" />
+                <span className="font-medium text-gray-800">October 4th, 2025</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-red-100 shadow-sm">
+                <MapPin className="h-5 w-5 text-red-600" />
+                <span className="font-medium text-gray-800">Amana Event Centre, Randan Kano, Zaria</span>
+              </div>
+              <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-red-100 shadow-sm">
+                <Users className="h-5 w-5 text-red-600" />
+                <span className="font-medium text-gray-800">400+ Expected</span>
+              </div>
+            </div>
+            <p className="text-md text-gray-500 mb-2">Theme: <span className="font-semibold text-red-600">Rebuild, Reinvent, Rise: Navigating Nigeria's Economy with Resilience</span></p>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8 mb-16">
-            {sponsorshipPackages.map((pkg, index) => (
-              <Card key={index} className={`${pkg.borderColor} border-2 hover:shadow-lg transition-shadow`}>
-                <CardHeader className="text-center">
-                  <div
-                    className={`w-16 h-16 rounded-full ${pkg.bgColor} flex items-center justify-center mx-auto mb-4`}
-                  >
-                    <pkg.icon className={`h-8 w-8 ${pkg.color}`} />
-                  </div>
-                  <CardTitle className="text-xl">{pkg.title}</CardTitle>
-                  <CardDescription className="text-2xl font-bold text-gray-900">{pkg.price}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-3 mb-6">
-                    {pkg.benefits.map((benefit, benefitIndex) => (
-                      <li key={benefitIndex} className="flex items-center gap-2">
-                        <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
-                        <span className="text-sm text-gray-700">{benefit}</span>
-                      </li>
-                    ))}
-                  </ul>
-                  <Button asChild className="w-full">
-                    <Link href="/sponsor-registration">Choose This Package</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-4 text-black">Mission</h2>
+            <p className="text-gray-700 mb-4">To empower, connect, and inspire entrepreneurs by providing platforms for networking, knowledge sharing, growth, and community transformation.</p>
+            <p className="text-gray-700 mb-4">Establishment of <span className="font-semibold">Zazzau Version Entrepreneurs (ZVE)</span> – the registered organization now managing WED and future projects.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
-            <Card>
-              <CardHeader>
-                <CardTitle>Partnership Opportunities</CardTitle>
-                <CardDescription>Collaborate with us in various aspects of WED 3.0</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-6">
-                  {partnershipAreas.map((area, index) => (
-                    <div key={index} className="flex gap-4">
-                      <div className="bg-blue-50 p-3 rounded-lg">
-                        <area.icon className="h-6 w-6 text-blue-600" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold mb-1">{area.title}</h4>
-                        <p className="text-sm text-gray-600">{area.description}</p>
-                      </div>
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-4 text-black">Why Sponsor WED 4.0?</h2>
+            <ul className="list-disc list-inside text-gray-700 space-y-2">
+              <li>Engage with Northern Nigeria's largest youth entrepreneurship summit.</li>
+              <li>Connect directly with hundreds of young entrepreneurs, SMEs, vendors and change makers.</li>
+              <li>Position your brand as a key supporter of youth-led innovation and development.</li>
+              <li>Gain brand visibility through our social media campaigns, press coverage and event branding.</li>
+              <li>Receive appreciation on event day and certificate of recognition.</li>
+            </ul>
+          </div>
+
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-4 text-black">Partnership & Sponsorship Opportunities</h2>
+            <p className="text-gray-700 mb-4">We offer flexible sponsorship packages – both in cash and in-kind – that match your branding and CSR goals.</p>
+            <div className="grid md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-4 gap-6 mb-8">
+              {sponsorshipPackages.map((pkg, index) => (
+                <Card key={index} className={`${pkg.borderColor} border-2 hover:shadow-lg transition-shadow flex flex-col`}>
+                  <CardHeader className="text-center">
+                    <div className={`w-16 h-16 rounded-full ${pkg.bgColor} flex items-center justify-center mx-auto mb-4`}>
+                      <pkg.icon className={`h-8 w-8 ${pkg.color}`} />
                     </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Why Sponsor WED 3.0?</CardTitle>
-                <CardDescription>Benefits of partnering with us</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Brand visibility to targeted audience</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Networking with industry leaders</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Support entrepreneurial community</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Corporate social responsibility</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Access to innovative startups</span>
-                  </li>
-                  <li className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-green-600" />
-                    <span className="text-sm">Media coverage and PR opportunities</span>
-                  </li>
-                </ul>
-              </CardContent>
-            </Card>
+                    <CardTitle className="text-xl">{pkg.title}</CardTitle>
+                    <CardDescription className="text-2xl font-bold text-gray-900">{pkg.price}</CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-grow flex flex-col">
+                    <ul className="space-y-3 mb-6 flex-grow">
+                      {pkg.benefits.map((benefit, benefitIndex) => (
+                        <li key={benefitIndex} className="flex items-start gap-2">
+                          <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0 mt-1" />
+                          <span className="text-sm text-gray-700">{benefit}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <Button asChild className="w-full mt-auto">
+                      <Link href="/sponsor-registration">Choose This Package</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </div>
 
-          <Card className="mb-8">
-            <CardHeader>
-              <CardTitle>Event Budget Breakdown</CardTitle>
-              <CardDescription>Total estimated budget: ₦2,120,000</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-4">
-                {budgetItems.map((item, index) => (
-                  <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100">
-                    <span className="text-sm text-gray-700">{item.item}</span>
-                    <span className="font-semibold">{item.cost}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="flex justify-between items-center">
-                  <span className="text-lg font-semibold">Total Budget</span>
-                  <span className="text-xl font-bold text-blue-600">₦2,120,000</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-4 text-black">What We're Raising Funds For</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full bg-white rounded-xl shadow-md">
+                <thead>
+                  <tr>
+                    <th className="py-3 px-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Item</th>
+                    <th className="py-3 px-6 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {budgetItems.map((item, idx) => (
+                    <tr key={idx} className="border-b">
+                      <td className="py-2 px-6 text-gray-700">{item.item}</td>
+                      <td className="py-2 px-6 text-gray-700">{item.cost}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
 
-          <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">Ready to Partner with Us?</h2>
-            <p className="text-gray-600 mb-6">
-              Join us in creating an impactful event that will drive the entrepreneurial ecosystem forward.
-            </p>
-            <Button asChild size="lg" className="bg-blue-900 hover:bg-blue-800">
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-4 text-black">How You Can Support</h2>
+            <ul className="list-disc list-inside text-gray-700 space-y-2">
+              <li>Sponsor a participant: <span className="font-semibold">₦6,000</span></li>
+              <li>Sponsor a vendor: <span className="font-semibold">₦10,000</span></li>
+              <li>Provide refreshments, printing, technical equipment, or branded kits</li>
+              <li>Recommend speakers or amplify our reach</li>
+            </ul>
+          </div>
+
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-4 text-black">Bank Details</h2>
+            <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8 text-center border-2 border-gray-200 shadow-md">
+              <div className="mb-4">
+                <p className="text-lg text-gray-600">Account Name</p>
+                <p className="text-2xl font-semibold text-gray-900">Zazzau Version Entrepreneurs</p>
+              </div>
+              <div className="mb-6">
+                <p className="text-lg text-gray-600">Bank</p>
+                <p className="text-2xl font-semibold text-gray-900">UBA Bank</p>
+              </div>
+              <div>
+                <p className="text-lg text-gray-600">Account Number</p>
+                <p className="text-5xl font-bold text-red-600 tracking-wider py-2 bg-white rounded-lg shadow-inner">
+                  1027308809
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold mb-4 text-black">Let's Collaborate</h2>
+            <p className="text-gray-700 mb-2">We believe collaboration builds stronger communities. Let's work together to drive sustainable youth development through entrepreneurship.</p>
+            <div className="flex flex-col md:flex-row gap-6 items-center mt-4">
+              <div className="flex items-center gap-2">
+                <Mail className="h-5 w-5 text-red-600" />
+                <span className="text-gray-700">wedzazzauversion@gmail.com</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-red-600" />
+                <span className="text-gray-700">Instagram/Facebook: zazzau version Entrepreneurs</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Phone className="h-5 w-5 text-red-600" />
+                <span className="text-gray-700">08140135206, 09036625032, 07035877985</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center mt-12">
+            <Button asChild className="bg-red-600 hover:bg-red-700 text-white rounded-full px-8 py-3 font-semibold">
               <Link href="/sponsor-registration">Become a Sponsor</Link>
             </Button>
           </div>

@@ -1,5 +1,6 @@
 import Link from "next/link"
 import { Facebook, Twitter, Instagram, Linkedin, Mail, Phone, MapPin } from "lucide-react"
+import Image from "next/image"
 
 export default function Footer() {
   return (
@@ -7,15 +8,26 @@ export default function Footer() {
       <div className="container mx-auto px-4">
         <div className="grid md:grid-cols-4 gap-8">
           <div>
-            <h3 className="text-xl font-bold mb-4">WED 3.0</h3>
-            <p className="text-gray-300 mb-4">
-              Empowering entrepreneurs for a sustainable future through innovation and collaboration.
+            <Link href="/" className="flex items-center gap-2 mb-4">
+              <Image src="/logo.png" alt="ZVE Logo" width={40} height={40} />
+              <span className="text-xl font-bold">ZVE</span>
+            </Link>
+            <p className="text-gray-300 mb-4 text-sm">
+              A transformative entrepreneurship organization dedicated to empowering innovators across Northern Nigeria and beyond.
             </p>
             <div className="flex space-x-4">
-              <Facebook className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
-              <Twitter className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
-              <Instagram className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
-              <Linkedin className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
+              <a href="https://www.facebook.com/zazzau.version" target="_blank" rel="noopener noreferrer">
+                <Facebook className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
+              </a>
+              <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer">
+                <Twitter className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
+              </a>
+              <a href="https://www.instagram.com/zazzau_version_entrepreneurs" target="_blank" rel="noopener noreferrer">
+                <Instagram className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
+              </a>
+              <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+                <Linkedin className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
+              </a>
             </div>
           </div>
 
@@ -24,7 +36,7 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link href="/about" className="text-gray-300 hover:text-white">
-                  About
+                  About ZVE
                 </Link>
               </li>
               <li>
@@ -40,6 +52,11 @@ export default function Footer() {
               <li>
                 <Link href="/sponsorship" className="text-gray-300 hover:text-white">
                   Sponsorship
+                </Link>
+              </li>
+              <li>
+                <Link href="/wed-4" className="text-gray-300 hover:text-white">
+                  WED 4.0
                 </Link>
               </li>
             </ul>
@@ -71,22 +88,22 @@ export default function Footer() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                <span className="text-gray-300 text-sm">Business School, ABU Zaria</span>
+                <span className="text-gray-300 text-sm">Amana Event Centre, Randan Kano, Zaria</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
-                <span className="text-gray-300 text-sm">info@wed3zazzau.com</span>
+                <span className="text-gray-300 text-sm">wedzazzauversion@gmail.com</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4" />
-                <span className="text-gray-300 text-sm">+234 XXX XXX XXXX</span>
+                <span className="text-gray-300 text-sm">08140135206, 09036625032, 07035877985</span>
               </div>
             </div>
           </div>
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-400">© 2024 World Entrepreneurship Day 3.0 - Zazzau Version. All rights reserved.</p>
+          <p className="text-gray-400">© 2025 World Entrepreneurship Day 4.0 - Organized by Zazzau Version Entrepreneurs (ZVE). All rights reserved.</p>
         </div>
       </div>
     </footer>
