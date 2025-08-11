@@ -211,10 +211,10 @@ Annual flagship events featuring:
 ## Follow Us
 
 - **Website**: www.wed4zazzau.com
-- **LinkedIn**: [ZVE LinkedIn Page]
+- **LinkedIn**: [ZVE LinkedIn Page](https://www.linkedin.com/company/zazzau-version-enterpreneurs-zve/)
 - **Twitter**: [@ZVENigeria]
-- **Instagram**: [@zve_nigeria]
-- **Facebook**: [ZVE Facebook Page]
+- **Instagram**: [@wed_zazzau_version](https://www.instagram.com/wed_zazzau_version?igsh=MXdsbHJ3NGxrMHV4OQ%3D%3D&utm_source=qr)
+- **Facebook**: [ZVE Facebook Page](https://www.facebook.com/share/1GE2yLpeg2/?mibextid=wwXIfr)
 
 ---
 

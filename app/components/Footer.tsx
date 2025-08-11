@@ -16,16 +16,16 @@ export default function Footer() {
               A transformative entrepreneurship organization dedicated to empowering innovators across Northern Nigeria and beyond.
             </p>
             <div className="flex space-x-4">
-              <a href="https://www.facebook.com/zazzau.version" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.facebook.com/share/1GE2yLpeg2/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer">
                 <Facebook className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
               </a>
               <a href="https://www.twitter.com" target="_blank" rel="noopener noreferrer">
                 <Twitter className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
               </a>
-              <a href="https://www.instagram.com/zazzau_version_entrepreneurs" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.instagram.com/wed_zazzau_version?igsh=MXdsbHJ3NGxrMHV4OQ%3D%3D&utm_source=qr" target="_blank" rel="noopener noreferrer">
                 <Instagram className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
               </a>
-              <a href="https://www.linkedin.com" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.linkedin.com/company/zazzau-version-enterpreneurs-zve/" target="_blank" rel="noopener noreferrer">
                 <Linkedin className="h-5 w-5 text-gray-400 hover:text-white cursor-pointer" />
               </a>
             </div>

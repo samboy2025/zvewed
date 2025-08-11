@@ -211,7 +211,7 @@ export default function SponsorshipPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-red-600" />
-                <span className="text-gray-700">Instagram/Facebook: zazzau version Entrepreneurs</span>
+                <span className="text-gray-700">Instagram/Facebook: wed_zazzau_version</span>
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-5 w-5 text-red-600" />
