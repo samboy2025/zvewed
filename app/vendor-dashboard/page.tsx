@@ -5,7 +5,8 @@ import { QRCodeCard } from "../components/QRCodeCard"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { 
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
   Store,
   Package,
   Users,
@@ -15,7 +16,8 @@ import {
   Mail,
   Globe,
   Calendar,
-  Loader2
+  Loader2,
+  Lock
 } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
@@ -123,8 +125,8 @@ export default function VendorDashboard() {
       {/* Main Content */}
       <div className="px-3 sm:px-6 space-y-6 pb-6">
         <div className="max-w-6xl mx-auto">
-          {/* QR Code Section - Show only if approved */}
-          {vendorStatus === 'approved' && (
+          {/* QR Code Section - Show only if approved AND payment is approved */}
+          {vendorStatus === 'approved' && paymentStatus === 'paid' && (
             <div className="mb-6">
               <div className="flex justify-center">
                 <div className="w-full max-w-md">
@@ -136,6 +138,34 @@ export default function VendorDashboard() {
                   />
                 </div>
               </div>
+            </div>
+          )}
+
+          {/* Payment Required Alert */}
+          {vendorStatus === 'approved' && paymentStatus !== 'paid' && (
+            <div className="mb-6">
+              <Card className="w-full max-w-md mx-auto">
+                <CardContent className="pt-6 text-center">
+                  <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    QR Code Locked
+                  </h3>
+                  <p className="text-gray-600 mb-4">
+                    Complete your payment verification to access your vendor QR code and booth details.
+                  </p>
+                  <Alert className="border-red-200 bg-red-50">
+                    <CreditCard className="h-4 w-4 text-red-600" />
+                    <AlertDescription className="text-red-800">
+                      Payment of ₦12,000 is required to access vendor features.
+                    </AlertDescription>
+                  </Alert>
+                  <Button asChild className="mt-4 bg-red-600 hover:bg-red-700">
+                    <Link href="/vendor-dashboard/payment">
+                      Complete Payment
+                    </Link>
+                  </Button>
+                </CardContent>
+              </Card>
             </div>
           )}
 

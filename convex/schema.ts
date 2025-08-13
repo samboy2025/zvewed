@@ -127,6 +127,19 @@ export default defineSchema({
     lastLogin: v.optional(v.number()),
     eventId: v.string(),
     password: v.optional(v.string()), // For authentication
+    paymentStatus: v.optional(v.string()), // unpaid, pending, approved, rejected
+    paymentAmount: v.optional(v.number()), // Required payment amount based on user type
+    paymentReceipt: v.optional(v.string()), // URL to uploaded receipt
+    paymentDetails: v.optional(v.object({
+      amount: v.number(),
+      paymentMethod: v.string(),
+      referenceNumber: v.string(),
+      paymentDate: v.string(),
+      bankName: v.optional(v.string()),
+    })),
+    paymentSubmittedAt: v.optional(v.number()),
+    paymentApprovedAt: v.optional(v.number()),
+    paymentRejectionReason: v.optional(v.string()),
   }),
   
   payments: defineTable({

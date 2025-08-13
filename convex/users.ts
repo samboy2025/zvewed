@@ -232,3 +232,94 @@ export const deleteUser = mutation({
     await ctx.db.delete(args.userId);
   },
 });
+
+// Submit payment receipt for user
+export const submitPaymentReceipt = mutation({
+  args: {
+    userId: v.id("users"),
+    receiptUrl: v.string(),
+    paymentDetails: v.object({
+      amount: v.number(),
+      paymentMethod: v.string(),
+      referenceNumber: v.string(),
+      paymentDate: v.string(),
+      bankName: v.optional(v.string()),
+    }),
+  },
+  handler: async (ctx, args) => {
+    const { userId, receiptUrl, paymentDetails } = args;
+
+    await ctx.db.patch(userId, {
+      paymentReceipt: receiptUrl,
+      paymentDetails: paymentDetails,
+      paymentStatus: "pending",
+      paymentSubmittedAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
+    return { success: true };
+  },
+});
+
+// Update user payment status (admin function)
+export const updateUserPaymentStatus = mutation({
+  args: {
+    userId: v.id("users"),
+    status: v.string(), // approved, rejected
+    rejectionReason: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const updateData: any = {
+      paymentStatus: args.status,
+      updatedAt: Date.now(),
+    };
+
+    if (args.rejectionReason) {
+      updateData.paymentRejectionReason = args.rejectionReason;
+    }
+
+    if (args.status === "approved") {
+      updateData.paymentApprovedAt = Date.now();
+    }
+
+    await ctx.db.patch(args.userId, updateData);
+
+    return { success: true };
+  },
+});
+
+// Get users by payment status
+export const getUsersByPaymentStatus = query({
+  args: { status: v.string() },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("users")
+      .filter((q) => q.eq(q.field("paymentStatus"), args.status))
+      .order("desc")
+      .collect();
+  },
+});
+
+// Initialize payment amount for user based on user type
+export const initializeUserPayment = mutation({
+  args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+    if (!user) throw new Error("User not found");
+
+    let paymentAmount = 0;
+    if (user.userType === "participant") {
+      paymentAmount = 7000; // ₦7,000 for participants
+    } else if (user.userType === "vendor") {
+      paymentAmount = 12000; // ₦12,000 for vendors
+    }
+
+    await ctx.db.patch(args.userId, {
+      paymentAmount: paymentAmount,
+      paymentStatus: paymentAmount > 0 ? "unpaid" : "approved", // Admin and speakers don't need to pay
+      updatedAt: Date.now(),
+    });
+
+    return { success: true, paymentAmount };
+  },
+});

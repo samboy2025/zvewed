@@ -8,7 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { 
+import {
   CreditCard,
   DollarSign,
   AlertCircle,
@@ -21,7 +21,9 @@ import {
   FileText,
   Loader2,
   Upload,
-  Image as ImageIcon
+  Image as ImageIcon,
+  MessageCircle,
+  Phone
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
@@ -37,10 +39,10 @@ export default function VendorPaymentPage() {
   const [uploadedReceipt, setUploadedReceipt] = useState<string>("")
   const [isUploading, setIsUploading] = useState(false)
   const [paymentForm, setPaymentForm] = useState({
-    amount: "",
+    amount: "12000", // Fixed amount for vendors
     referenceNumber: "",
     paymentDate: new Date().toISOString().split('T')[0],
-    bankName: ""
+    bankName: "UBA Bank"
   })
 
   const createPayment = useMutation(api.payments.createPayment)
@@ -56,35 +58,24 @@ export default function VendorPaymentPage() {
     setIsLoading(false)
   }, [])
 
-  // Get payment amount based on booth size
-  const getPaymentAmount = () => {
-    const boothPrices = {
-      small: { price: 50000, description: "Small Booth (3m x 2m)" },
-      medium: { price: 75000, description: "Medium Booth (3m x 3m)" },
-      large: { price: 100000, description: "Large Booth (3m x 4m)" },
-      custom: { price: 150000, description: "Custom Booth Size" }
-    }
-
-    return boothPrices[currentVendor?.boothSize as keyof typeof boothPrices] || boothPrices.medium
+  // Fixed payment amount for vendors
+  const paymentDetails = {
+    price: 12000,
+    description: "Vendor Booth Registration Fee"
   }
-
-  const paymentDetails = getPaymentAmount()
 
   // Bank account details
   const bankAccounts = [
     {
-      bank: "First Bank of Nigeria",
-      accountName: "ZVE Entrepreneurship Conference",
-      accountNumber: "3123456789",
-      accountType: "Current Account"
-    },
-    {
-      bank: "Zenith Bank PLC",
-      accountName: "ZVE Entrepreneurship Conference",
-      accountNumber: "1234567890",
+      bank: "UBA Bank",
+      accountName: "Zazzau Version Entrepreneurs",
+      accountNumber: "1027308809",
       accountType: "Current Account"
     }
   ]
+
+  // WhatsApp contact for receipt submission
+  const whatsappNumber = "08140135206"
 
   const handleCopyAccount = (accountNumber: string) => {
     navigator.clipboard.writeText(accountNumber)
@@ -418,13 +409,43 @@ export default function VendorPaymentPage() {
                           </div>
                         </div>
 
-                        <Button 
-                          onClick={handleSubmitPayment} 
+                        <Button
+                          onClick={handleSubmitPayment}
                           className="w-full bg-red-600 hover:bg-red-700"
                           disabled={isUploading || !uploadedReceipt}
                         >
                           {isUploading ? "Uploading..." : "Submit Payment Confirmation"}
                         </Button>
+
+                        {/* WhatsApp Alternative */}
+                        <div className="border-t pt-4 mt-4">
+                          <h4 className="font-medium mb-2 flex items-center gap-2">
+                            <MessageCircle className="h-4 w-4" />
+                            Alternative: Send via WhatsApp
+                          </h4>
+                          <p className="text-sm text-gray-600 mb-3">
+                            You can also send your payment receipt directly to our WhatsApp number
+                          </p>
+                          <Button
+                            onClick={() => {
+                              const message = `Hello! I'm submitting my payment receipt for WED 4.0 vendor booth.
+
+Company: ${currentVendor.companyName}
+Amount Paid: ₦${paymentDetails.price.toLocaleString()}
+Reference: ${paymentForm.referenceNumber || 'Please provide reference number'}
+
+I will send the receipt image in the next message.`
+
+                              const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+                              window.open(whatsappUrl, '_blank')
+                            }}
+                            variant="outline"
+                            className="w-full border-green-500 text-green-600 hover:bg-green-50"
+                          >
+                            <Phone className="h-4 w-4 mr-2" />
+                            Send to WhatsApp: {whatsappNumber}
+                          </Button>
+                        </div>
                       </div>
                     </CardContent>
                   </Card>

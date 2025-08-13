@@ -3,19 +3,23 @@
 import { DashboardLayout } from "../components/DashboardLayout"
 import { QRCodeCard } from "../components/QRCodeCard"
 import { UserProfileCard } from "../components/UserProfileCard"
+import { PaymentVerificationCard } from "../components/PaymentVerificationCard"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Calendar, 
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import {
+  Calendar,
   ArrowRight,
   Loader2,
   User,
   Clock,
-  MapPin
+  MapPin,
+  Lock,
+  CreditCard
 } from "lucide-react"
 import Link from "next/link"
-import { useQuery } from "convex/react"
+import { useQuery, useMutation } from "convex/react"
 import { api } from "../../convex/_generated/api"
 import { useEffect, useState } from "react"
 
@@ -24,14 +28,27 @@ export default function UserDashboard() {
   const [isLoading, setIsLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
 
+  const initializeUserPayment = useMutation(api.users.initializeUserPayment)
+
   // Get user data from localStorage (from login)
   useEffect(() => {
     const userData = localStorage.getItem('currentUser')
     if (userData) {
-      setCurrentUser(JSON.parse(userData))
+      const user = JSON.parse(userData)
+      setCurrentUser(user)
+
+      // Initialize payment if not already set
+      if (user._id && !user.paymentStatus && (user.userType === "participant" || user.userType === "vendor")) {
+        initializeUserPayment({ userId: user._id })
+          .then(() => {
+            // Refresh user data
+            setRefreshKey(prev => prev + 1)
+          })
+          .catch(console.error)
+      }
     }
     setIsLoading(false)
-  }, [refreshKey])
+  }, [refreshKey, initializeUserPayment])
 
   // Mock events data for the current user
   const recentEvents = [
@@ -102,6 +119,16 @@ export default function UserDashboard() {
   const userName = `${currentUser.firstName} ${currentUser.lastName}`
   const eventId = `WED4-${currentUser._id?.slice(-8).toUpperCase() || 'USER123'}`
 
+  // Check if user needs to pay and if payment is approved
+  const needsPayment = currentUser.userType === "participant" || currentUser.userType === "vendor"
+  const paymentApproved = currentUser.paymentStatus === "approved"
+  const canAccessQRCode = !needsPayment || paymentApproved
+
+  const handlePaymentSubmitted = () => {
+    // Refresh user data after payment submission
+    setRefreshKey(prev => prev + 1)
+  }
+
   return (
     <DashboardLayout userType="user">
       {/* Header - Sticky */}
@@ -122,6 +149,17 @@ export default function UserDashboard() {
             <Badge variant="outline" className="text-xs">
               {currentUser.status}
             </Badge>
+            {needsPayment && (
+              <Badge className={`text-xs ${
+                paymentApproved ? 'bg-green-600 text-white' :
+                currentUser.paymentStatus === 'pending' ? 'bg-yellow-600 text-white' :
+                'bg-red-600 text-white'
+              }`}>
+                {currentUser.paymentStatus === 'approved' ? 'Paid' :
+                 currentUser.paymentStatus === 'pending' ? 'Payment Pending' :
+                 'Payment Required'}
+              </Badge>
+            )}
           </div>
         </div>
       </div>
@@ -129,17 +167,47 @@ export default function UserDashboard() {
       {/* Main Content */}
       <div className="px-3 sm:px-6 space-y-4 sm:space-y-6 pb-6">
         <div className="max-w-6xl mx-auto">
-          {/* QR Code Card - Centered with better container */}
-          <div className="flex justify-center">
-            <div className="w-full max-w-md">
-              <QRCodeCard
-                eventId={eventId}
-                userName={userName}
-                userType={currentUser.userType}
-                eventName="WED 4.0"
+          {/* Payment Verification Section */}
+          {needsPayment && (
+            <div className="mb-6">
+              <PaymentVerificationCard
+                user={currentUser}
+                onPaymentSubmitted={handlePaymentSubmitted}
               />
             </div>
-          </div>
+          )}
+
+          {/* QR Code Section - Show only if payment is approved or not required */}
+          {canAccessQRCode ? (
+            <div className="flex justify-center">
+              <div className="w-full max-w-md">
+                <QRCodeCard
+                  eventId={eventId}
+                  userName={userName}
+                  userType={currentUser.userType}
+                  eventName="WED 4.0"
+                />
+              </div>
+            </div>
+          ) : (
+            <Card className="w-full max-w-md mx-auto">
+              <CardContent className="pt-6 text-center">
+                <Lock className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  QR Code Locked
+                </h3>
+                <p className="text-gray-600 mb-4">
+                  Complete your payment verification to access your event QR code and ID.
+                </p>
+                <Alert className="border-red-200 bg-red-50">
+                  <CreditCard className="h-4 w-4 text-red-600" />
+                  <AlertDescription className="text-red-800">
+                    Payment of ₦{currentUser.userType === "participant" ? "7,000" : "12,000"} is required to access event features.
+                  </AlertDescription>
+                </Alert>
+              </CardContent>
+            </Card>
+          )}
         </div>
       </div>
     </DashboardLayout>

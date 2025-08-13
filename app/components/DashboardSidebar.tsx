@@ -3,19 +3,20 @@
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { 
-  Home, 
-  User, 
-  Calendar, 
-  Users, 
-  BarChart3, 
-  Settings, 
-  FileText, 
+import {
+  Home,
+  User,
+  Calendar,
+  Users,
+  BarChart3,
+  Settings,
+  FileText,
   Handshake,
   Store,
   LogOut,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  CreditCard
 } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
@@ -76,12 +77,14 @@ export function DashboardSidebar({ userType, currentPath, className }: Dashboard
   const userNavItems = [
     { href: "/dashboard", icon: Home, label: "Dashboard", badge: null },
     { href: "/dashboard/profile", icon: User, label: "Profile", badge: null },
+    { href: "/dashboard/payment", icon: CreditCard, label: "Payment", badge: null },
     { href: "/dashboard/events", icon: Calendar, label: "My Events", badge: "2" },
   ]
 
   const adminNavItems = [
     { href: "/admin", icon: Home, label: "Dashboard", badge: null },
     { href: "/admin/participants", icon: Users, label: "Participants", badge: "245" },
+    { href: "/admin/payments", icon: CreditCard, label: "Payments", badge: null },
     { href: "/admin/events", icon: Calendar, label: "Events", badge: null },
     { href: "/admin/sponsors", icon: Handshake, label: "Sponsors", badge: "12" },
     { href: "/admin/vendors", icon: Store, label: "Vendors", badge: "8" },
