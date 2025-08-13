@@ -76,33 +76,47 @@ export function PaymentVerificationCard({ user, onPaymentSubmitted }: PaymentVer
     setIsUploading(true)
 
     try {
+      console.log("Starting Cloudinary upload...")
+      console.log("Cloud name:", process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME)
+      console.log("Upload preset:", process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET)
+
       const formData = new FormData()
       formData.append('file', file)
       formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!)
 
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        {
-          method: 'POST',
-          body: formData,
-        }
-      )
+      const uploadUrl = `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`
+      console.log("Upload URL:", uploadUrl)
+
+      const response = await fetch(uploadUrl, {
+        method: 'POST',
+        body: formData,
+      })
+
+      console.log("Upload response status:", response.status)
 
       if (!response.ok) {
-        throw new Error('Upload failed')
+        const errorText = await response.text()
+        console.error("Upload error response:", errorText)
+        throw new Error(`Upload failed: ${response.status} - ${errorText}`)
       }
 
       const data = await response.json()
+      console.log("Upload successful:", data)
       setUploadedReceipt(data.secure_url)
       setIsUploading(false)
     } catch (error) {
       console.error("Upload failed:", error)
-      alert("Failed to upload receipt. Please try again.")
+      alert(`Failed to upload receipt: ${error.message}. Please try again.`)
       setIsUploading(false)
     }
   }
 
   const handleSubmitPayment = async () => {
+    console.log("Starting payment submission...")
+    console.log("User:", user)
+    console.log("Uploaded receipt:", uploadedReceipt)
+    console.log("Payment form:", paymentForm)
+
     if (!user?._id || !uploadedReceipt) {
       alert("Please upload your payment receipt")
       return
@@ -114,7 +128,40 @@ export function PaymentVerificationCard({ user, onPaymentSubmitted }: PaymentVer
     }
 
     try {
-      await submitPaymentReceipt({
+      console.log("Calling submitPaymentReceipt mutation...")
+
+      // Check if Convex is properly configured
+      const convexUrl = process.env.NEXT_PUBLIC_CONVEX_URL
+      if (!convexUrl || convexUrl.includes('placeholder') || convexUrl.includes('your-convex-deployment-url')) {
+        // Mock implementation for development when Convex is not configured
+        console.log("Using mock implementation - Convex not configured")
+
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 1000))
+
+        // Update user in localStorage with payment submission
+        const updatedUser = {
+          ...user,
+          paymentReceipt: uploadedReceipt,
+          paymentDetails: {
+            amount: parseFloat(paymentForm.amount),
+            paymentMethod: "Bank Transfer",
+            referenceNumber: paymentForm.referenceNumber,
+            paymentDate: paymentForm.paymentDate,
+            bankName: paymentForm.bankName
+          },
+          paymentStatus: "pending",
+          paymentSubmittedAt: Date.now()
+        }
+
+        localStorage.setItem('currentUser', JSON.stringify(updatedUser))
+
+        alert("Payment receipt submitted successfully! Our team will verify it within 24-48 hours. (Mock submission - Convex not configured)")
+        onPaymentSubmitted?.()
+        return
+      }
+
+      const result = await submitPaymentReceipt({
         userId: user._id,
         receiptUrl: uploadedReceipt,
         paymentDetails: {
@@ -126,11 +173,13 @@ export function PaymentVerificationCard({ user, onPaymentSubmitted }: PaymentVer
         }
       })
 
+      console.log("Mutation result:", result)
       alert("Payment receipt submitted successfully! Our team will verify it within 24-48 hours.")
       onPaymentSubmitted?.()
     } catch (error) {
       console.error("Submission failed:", error)
-      alert("Failed to submit payment receipt. Please try again.")
+      console.error("Error details:", error)
+      alert(`Failed to submit payment receipt. Error: ${error.message || 'Unknown error'}. Please try again.`)
     }
   }
 

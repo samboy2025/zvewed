@@ -126,6 +126,10 @@ export default function UserDashboard() {
 
   const handlePaymentSubmitted = () => {
     // Refresh user data after payment submission
+    const userData = localStorage.getItem('currentUser')
+    if (userData) {
+      setCurrentUser(JSON.parse(userData))
+    }
     setRefreshKey(prev => prev + 1)
   }
 
