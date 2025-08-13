@@ -60,18 +60,44 @@ export function PaymentVerificationCard({ user, onPaymentSubmitted }: PaymentVer
     const file = event.target.files?.[0]
     if (!file) return
 
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf']
+    if (!validTypes.includes(file.type)) {
+      alert('Please upload a valid image file (JPEG, PNG, WebP) or PDF')
+      return
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('File size must be less than 5MB')
+      return
+    }
+
     setIsUploading(true)
+
     try {
-      // Create a simple data URL for the file (in production, you'd upload to a cloud service)
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        const result = e.target?.result as string
-        setUploadedReceipt(result)
-        setIsUploading(false)
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!)
+
+      const response = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        {
+          method: 'POST',
+          body: formData,
+        }
+      )
+
+      if (!response.ok) {
+        throw new Error('Upload failed')
       }
-      reader.readAsDataURL(file)
+
+      const data = await response.json()
+      setUploadedReceipt(data.secure_url)
+      setIsUploading(false)
     } catch (error) {
       console.error("Upload failed:", error)
+      alert("Failed to upload receipt. Please try again.")
       setIsUploading(false)
     }
   }
