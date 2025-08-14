@@ -154,26 +154,12 @@ export function PaymentVerificationCard({ user, onPaymentSubmitted }: PaymentVer
     }
 
     try {
-      if (submitPaymentReceipt) {
-        await submitPaymentReceipt(paymentData)
-      } else {
-        // Fallback to mock implementation
-        await mockSubmitPayment(paymentData)
-      }
-
+      await submitPaymentReceipt(paymentData)
       alert("Payment receipt submitted successfully! Our team will verify it within 24-48 hours.")
       onPaymentSubmitted?.()
     } catch (error) {
       console.error("Submission failed:", error)
-      // Try mock implementation as fallback
-      try {
-        await mockSubmitPayment(paymentData)
-        alert("Payment receipt submitted successfully! Our team will verify it within 24-48 hours.")
-        onPaymentSubmitted?.()
-      } catch (mockError) {
-        console.error("Mock submission also failed:", mockError)
-        alert("Failed to submit payment receipt. Please try again.")
-      }
+      alert("Failed to submit payment receipt. Please check your connection and try again. If the problem persists, contact support.")
     }
   }
 
