@@ -45,9 +45,7 @@ export default function VendorPaymentPage() {
     bankName: "UBA Bank"
   })
 
-  const createPayment = useMutation(api.payments.createPayment)
-  const updateVendorStatus = useMutation(api.vendors.updateVendorStatus)
-  const uploadPaymentReceipt = useMutation(api.vendors.uploadPaymentReceipt)
+  const submitVendorPayment = useMutation(api.vendors.uploadPaymentReceipt)
 
   // Get vendor data from localStorage
   useEffect(() => {
@@ -139,48 +137,49 @@ export default function VendorPaymentPage() {
     }
 
     try {
-      // Create payment record in database
-      const paymentReference = `PAY-VEN-${Date.now()}-${currentVendor._id?.slice(-6).toUpperCase()}`
-      
-      await createPayment({
-        userId: currentVendor._id,
-        userType: "vendor",
-        userName: currentVendor.companyName,
-        userEmail: currentVendor.email,
-        amount: parseFloat(paymentForm.amount),
-        type: "vendor_booth",
-        reference: paymentReference,
-        status: "pending",
-        paymentMethod: paymentForm.bankName || "Bank Transfer",
-        receiptUrl: uploadedReceipt
-      })
-
-      // Also upload to vendor record
+      // Upload payment receipt and update vendor status
       await uploadPaymentReceipt({
         vendorId: currentVendor._id,
         receiptUrl: uploadedReceipt,
         paymentDetails: {
           amount: parseFloat(paymentForm.amount),
-          paymentMethod: "bank_transfer",
+          paymentMethod: "Bank Transfer",
           referenceNumber: paymentForm.referenceNumber,
           paymentDate: paymentForm.paymentDate,
           bankName: paymentForm.bankName
         }
-      })
+      });
+
+      alert("Payment receipt submitted successfully! Our team will verify it within 24-48 hours.");
       
-      // Update localStorage
-      const updatedVendor = { 
-        ...currentVendor, 
+      // Update local storage
+      const updatedVendor = {
+        ...currentVendor,
         paymentStatus: "pending",
-        paymentReceipt: uploadedReceipt 
-      }
-      localStorage.setItem('currentVendor', JSON.stringify(updatedVendor))
-      setCurrentVendor(updatedVendor)
+        paymentReceipt: uploadedReceipt,
+        paymentSubmittedAt: Date.now()
+      };
+      localStorage.setItem('currentVendor', JSON.stringify(updatedVendor));
+      setCurrentVendor(updatedVendor);
       
-      alert("Payment receipt uploaded successfully! We'll verify your payment within 24 hours.")
     } catch (error) {
-      console.error("Error submitting payment:", error)
-      alert("Failed to submit payment. Please try again.")
+      console.error("Payment submission failed:", error);
+      alert("Failed to submit payment. Please ensure all details are correct and try again. If the problem persists, contact support.");
+    }
+      alert("Payment receipt submitted successfully! Our team will verify it within 24-48 hours.");
+      
+      // Update local storage
+      const updatedVendor = {
+        ...currentVendor,
+        paymentStatus: "pending",
+        paymentReceipt: uploadedReceipt,
+        paymentSubmittedAt: Date.now()
+      };
+      localStorage.setItem('currentVendor', JSON.stringify(updatedVendor));
+      setCurrentVendor(updatedVendor);
+    } catch (error) {
+      console.error("Payment submission failed:", error);
+      alert("Failed to submit payment. Please ensure all details are correct and try again. If the problem persists, contact support.");
     }
   }
 
