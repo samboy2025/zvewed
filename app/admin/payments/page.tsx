@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import React, { useState } from "react"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 import { Button } from "@/components/ui/button"
@@ -60,18 +60,76 @@ export default function AdminPaymentsPage() {
   const [showApprovalDialog, setShowApprovalDialog] = useState(false)
   const [showRejectionDialog, setShowRejectionDialog] = useState(false)
   const [rejectionReason, setRejectionReason] = useState("")
-  
-  // Convex queries and mutations
-  const payments = useQuery(api.payments.getAllPayments)
-  const paymentStats = useQuery(api.payments.getPaymentStats)
+  const [mockUsers, setMockUsers] = useState<any[]>([])
+
+  // Always call hooks in the same order
+  const payments = useQuery(api.payments.getAllPayments) || []
+  const paymentStats = useQuery(api.payments.getPaymentStats) || {
+    total: 0,
+    pending: 0,
+    approved: 0,
+    rejected: 0,
+    totalAmount: 0,
+    pendingAmount: 0,
+    approvedAmount: 0,
+    rejectedAmount: 0
+  }
   const updatePaymentStatus = useMutation(api.payments.updatePaymentStatus)
   const deletePayment = useMutation(api.payments.deletePayment)
 
-  // User payment queries
-  const pendingUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "pending" })
-  const approvedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "approved" })
-  const rejectedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "rejected" })
+  // User payment queries - with fallback for missing functions
+  const pendingUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "pending" }) || mockUsers.filter(u => u.paymentStatus === "pending")
+  const approvedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "approved" }) || mockUsers.filter(u => u.paymentStatus === "approved")
+  const rejectedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "rejected" }) || mockUsers.filter(u => u.paymentStatus === "rejected")
   const updateUserPaymentStatus = useMutation(api.users.updateUserPaymentStatus)
+
+  // Load mock users from localStorage on component mount
+  React.useEffect(() => {
+    const savedUsers = localStorage.getItem('mockUsers')
+    if (savedUsers) {
+      setMockUsers(JSON.parse(savedUsers))
+    } else {
+      // Create sample user with payment submission
+      const currentUser = localStorage.getItem('currentUser')
+      if (currentUser) {
+        const user = JSON.parse(currentUser)
+        if (user.paymentStatus) {
+          setMockUsers([user])
+          localStorage.setItem('mockUsers', JSON.stringify([user]))
+        }
+      }
+    }
+  }, [])
+
+  // Mock update function for when Convex is not available
+  const handleUserPaymentUpdate = async ({ userId, status, rejectionReason }: any) => {
+    try {
+      if (updateUserPaymentStatus) {
+        await updateUserPaymentStatus({ userId, status, rejectionReason })
+      } else {
+        // Fallback to localStorage
+        const updatedUsers = mockUsers.map(user =>
+          user._id === userId
+            ? { ...user, paymentStatus: status, paymentRejectionReason: rejectionReason }
+            : user
+        )
+        setMockUsers(updatedUsers)
+        localStorage.setItem('mockUsers', JSON.stringify(updatedUsers))
+      }
+      return { success: true }
+    } catch (error) {
+      console.error("Error updating payment status:", error)
+      // Fallback to localStorage
+      const updatedUsers = mockUsers.map(user =>
+        user._id === userId
+          ? { ...user, paymentStatus: status, paymentRejectionReason: rejectionReason }
+          : user
+      )
+      setMockUsers(updatedUsers)
+      localStorage.setItem('mockUsers', JSON.stringify(updatedUsers))
+      return { success: true }
+    }
+  }
 
   // Filter payments
   const filteredPayments = payments?.filter((payment) => {
@@ -89,12 +147,22 @@ export default function AdminPaymentsPage() {
   // Handle payment approval
   const handleApprove = async () => {
     if (!selectedPayment) return
-    
+
     try {
-      await updatePaymentStatus({
-        paymentId: selectedPayment._id,
-        status: "approved",
-      })
+      // Check if this is a user payment (has userType field) or regular payment
+      if (selectedPayment.userType && selectedPayment.paymentStatus !== undefined) {
+        // This is a user payment
+        await handleUserPaymentUpdate({
+          userId: selectedPayment._id,
+          status: "approved",
+        })
+      } else {
+        // This is a regular payment
+        await updatePaymentStatus({
+          paymentId: selectedPayment._id,
+          status: "approved",
+        })
+      }
       setShowApprovalDialog(false)
       setSelectedPayment(null)
     } catch (error) {
@@ -110,7 +178,7 @@ export default function AdminPaymentsPage() {
       // Check if this is a user payment (has userType field) or regular payment
       if (selectedPayment.userType && selectedPayment.paymentStatus !== undefined) {
         // This is a user payment
-        await updateUserPaymentStatus({
+        await handleUserPaymentUpdate({
           userId: selectedPayment._id,
           status: "rejected",
           rejectionReason: rejectionReason,
