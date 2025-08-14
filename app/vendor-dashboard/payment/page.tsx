@@ -138,7 +138,7 @@ export default function VendorPaymentPage() {
 
     try {
       // Upload payment receipt and update vendor status
-      await uploadPaymentReceipt({
+      await submitVendorPayment({
         vendorId: currentVendor._id,
         receiptUrl: uploadedReceipt,
         paymentDetails: {
@@ -181,7 +181,7 @@ export default function VendorPaymentPage() {
       console.error("Payment submission failed:", error);
       alert("Failed to submit payment. Please ensure all details are correct and try again. If the problem persists, contact support.");
     }
-  }
+  };
 
   if (isLoading) {
     return (
