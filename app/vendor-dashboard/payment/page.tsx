@@ -127,13 +127,13 @@ export default function VendorPaymentPage() {
 
   const handleSubmitPayment = async () => {
     if (!currentVendor || !uploadedReceipt) {
-      alert("Please upload your payment receipt")
-      return
+      alert("Please upload your payment receipt");
+      return;
     }
 
     if (!paymentForm.amount || !paymentForm.referenceNumber) {
-      alert("Please fill in all required fields")
-      return
+      alert("Please fill in all required fields");
+      return;
     }
 
     try {
@@ -150,22 +150,6 @@ export default function VendorPaymentPage() {
         }
       });
 
-      alert("Payment receipt submitted successfully! Our team will verify it within 24-48 hours.");
-      
-      // Update local storage
-      const updatedVendor = {
-        ...currentVendor,
-        paymentStatus: "pending",
-        paymentReceipt: uploadedReceipt,
-        paymentSubmittedAt: Date.now()
-      };
-      localStorage.setItem('currentVendor', JSON.stringify(updatedVendor));
-      setCurrentVendor(updatedVendor);
-      
-    } catch (error) {
-      console.error("Payment submission failed:", error);
-      alert("Failed to submit payment. Please ensure all details are correct and try again. If the problem persists, contact support.");
-    }
       alert("Payment receipt submitted successfully! Our team will verify it within 24-48 hours.");
       
       // Update local storage
