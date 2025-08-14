@@ -39,6 +39,9 @@ export function PaymentVerificationCard({ user, onPaymentSubmitted }: PaymentVer
     bankName: "UBA Bank"
   })
 
+  // Check if payment is already submitted
+  const isPaymentSubmitted = user?.paymentStatus === "pending" || user?.paymentStatus === "approved"
+
   const submitPaymentReceipt = useMutation(api.users.submitPaymentReceipt)
 
   const bankDetails = {
@@ -305,7 +308,7 @@ I will send the receipt image in the next message.`
                       type="file"
                       accept="image/*,.pdf"
                       onChange={handleFileUpload}
-                      disabled={isUploading}
+                      disabled={isUploading || isPaymentSubmitted}
                     />
                     {isUploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>}
                     {uploadedReceipt && <p className="text-sm text-green-600 mt-1">Receipt uploaded successfully!</p>}

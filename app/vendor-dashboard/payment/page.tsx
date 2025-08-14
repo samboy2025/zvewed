@@ -45,6 +45,9 @@ export default function VendorPaymentPage() {
     bankName: "UBA Bank"
   })
 
+  // Check if payment is already submitted
+  const isPaymentSubmitted = currentVendor?.paymentStatus === "pending" || currentVendor?.paymentStatus === "approved"
+
   const submitVendorPayment = useMutation(api.vendors.uploadPaymentReceipt)
 
   // Get vendor data from localStorage
@@ -321,6 +324,7 @@ export default function VendorPaymentPage() {
                               value={paymentForm.amount}
                               onChange={(e) => setPaymentForm({...paymentForm, amount: e.target.value})}
                               required
+                              disabled={isPaymentSubmitted}
                             />
                           </div>
                           <div>
@@ -331,6 +335,7 @@ export default function VendorPaymentPage() {
                               value={paymentForm.paymentDate}
                               onChange={(e) => setPaymentForm({...paymentForm, paymentDate: e.target.value})}
                               required
+                              disabled={isPaymentSubmitted}
                             />
                           </div>
                         </div>
@@ -343,6 +348,7 @@ export default function VendorPaymentPage() {
                             value={paymentForm.referenceNumber}
                             onChange={(e) => setPaymentForm({...paymentForm, referenceNumber: e.target.value})}
                             required
+                            disabled={isPaymentSubmitted}
                           />
                         </div>
                         
@@ -353,6 +359,7 @@ export default function VendorPaymentPage() {
                             placeholder="e.g., Access Bank, GTBank"
                             value={paymentForm.bankName}
                             onChange={(e) => setPaymentForm({...paymentForm, bankName: e.target.value})}
+                            disabled={isPaymentSubmitted}
                           />
                         </div>
 
@@ -366,6 +373,7 @@ export default function VendorPaymentPage() {
                               className="hidden"
                               accept="image/jpeg,image/png,image/webp"
                               onChange={handleReceiptUpload}
+                              disabled={isPaymentSubmitted}
                             />
                             {isUploading ? (
                               <div className="flex flex-col items-center justify-center">
@@ -394,8 +402,8 @@ export default function VendorPaymentPage() {
 
                         <Button
                           onClick={handleSubmitPayment}
-                          className="w-full bg-red-600 hover:bg-red-700"
-                          disabled={isUploading || !uploadedReceipt}
+                          className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                          disabled={isPaymentSubmitted || !uploadedReceipt || !paymentForm.referenceNumber || isUploading}
                         >
                           {isUploading ? "Uploading..." : "Submit Payment Confirmation"}
                         </Button>

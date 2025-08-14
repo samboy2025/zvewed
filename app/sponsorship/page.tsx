@@ -91,7 +91,7 @@ export default function SponsorshipPage() {
               </div>
               <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-red-100 shadow-sm">
                 <MapPin className="h-5 w-5 text-red-600" />
-                <span className="font-medium text-gray-800">Amana Event Centre, Randan Kano, Zaria</span>
+                <span className="font-medium text-gray-800">Balarabe Tanimu Hall, Samaru Zaria</span>
               </div>
               <div className="flex items-center gap-2 bg-white/90 backdrop-blur-sm rounded-full px-6 py-3 border border-red-100 shadow-sm">
                 <Users className="h-5 w-5 text-red-600" />

@@ -3,6 +3,7 @@
 import React, { useState } from "react"
 import { useQuery, useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
+import { Id } from "../../../convex/_generated/dataModel"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -56,14 +57,47 @@ export default function AdminPaymentsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")
-  const [selectedPayment, setSelectedPayment] = useState<any>(null)
-  const [showApprovalDialog, setShowApprovalDialog] = useState(false)
-  const [showRejectionDialog, setShowRejectionDialog] = useState(false)
-  const [rejectionReason, setRejectionReason] = useState("")
-  const [mockUsers, setMockUsers] = useState<any[]>([])
+  // Define types for payments and users
+  interface Payment {
+    _id: Id<"payments">;
+    userName: string;
+    userEmail: string;
+    reference: string;
+    status: string;
+    type: string;
+    amount: number;
+    rejectionReason?: string;
+    userType?: string;
+    paymentStatus?: string;
+    paymentMethod?: string;
+    createdAt: number;
+    receiptUrl?: string;
+    _creationTime?: number;
+  }
 
-  // Always call hooks in the same order
-  const payments = useQuery(api.payments.getAllPayments) || []
+  interface UserPayment {
+    _id: Id<"users">;
+    email: string;
+    name: string;
+    userType: string;
+    paymentAmount?: number;
+    paymentStatus?: string;
+    _creationTime: number;
+  }
+
+  interface User {
+    _id: string;
+    paymentStatus: string;
+    paymentRejectionReason?: string;
+  }
+
+  const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [showApprovalDialog, setShowApprovalDialog] = useState(false);
+  const [showRejectionDialog, setShowRejectionDialog] = useState(false);
+  const [rejectionReason, setRejectionReason] = useState("");
+  
+  // Fetch real payment data from the database
+  const payments = useQuery(api.payments.getAllPayments) || [];
   const paymentStats = useQuery(api.payments.getPaymentStats) || {
     total: 0,
     pending: 0,
@@ -73,66 +107,42 @@ export default function AdminPaymentsPage() {
     pendingAmount: 0,
     approvedAmount: 0,
     rejectedAmount: 0
-  }
-  const updatePaymentStatus = useMutation(api.payments.updatePaymentStatus)
-  const deletePayment = useMutation(api.payments.deletePayment)
+  };
+  const updatePaymentStatus = useMutation(api.payments.updatePaymentStatus);
+  const deletePayment = useMutation(api.payments.deletePayment);
 
-  // User payment queries - with fallback for missing functions
-  const pendingUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "pending" }) || mockUsers.filter(u => u.paymentStatus === "pending")
-  const approvedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "approved" }) || mockUsers.filter(u => u.paymentStatus === "approved")
-  const rejectedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "rejected" }) || mockUsers.filter(u => u.paymentStatus === "rejected")
-  const updateUserPaymentStatus = useMutation(api.users.updateUserPaymentStatus)
-
-  // Load mock users from localStorage on component mount
-  React.useEffect(() => {
-    const savedUsers = localStorage.getItem('mockUsers')
-    if (savedUsers) {
-      setMockUsers(JSON.parse(savedUsers))
-    } else {
-      // Create sample user with payment submission
-      const currentUser = localStorage.getItem('currentUser')
-      if (currentUser) {
-        const user = JSON.parse(currentUser)
-        if (user.paymentStatus) {
-          setMockUsers([user])
-          localStorage.setItem('mockUsers', JSON.stringify([user]))
-        }
-      }
-    }
-  }, [])
+  // Get real user payment data
+  const pendingUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "pending" }) || [];
+  const approvedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "approved" }) || [];
+  const rejectedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "rejected" }) || [];
+  const updateUserPaymentStatus = useMutation(api.users.updateUserPaymentStatus);
 
   // Mock update function for when Convex is not available
-  const handleUserPaymentUpdate = async ({ userId, status, rejectionReason }: any) => {
+  interface PaymentUpdateParams {
+    userId: Id<"users">;
+    status: string;
+    rejectionReason?: string;
+  }
+
+  const handleUserPaymentUpdate = async ({ userId, status, rejectionReason }: { userId: Id<"users">; status: string; rejectionReason?: string }) => {
     try {
       if (updateUserPaymentStatus) {
-        await updateUserPaymentStatus({ userId, status, rejectionReason })
-      } else {
-        // Fallback to localStorage
-        const updatedUsers = mockUsers.map(user =>
-          user._id === userId
-            ? { ...user, paymentStatus: status, paymentRejectionReason: rejectionReason }
-            : user
-        )
-        setMockUsers(updatedUsers)
-        localStorage.setItem('mockUsers', JSON.stringify(updatedUsers))
+        await updateUserPaymentStatus({ userId, status, rejectionReason });
       }
-      return { success: true }
+      return { success: true };
     } catch (error) {
-      console.error("Error updating payment status:", error)
-      // Fallback to localStorage
-      const updatedUsers = mockUsers.map(user =>
-        user._id === userId
-          ? { ...user, paymentStatus: status, paymentRejectionReason: rejectionReason }
-          : user
-      )
-      setMockUsers(updatedUsers)
-      localStorage.setItem('mockUsers', JSON.stringify(updatedUsers))
-      return { success: true }
+      console.error("Error updating payment status:", error);
+      return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
     }
   }
 
-  // Filter payments
+  // Filter real payments from database
   const filteredPayments = payments?.filter((payment) => {
+    // Ensure we have a valid payment record
+    if (!payment || !payment.userName || !payment.userEmail || !payment.reference) {
+      return false;
+    }
+
     const matchesSearch =
       payment.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       payment.userEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -152,8 +162,9 @@ export default function AdminPaymentsPage() {
       // Check if this is a user payment (has userType field) or regular payment
       if (selectedPayment.userType && selectedPayment.paymentStatus !== undefined) {
         // This is a user payment
+        const userPayment = selectedPayment as unknown as { _id: Id<"users"> };
         await handleUserPaymentUpdate({
-          userId: selectedPayment._id,
+          userId: userPayment._id,
           status: "approved",
         })
       } else {
@@ -178,8 +189,9 @@ export default function AdminPaymentsPage() {
       // Check if this is a user payment (has userType field) or regular payment
       if (selectedPayment.userType && selectedPayment.paymentStatus !== undefined) {
         // This is a user payment
+        const userPayment = selectedPayment as unknown as { _id: Id<"users"> };
         await handleUserPaymentUpdate({
-          userId: selectedPayment._id,
+          userId: userPayment._id,
           status: "rejected",
           rejectionReason: rejectionReason,
         })
@@ -239,7 +251,7 @@ export default function AdminPaymentsPage() {
   }
 
   // Prepare export data
-  const exportData = filteredPayments.map((payment) => ({
+  const exportData = filteredPayments.map((payment: Payment & { createdAt: number; approvedAt?: number; paymentMethod?: string }) => ({
     Date: formatDate(payment.createdAt),
     Name: payment.userName,
     Email: payment.userEmail,
@@ -251,12 +263,25 @@ export default function AdminPaymentsPage() {
     ApprovedAt: payment.approvedAt ? formatDate(payment.approvedAt) : "N/A",
   }))
 
-  if (!payments || !paymentStats) {
+  // Handle loading state
+  if (!payments || !paymentStats || !pendingUserPayments || !approvedUserPayments || !rejectedUserPayments) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
-          <Clock className="h-8 w-8 mx-auto mb-4 text-gray-400" />
-          <p className="text-gray-500">Loading payments...</p>
+          <Clock className="h-8 w-8 mx-auto mb-4 text-gray-400 animate-spin" />
+          <p className="text-gray-500">Loading payment data...</p>
+        </div>
+      </div>
+    )
+  }
+
+  // Handle empty state
+  if (payments.length === 0 && pendingUserPayments.length === 0 && approvedUserPayments.length === 0 && rejectedUserPayments.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <DollarSign className="h-8 w-8 mx-auto mb-4 text-gray-400" />
+          <p className="text-gray-500">No payment records found</p>
         </div>
       </div>
     )
@@ -687,7 +712,22 @@ export default function AdminPaymentsPage() {
                             size="sm"
                             variant="destructive"
                             onClick={() => {
-                              setSelectedPayment(user)
+                              {
+                                const userPayment = user as unknown as UserPayment;
+                                const userPaymentView = {
+                                  _id: userPayment._id as unknown as Id<"payments">, // Type cast for view only
+                                  userName: userPayment.name,
+                                  userEmail: userPayment.email,
+                                  reference: userPayment._id.toString(),
+                                  type: userPayment.userType || 'user',
+                                  amount: userPayment.paymentAmount || 0,
+                                  status: userPayment.paymentStatus || 'pending',
+                                  createdAt: userPayment._creationTime,
+                                  userType: 'user',
+                                  paymentStatus: userPayment.paymentStatus || 'pending',
+                                } satisfies Payment;
+                                setSelectedPayment(userPaymentView);
+                              }
                               setShowRejectionDialog(true)
                             }}
                           >

@@ -88,7 +88,7 @@ export default function Footer() {
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <MapPin className="h-4 w-4" />
-                <span className="text-gray-300 text-sm">Amana Event Centre, Randan Kano, Zaria</span>
+                <span className="text-gray-300 text-sm">Balarabe Tanimu Hall, Samaru Zaria</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4" />
