@@ -8,37 +8,37 @@ const testimonials = [
     name: "Aisha Abubakar",
     title: "Founder & CEO, EcoInnovate Solutions",
     quote: "WED was a game-changer for my startup. The mentorship and networking opportunities were invaluable. We've grown from 5 to 25 employees since attending WED 2.0.",
-    image: "/WED 2.0/Pictures WED 2.0/a9fdf12c-df22-4e26-8014-b060e6fa6042.jpg",
+    image: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.34_f02e294f.jpg",
   },
   {
     name: "Bello Mohammed",
     title: "Founder & Managing Director, Student Ventures",
     quote: "As a student entrepreneur, WED gave me the confidence and connections to pursue my business idea. We've secured our first major client and are expanding rapidly.",
-    image: "/WED 1.0/Pictures WED 1.0/DSC_2517_Original.jpg",
+    image: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.35_3e862169.jpg",
   },
   {
     name: "Fatima Yusuf",
     title: "Founder & CEO, TechSavvy Solutions",
     quote: "The pitch competition was intense but incredibly rewarding. We secured our first seed funding thanks to WED. The investor connections alone were worth the experience.",
-    image: "/WED 2.0/Pictures WED 2.0/IMG_6296.JPG",
+    image: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.35_c34d51ee.jpg",
   },
   {
     name: "David Okon",
     title: "Founder & Executive Director, Social Impact Hub",
     quote: "I met my co-founder at WED. It's more than a conference; it's a community of passionate innovators. Our social enterprise has impacted over 10,000 lives.",
-    image: "/WED 2.0/Pictures WED 2.0/5d0a04c5-d840-469b-bad0-a71bfd322b8f.jpg",
+    image: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.35_d6d26545.jpg",
   },
   {
     name: "Chiamaka Nwosu",
     title: "Founder & CEO, AgriTech Innovations",
     quote: "The workshops on sustainable agriculture were eye-opening. WED is relevant and forward-thinking. We've developed new farming technologies that are now used across 5 states.",
-    image: "/WED 3.0/WED 3.0/IMG_8111.JPG",
+    image: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.35_d8cb4136.jpg",
   },
   {
     name: "Usman Aliyu",
     title: "Founder & Creative Director, Zaria Arts Collective",
     quote: "A fantastic platform for creative entrepreneurs to showcase their work and connect with a wider audience. We've expanded our business to three cities since WED 1.0.",
-    image: "/WED 1.0/Pictures WED 1.0/DSC_2601_Original.JPG",
+    image: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.36_6d4e05d7.jpg",
   },
 ]
 
