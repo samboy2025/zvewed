@@ -402,3 +402,100 @@ export const getAdminProfile = query({
     return user;
   },
 });
+
+// Manual payment verification for admin
+export const manuallyVerifyUserPayment = mutation({
+  args: {
+    userId: v.id("users"),
+    adminId: v.id("users"),
+    amount: v.number(),
+    paymentMethod: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Verify the admin exists and is an admin
+    const admin = await ctx.db.get(args.adminId);
+    if (!admin || admin.userType !== "admin") {
+      throw new Error("Unauthorized: User is not an admin");
+    }
+
+    // Get the user to verify
+    const user = await ctx.db.get(args.userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Create a payment record for manual verification
+    const paymentId = await ctx.db.insert("payments", {
+      userId: args.userId,
+      userType: user.userType,
+      userName: `${user.firstName} ${user.lastName}`,
+      userEmail: user.email,
+      amount: args.amount,
+      type: user.userType === "participant" ? "ticket" : "vendor_booth",
+      reference: `MANUAL-${Date.now()}`,
+      status: "approved",
+      paymentMethod: args.paymentMethod || "manual_verification",
+      approvedAt: Date.now(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
+    // Update user payment status
+    await ctx.db.patch(args.userId, {
+      paymentStatus: "approved",
+      paymentAmount: args.amount,
+      paymentSubmittedAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
+    // Log the admin action
+    await ctx.db.insert("admin_actions", {
+      adminId: args.adminId,
+      action: "manual_payment_verification",
+      targetType: "user",
+      targetId: args.userId,
+      details: `Manually verified payment of ₦${args.amount} for ${user.firstName} ${user.lastName}. ${args.notes || ""}`,
+      timestamp: Date.now(),
+    });
+
+    return { success: true, paymentId };
+  },
+});
+
+// Get users eligible for manual payment verification
+export const getUsersEligibleForManualVerification = query({
+  args: {
+    searchTerm: v.optional(v.string()),
+    userTypeFilter: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    let users = await ctx.db.query("users").collect();
+    
+    // Filter users who don't have approved payments
+    users = users.filter(user => 
+      user.paymentStatus !== "approved" && 
+      user.userType !== "admin"
+    );
+    
+    // Apply search filter
+    if (args.searchTerm) {
+      const search = args.searchTerm.toLowerCase();
+      users = users.filter(user => 
+        user.firstName.toLowerCase().includes(search) ||
+        user.lastName.toLowerCase().includes(search) ||
+        user.email.toLowerCase().includes(search)
+      );
+    }
+    
+    // Apply user type filter
+    if (args.userTypeFilter && args.userTypeFilter !== "all") {
+      users = users.filter(user => user.userType === args.userTypeFilter);
+    }
+    
+    // Sort by creation date (newest first)
+    users.sort((a, b) => b.createdAt - a.createdAt);
+    
+    return users;
+  },
+});

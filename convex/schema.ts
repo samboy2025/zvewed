@@ -64,6 +64,7 @@ export default defineSchema({
       bankName: v.optional(v.string()),
     })),
     paymentSubmittedAt: v.optional(v.number()),
+    paymentNotes: v.optional(v.string()), // Notes about payment proof submission
     eventId: v.string(),
   }),
   
@@ -101,6 +102,7 @@ export default defineSchema({
       bankName: v.optional(v.string()),
     })),
     paymentSubmittedAt: v.optional(v.number()),
+    paymentNotes: v.optional(v.string()), // Notes about payment proof submission
     eventId: v.string(),
   }),
   
@@ -140,6 +142,7 @@ export default defineSchema({
     paymentSubmittedAt: v.optional(v.number()),
     paymentApprovedAt: v.optional(v.number()),
     paymentRejectionReason: v.optional(v.string()),
+    paymentNotes: v.optional(v.string()), // Notes about payment proof submission
   }),
   
   payments: defineTable({
@@ -170,5 +173,14 @@ export default defineSchema({
     status: v.string(), // active, upcoming, completed
     createdAt: v.number(),
     updatedAt: v.number(),
+  }),
+
+  admin_actions: defineTable({
+    adminId: v.id("users"),
+    action: v.string(),
+    targetType: v.string(),
+    targetId: v.optional(v.string()),
+    details: v.optional(v.string()),
+    timestamp: v.number(),
   }),
 });

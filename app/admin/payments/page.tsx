@@ -78,6 +78,7 @@ export default function AdminPaymentsPage() {
     receiptUrl?: string;
     updatedAt?: number;
     approvedAt?: number;
+    notes?: string; // Added notes field
   }
 
   interface User {
@@ -140,6 +141,30 @@ export default function AdminPaymentsPage() {
   const usersWithoutPayments = useQuery(api.users.getUsersWithoutPayments) || [];
   const updateUserPaymentStatus = useMutation(api.users.updateUserPaymentStatus);
   const initializeUserPayment = useMutation(api.users.initializeUserPayment);
+
+  // Get users eligible for manual payment verification
+  const usersEligibleForManualVerification = useQuery(api.admin.getUsersEligibleForManualVerification, {}) || [];
+  const manuallyVerifyUserPayment = useMutation(api.admin.manuallyVerifyUserPayment);
+
+  // Debug logging for convex functions
+  console.log("Convex API functions loaded:", {
+    payments: !!api.payments,
+    users: !!api.users,
+    admin: !!api.admin,
+    getPaymentsMissingReceipts: !!api.payments?.getPaymentsMissingReceipts,
+    getUsersByPaymentStatus: !!api.users?.getUsersByPaymentStatus,
+    getUsersWithoutPayments: !!api.users?.getUsersWithoutPayments,
+    getUsersEligibleForManualVerification: !!api.admin?.getUsersEligibleForManualVerification,
+  });
+
+  // Manual verification form state
+  const [showManualVerificationDialog, setShowManualVerificationDialog] = useState(false);
+  const [selectedUserForVerification, setSelectedUserForVerification] = useState<User | null>(null);
+  const [manualVerificationData, setManualVerificationData] = useState({
+    amount: "",
+    paymentMethod: "manual_verification",
+    notes: ""
+  });
 
   // Generate unique reference number
   const generateReference = () => {
@@ -262,6 +287,50 @@ export default function AdminPaymentsPage() {
       alert("Failed to reject payment");
     }
   }
+
+  // Handle manual payment verification
+  const handleManualVerification = async () => {
+    if (!selectedUserForVerification || !manualVerificationData.amount) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    try {
+      // Get current admin user ID from localStorage
+      const userData = localStorage.getItem('currentUser');
+      if (!userData) {
+        alert("Admin authentication not found. Please log in again.");
+        return;
+      }
+      
+      const adminUser = JSON.parse(userData);
+      if (adminUser.userType !== 'admin') {
+        alert("Unauthorized: Only admins can verify payments.");
+        return;
+      }
+      
+      await manuallyVerifyUserPayment({
+        userId: selectedUserForVerification._id,
+        adminId: adminUser._id,
+        amount: parseFloat(manualVerificationData.amount),
+        paymentMethod: manualVerificationData.paymentMethod,
+        notes: manualVerificationData.notes,
+      });
+
+      // Reset form
+      setManualVerificationData({
+        amount: "",
+        paymentMethod: "manual_verification",
+        notes: ""
+      });
+      setShowManualVerificationDialog(false);
+      setSelectedUserForVerification(null);
+      alert("Payment verified successfully!");
+    } catch (error) {
+      console.error("Error verifying payment:", error);
+      alert("Failed to verify payment");
+    }
+  };
 
   // Get status badge
   const getStatusBadge = (status: string) => {
@@ -672,6 +741,12 @@ export default function AdminPaymentsPage() {
                                     {formatDate(selectedPayment.createdAt)}
                                   </p>
                                 </div>
+                                {selectedPayment.notes && (
+                                  <div>
+                                    <Label>Notes</Label>
+                                    <p className="text-sm text-gray-700">{selectedPayment.notes}</p>
+                                  </div>
+                                )}
                               </div>
                               
                               {selectedPayment.receiptUrl && (
@@ -1036,6 +1111,98 @@ export default function AdminPaymentsPage() {
         </CardContent>
       </Card>
 
+      {/* Manual Payment Verification Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            Manual Payment Verification
+          </CardTitle>
+          <CardDescription>
+            Manually verify payments for users without requiring receipt submission
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {usersEligibleForManualVerification && usersEligibleForManualVerification.length > 0 ? (
+            <div>
+              <div className="mb-4 flex items-center justify-between">
+                <Badge variant="outline" className="text-blue-600">
+                  {usersEligibleForManualVerification.length} users eligible for manual verification
+                </Badge>
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Required Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {usersEligibleForManualVerification.map((user) => (
+                    <TableRow key={user._id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{user.firstName} {user.lastName}</div>
+                          <div className="text-sm text-gray-500">{user.email}</div>
+                          {user.paymentNotes && (
+                            <div className="text-xs text-blue-600 mt-1">
+                              Note: {user.paymentNotes}
+                            </div>
+                          )}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">
+                          {user.userType}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">
+                          ₦{(user.paymentAmount || (user.userType === "participant" ? 7000 : 12000)).toLocaleString()}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-orange-600">
+                          {user.paymentStatus === "pending" ? "Pending Receipt" : "No Payment"}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700"
+                            onClick={() => {
+                              setSelectedUserForVerification(user);
+                              setManualVerificationData({
+                                amount: (user.paymentAmount || (user.userType === "participant" ? 7000 : 12000)).toString(),
+                                paymentMethod: "manual_verification",
+                                notes: ""
+                              });
+                              setShowManualVerificationDialog(true);
+                            }}
+                          >
+                            <Check className="h-4 w-4 mr-2" />
+                            Verify Payment
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-400" />
+              <p className="text-gray-500">No users eligible for manual payment verification</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
       {/* Payments Missing Receipts Section */}
       {paymentsMissingReceipts && paymentsMissingReceipts.length > 0 && (
         <Card>
@@ -1313,6 +1480,69 @@ export default function AdminPaymentsPage() {
               disabled={!rejectionReason.trim()}
             >
               Reject Payment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Manual Verification Dialog */}
+      <Dialog open={showManualVerificationDialog} onOpenChange={setShowManualVerificationDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Manually Verify Payment</DialogTitle>
+            <DialogDescription>
+              Manually verify a payment for a user who hasn't submitted a receipt.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {selectedUserForVerification && (
+              <div className="space-y-2">
+                <p><strong>User:</strong> {selectedUserForVerification.firstName} {selectedUserForVerification.lastName}</p>
+                <p><strong>Email:</strong> {selectedUserForVerification.email}</p>
+                <p><strong>Type:</strong> {selectedUserForVerification.userType}</p>
+              </div>
+            )}
+            <div>
+              <Label htmlFor="manualAmount">Amount (₦)</Label>
+              <Input
+                id="manualAmount"
+                type="number"
+                value={manualVerificationData.amount}
+                onChange={(e) => setManualVerificationData({...manualVerificationData, amount: e.target.value})}
+                placeholder="Enter payment amount"
+              />
+            </div>
+            <div>
+              <Label htmlFor="manualPaymentMethod">Payment Method</Label>
+              <Select value={manualVerificationData.paymentMethod} onValueChange={(value) => setManualVerificationData({...manualVerificationData, paymentMethod: value})}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="manual_verification">Manual Verification</SelectItem>
+                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="card">Card Payment</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="manualNotes">Notes (Optional)</Label>
+              <Textarea
+                id="manualNotes"
+                placeholder="Add any notes for the verification..."
+                value={manualVerificationData.notes}
+                onChange={(e) => setManualVerificationData({...manualVerificationData, notes: e.target.value})}
+                className="mt-2"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowManualVerificationDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleManualVerification} className="bg-blue-600 hover:bg-blue-700">
+              Verify Payment
             </Button>
           </DialogFooter>
         </DialogContent>
