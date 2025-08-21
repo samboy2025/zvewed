@@ -50,51 +50,67 @@ import {
   CreditCard,
   Building,
   Package,
-  Ticket
+  Ticket,
+  Plus,
+  UserPlus
 } from "lucide-react"
 
 export default function AdminPaymentsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [typeFilter, setTypeFilter] = useState("all")
+  const [dateRange, setDateRange] = useState("all") // all, today, week, month
+  
   // Define types for payments and users
   interface Payment {
     _id: Id<"payments">;
+    userId: string;
     userName: string;
     userEmail: string;
     reference: string;
     status: string;
     type: string;
     amount: number;
+    userType: string;
     rejectionReason?: string;
-    userType?: string;
-    paymentStatus?: string;
     paymentMethod?: string;
     createdAt: number;
     receiptUrl?: string;
-    _creationTime?: number;
-  }
-
-  interface UserPayment {
-    _id: Id<"users">;
-    email: string;
-    name: string;
-    userType: string;
-    paymentAmount?: number;
-    paymentStatus?: string;
-    _creationTime: number;
+    updatedAt?: number;
+    approvedAt?: number;
   }
 
   interface User {
-    _id: string;
-    paymentStatus: string;
-    paymentRejectionReason?: string;
+    _id: Id<"users">;
+    firstName: string;
+    lastName: string;
+    email: string;
+    userType: string;
+    paymentAmount?: number;
+    paymentStatus?: string;
+    paymentReceipt?: string;
+    paymentDetails?: any;
+    paymentSubmittedAt?: number;
+    _creationTime: number;
   }
 
   const [selectedPayment, setSelectedPayment] = useState<Payment | null>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showApprovalDialog, setShowApprovalDialog] = useState(false);
   const [showRejectionDialog, setShowRejectionDialog] = useState(false);
+  const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
+  
+  // Create payment form state
+  const [newPayment, setNewPayment] = useState({
+    userName: "",
+    userEmail: "",
+    amount: "",
+    type: "ticket",
+    userType: "participant",
+    reference: "",
+    paymentMethod: "bank_transfer"
+  });
   
   // Fetch real payment data from the database
   const payments = useQuery(api.payments.getAllPayments) || [];
@@ -108,37 +124,70 @@ export default function AdminPaymentsPage() {
     approvedAmount: 0,
     rejectedAmount: 0
   };
+  
   const updatePaymentStatus = useMutation(api.payments.updatePaymentStatus);
   const deletePayment = useMutation(api.payments.deletePayment);
+  const createPayment = useMutation(api.payments.createPayment);
+
+  // Get payments missing receipts
+  const paymentsMissingReceipts = useQuery(api.payments.getPaymentsMissingReceipts) || [];
 
   // Get real user payment data
+  const allUsers = useQuery(api.users.getAllUsers) || [];
   const pendingUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "pending" }) || [];
   const approvedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "approved" }) || [];
   const rejectedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "rejected" }) || [];
+  const usersWithoutPayments = useQuery(api.users.getUsersWithoutPayments) || [];
   const updateUserPaymentStatus = useMutation(api.users.updateUserPaymentStatus);
+  const initializeUserPayment = useMutation(api.users.initializeUserPayment);
 
-  // Mock update function for when Convex is not available
-  interface PaymentUpdateParams {
-    userId: Id<"users">;
-    status: string;
-    rejectionReason?: string;
-  }
+  // Generate unique reference number
+  const generateReference = () => {
+    const timestamp = Date.now().toString(36);
+    const random = Math.random().toString(36).substr(2, 5);
+    return `WED-${timestamp}-${random}`.toUpperCase();
+  };
 
-  const handleUserPaymentUpdate = async ({ userId, status, rejectionReason }: { userId: Id<"users">; status: string; rejectionReason?: string }) => {
-    try {
-      if (updateUserPaymentStatus) {
-        await updateUserPaymentStatus({ userId, status, rejectionReason });
-      }
-      return { success: true };
-    } catch (error) {
-      console.error("Error updating payment status:", error);
-      return { success: false, error: error instanceof Error ? error.message : "Unknown error" };
+  // Handle creating new payment
+  const handleCreatePayment = async () => {
+    if (!newPayment.userName || !newPayment.userEmail || !newPayment.amount || !newPayment.reference) {
+      alert("Please fill in all required fields");
+      return;
     }
-  }
+
+    try {
+      await createPayment({
+        userId: `admin-created-${Date.now()}`,
+        userName: newPayment.userName,
+        userEmail: newPayment.userEmail,
+        amount: parseFloat(newPayment.amount),
+        type: newPayment.type,
+        userType: newPayment.userType,
+        reference: newPayment.reference,
+        status: "pending",
+        paymentMethod: newPayment.paymentMethod,
+      });
+
+      // Reset form
+      setNewPayment({
+        userName: "",
+        userEmail: "",
+        amount: "",
+        type: "ticket",
+        userType: "participant",
+        reference: "",
+        paymentMethod: "bank_transfer"
+      });
+      setShowCreatePaymentDialog(false);
+      alert("Payment created successfully!");
+    } catch (error) {
+      console.error("Error creating payment:", error);
+      alert("Failed to create payment");
+    }
+  };
 
   // Filter real payments from database
   const filteredPayments = payments?.filter((payment) => {
-    // Ensure we have a valid payment record
     if (!payment || !payment.userName || !payment.userEmail || !payment.reference) {
       return false;
     }
@@ -151,7 +200,29 @@ export default function AdminPaymentsPage() {
     const matchesStatus = statusFilter === "all" || payment.status === statusFilter
     const matchesType = typeFilter === "all" || payment.type === typeFilter
 
-    return matchesSearch && matchesStatus && matchesType
+    // Date filtering
+    let matchesDate = true;
+    if (dateRange !== "all") {
+      const paymentDate = new Date(payment.createdAt);
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+      const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
+
+      switch (dateRange) {
+        case "today":
+          matchesDate = paymentDate >= today;
+          break;
+        case "week":
+          matchesDate = paymentDate >= weekAgo;
+          break;
+        case "month":
+          matchesDate = paymentDate >= monthAgo;
+          break;
+      }
+    }
+
+    return matchesSearch && matchesStatus && matchesType && matchesDate
   }) || []
 
   // Handle payment approval
@@ -159,25 +230,16 @@ export default function AdminPaymentsPage() {
     if (!selectedPayment) return
 
     try {
-      // Check if this is a user payment (has userType field) or regular payment
-      if (selectedPayment.userType && selectedPayment.paymentStatus !== undefined) {
-        // This is a user payment
-        const userPayment = selectedPayment as unknown as { _id: Id<"users"> };
-        await handleUserPaymentUpdate({
-          userId: userPayment._id,
-          status: "approved",
-        })
-      } else {
-        // This is a regular payment
-        await updatePaymentStatus({
-          paymentId: selectedPayment._id,
-          status: "approved",
-        })
-      }
+      await updatePaymentStatus({
+        paymentId: selectedPayment._id,
+        status: "approved",
+      })
       setShowApprovalDialog(false)
       setSelectedPayment(null)
+      alert("Payment approved successfully!");
     } catch (error) {
       console.error("Error approving payment:", error)
+      alert("Failed to approve payment");
     }
   }
 
@@ -186,28 +248,18 @@ export default function AdminPaymentsPage() {
     if (!selectedPayment || !rejectionReason.trim()) return
 
     try {
-      // Check if this is a user payment (has userType field) or regular payment
-      if (selectedPayment.userType && selectedPayment.paymentStatus !== undefined) {
-        // This is a user payment
-        const userPayment = selectedPayment as unknown as { _id: Id<"users"> };
-        await handleUserPaymentUpdate({
-          userId: userPayment._id,
-          status: "rejected",
-          rejectionReason: rejectionReason,
-        })
-      } else {
-        // This is a regular payment
-        await updatePaymentStatus({
-          paymentId: selectedPayment._id,
-          status: "rejected",
-          rejectionReason: rejectionReason,
-        })
-      }
+      await updatePaymentStatus({
+        paymentId: selectedPayment._id,
+        status: "rejected",
+        rejectionReason: rejectionReason,
+      })
       setShowRejectionDialog(false)
       setSelectedPayment(null)
       setRejectionReason("")
+      alert("Payment rejected successfully!");
     } catch (error) {
       console.error("Error rejecting payment:", error)
+      alert("Failed to reject payment");
     }
   }
 
@@ -251,7 +303,7 @@ export default function AdminPaymentsPage() {
   }
 
   // Prepare export data
-  const exportData = filteredPayments.map((payment: Payment & { createdAt: number; approvedAt?: number; paymentMethod?: string }) => ({
+  const exportData = filteredPayments.map((payment: Payment) => ({
     Date: formatDate(payment.createdAt),
     Name: payment.userName,
     Email: payment.userEmail,
@@ -264,24 +316,12 @@ export default function AdminPaymentsPage() {
   }))
 
   // Handle loading state
-  if (!payments || !paymentStats || !pendingUserPayments || !approvedUserPayments || !rejectedUserPayments) {
+  if (!payments || !paymentStats || !allUsers) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <Clock className="h-8 w-8 mx-auto mb-4 text-gray-400 animate-spin" />
           <p className="text-gray-500">Loading payment data...</p>
-        </div>
-      </div>
-    )
-  }
-
-  // Handle empty state
-  if (payments.length === 0 && pendingUserPayments.length === 0 && approvedUserPayments.length === 0 && rejectedUserPayments.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-center">
-          <DollarSign className="h-8 w-8 mx-auto mb-4 text-gray-400" />
-          <p className="text-gray-500">No payment records found</p>
         </div>
       </div>
     )
@@ -297,11 +337,20 @@ export default function AdminPaymentsPage() {
             Review and manage all payment transactions
           </p>
         </div>
-        <ExcelExportButton
-          data={exportData}
-          filename="payments"
-          buttonText="Export Payments"
-        />
+        <div className="flex gap-2">
+          <Button
+            onClick={() => setShowCreatePaymentDialog(true)}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Create Payment
+          </Button>
+          <ExcelExportButton
+            data={exportData}
+            filename="payments"
+            buttonText="Export Payments"
+          />
+        </div>
       </div>
 
       {/* Stats Cards */}
@@ -346,7 +395,7 @@ export default function AdminPaymentsPage() {
               {paymentStats.pending}
             </div>
             <p className="text-xs text-muted-foreground">
-              Awaiting approval
+              ₦{paymentStats.pendingAmount.toLocaleString()}
             </p>
           </CardContent>
         </Card>
@@ -363,6 +412,95 @@ export default function AdminPaymentsPage() {
             <p className="text-xs text-muted-foreground">
               Payment issues
             </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Revenue Breakdown */}
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Building className="h-5 w-5" />
+              Revenue by User Type
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+                  <span>Participants</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">₦{paymentStats.byUserType?.participant?.amount?.toLocaleString() || 0}</div>
+                  <div className="text-sm text-gray-500">{paymentStats.byUserType?.participant?.count || 0} payments</div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                  <span>Vendors</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">₦{paymentStats.byUserType?.vendor?.amount?.toLocaleString() || 0}</div>
+                  <div className="text-sm text-gray-500">{paymentStats.byUserType?.vendor?.count || 0} payments</div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
+                  <span>Sponsors</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">₦{paymentStats.byUserType?.sponsor?.amount?.toLocaleString() || 0}</div>
+                  <div className="text-sm text-gray-500">{paymentStats.byUserType?.sponsor?.count || 0} payments</div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <CreditCard className="h-5 w-5" />
+              Revenue by Payment Type
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Ticket className="h-4 w-4 text-blue-600" />
+                  <span>Event Tickets</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">₦{paymentStats.byType?.ticket?.amount?.toLocaleString() || 0}</div>
+                  <div className="text-sm text-gray-500">{paymentStats.byType?.ticket?.count || 0} payments</div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Package className="h-4 w-4 text-orange-600" />
+                  <span>Vendor Booths</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">₦{paymentStats.byType?.vendor_booth?.amount?.toLocaleString() || 0}</div>
+                  <div className="text-sm text-gray-500">{paymentStats.byType?.vendor_booth?.count || 0} payments</div>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Building className="h-4 w-4 text-purple-600" />
+                  <span>Sponsorships</span>
+                </div>
+                <div className="text-right">
+                  <div className="font-semibold">₦{paymentStats.byType?.sponsorship?.amount?.toLocaleString() || 0}</div>
+                  <div className="text-sm text-gray-500">{paymentStats.byType?.sponsorship?.count || 0} payments</div>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -408,6 +546,17 @@ export default function AdminPaymentsPage() {
                 <SelectItem value="ticket">Tickets</SelectItem>
                 <SelectItem value="sponsorship">Sponsorships</SelectItem>
                 <SelectItem value="vendor_booth">Vendor Booths</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={dateRange} onValueChange={setDateRange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by date" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Time</SelectItem>
+                <SelectItem value="today">Today</SelectItem>
+                <SelectItem value="week">This Week</SelectItem>
+                <SelectItem value="month">This Month</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -575,6 +724,28 @@ export default function AdminPaymentsPage() {
                           </Button>
                         </>
                       )}
+                      {payment.status === "pending" && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-blue-600"
+                          title="Mark as payment received (for offline payments)"
+                          onClick={async () => {
+                            try {
+                              await updatePaymentStatus({
+                                paymentId: payment._id,
+                                status: "approved",
+                              })
+                              alert("Payment marked as received successfully!");
+                            } catch (error) {
+                              console.error("Error updating payment:", error)
+                              alert("Failed to update payment")
+                            }
+                          }}
+                        >
+                          <DollarSign className="h-4 w-4" />
+                        </Button>
+                      )}
                     </div>
                   </TableCell>
                 </TableRow>
@@ -712,22 +883,7 @@ export default function AdminPaymentsPage() {
                             size="sm"
                             variant="destructive"
                             onClick={() => {
-                              {
-                                const userPayment = user as unknown as UserPayment;
-                                const userPaymentView = {
-                                  _id: userPayment._id as unknown as Id<"payments">, // Type cast for view only
-                                  userName: userPayment.name,
-                                  userEmail: userPayment.email,
-                                  reference: userPayment._id.toString(),
-                                  type: userPayment.userType || 'user',
-                                  amount: userPayment.paymentAmount || 0,
-                                  status: userPayment.paymentStatus || 'pending',
-                                  createdAt: userPayment._creationTime,
-                                  userType: 'user',
-                                  paymentStatus: userPayment.paymentStatus || 'pending',
-                                } satisfies Payment;
-                                setSelectedPayment(userPaymentView);
-                              }
+                              setSelectedUser(user);
                               setShowRejectionDialog(true)
                             }}
                           >
@@ -750,6 +906,336 @@ export default function AdminPaymentsPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Users Without Payments Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <UserPlus className="h-5 w-5" />
+            Users Without Payment Submissions
+          </CardTitle>
+          <CardDescription>
+            Users who haven't submitted payment receipts yet
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {usersWithoutPayments && usersWithoutPayments.length > 0 ? (
+            <div>
+              <div className="mb-4 flex items-center justify-between">
+                <Badge variant="outline" className="text-orange-600">
+                  {usersWithoutPayments.length} users need to submit payments
+                </Badge>
+                <Button
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      let successCount = 0;
+                      for (const user of usersWithoutPayments) {
+                        try {
+                          await initializeUserPayment({ userId: user._id });
+                          successCount++;
+                        } catch (error) {
+                          console.error(`Failed to initialize payment for ${user.email}:`, error);
+                        }
+                      }
+                      alert(`Successfully initialized payment amounts for ${successCount} out of ${usersWithoutPayments.length} users`);
+                    } catch (error) {
+                      console.error("Error in bulk initialization:", error);
+                      alert("Failed to initialize payment amounts");
+                    }
+                  }}
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Initialize All Payment Amounts
+                </Button>
+              </div>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>User</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Required Amount</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {usersWithoutPayments.map((user) => (
+                    <TableRow key={user._id}>
+                      <TableCell>
+                        <div>
+                          <div className="font-medium">{user.firstName} {user.lastName}</div>
+                          <div className="text-sm text-gray-500">{user.email}</div>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="capitalize">
+                          {user.userType}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">
+                          ₦{(user.paymentAmount || (user.userType === "participant" ? 7000 : 12000)).toLocaleString()}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <Badge variant="outline" className="text-orange-600">
+                          Payment Required
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setNewPayment({
+                                userName: `${user.firstName} ${user.lastName}`,
+                                userEmail: user.email,
+                                amount: (user.paymentAmount || (user.userType === "participant" ? 7000 : 12000)).toString(),
+                                type: user.userType === "participant" ? "ticket" : "vendor_booth",
+                                userType: user.userType,
+                                reference: generateReference(),
+                                paymentMethod: "bank_transfer"
+                              });
+                              setShowCreatePaymentDialog(true);
+                            }}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Create Payment
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={async () => {
+                              try {
+                                await initializeUserPayment({ userId: user._id });
+                                alert("Payment amount initialized successfully!");
+                              } catch (error) {
+                                console.error("Error initializing payment amount:", error);
+                                alert("Failed to initialize payment amount");
+                              }
+                            }}
+                          >
+                            <Download className="h-4 w-4 mr-2" />
+                            Initialize Amount
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-400" />
+              <p className="text-gray-500">All users have submitted payments or are exempt</p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Payments Missing Receipts Section */}
+      {paymentsMissingReceipts && paymentsMissingReceipts.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Payments Missing Receipts
+            </CardTitle>
+            <CardDescription>
+              Approved payments that don't have receipt files uploaded
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="mb-4">
+              <Badge variant="outline" className="text-orange-600">
+                {paymentsMissingReceipts.length} payments missing receipts
+              </Badge>
+            </div>
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Date</TableHead>
+                  <TableHead>User</TableHead>
+                  <TableHead>Type</TableHead>
+                  <TableHead>Amount</TableHead>
+                  <TableHead>Reference</TableHead>
+                  <TableHead>Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {paymentsMissingReceipts.map((payment) => (
+                  <TableRow key={payment._id}>
+                    <TableCell>
+                      <div className="text-sm">
+                        {formatDate(payment.createdAt)}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <div className="font-medium">{payment.userName}</div>
+                        <div className="text-sm text-gray-500">{payment.userEmail}</div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        {getTypeIcon(payment.type)}
+                        <span className="capitalize">{payment.type.replace('_', ' ')}</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-medium">
+                        ₦{payment.amount.toLocaleString()}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="font-mono text-sm">
+                        {payment.reference}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => {
+                            setSelectedPayment(payment);
+                            setShowApprovalDialog(false);
+                            setShowRejectionDialog(false);
+                          }}
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="text-blue-600"
+                          onClick={() => {
+                            // This could open a dialog to upload receipt
+                            alert("Receipt upload functionality can be added here");
+                          }}
+                        >
+                          <FileText className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Create Payment Dialog */}
+      <Dialog open={showCreatePaymentDialog} onOpenChange={setShowCreatePaymentDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Create New Payment Record</DialogTitle>
+            <DialogDescription>
+              Manually create a payment record for a user
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="userName">User Name</Label>
+              <Input
+                id="userName"
+                value={newPayment.userName}
+                onChange={(e) => setNewPayment({...newPayment, userName: e.target.value})}
+                placeholder="Enter user's full name"
+              />
+            </div>
+            <div>
+              <Label htmlFor="userEmail">User Email</Label>
+              <Input
+                id="userEmail"
+                type="email"
+                value={newPayment.userEmail}
+                onChange={(e) => setNewPayment({...newPayment, userEmail: e.target.value})}
+                placeholder="Enter user's email"
+              />
+            </div>
+            <div>
+              <Label htmlFor="amount">Amount (₦)</Label>
+              <Input
+                id="amount"
+                type="number"
+                value={newPayment.amount}
+                onChange={(e) => setNewPayment({...newPayment, amount: e.target.value})}
+                placeholder="Enter payment amount"
+              />
+            </div>
+            <div>
+              <Label htmlFor="type">Payment Type</Label>
+              <Select value={newPayment.type} onValueChange={(value) => setNewPayment({...newPayment, type: value})}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ticket">Event Ticket</SelectItem>
+                  <SelectItem value="sponsorship">Sponsorship</SelectItem>
+                  <SelectItem value="vendor_booth">Vendor Booth</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="userType">User Type</Label>
+              <Select value={newPayment.userType} onValueChange={(value) => setNewPayment({...newPayment, userType: value})}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="participant">Participant</SelectItem>
+                  <SelectItem value="vendor">Vendor</SelectItem>
+                  <SelectItem value="sponsor">Sponsor</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="reference">Reference Number</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="reference"
+                  value={newPayment.reference}
+                  onChange={(e) => setNewPayment({...newPayment, reference: e.target.value})}
+                  placeholder="Payment reference"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setNewPayment({...newPayment, reference: generateReference()})}
+                >
+                  Generate
+                </Button>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="paymentMethod">Payment Method</Label>
+              <Select value={newPayment.paymentMethod} onValueChange={(value) => setNewPayment({...newPayment, paymentMethod: value})}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
+                  <SelectItem value="cash">Cash</SelectItem>
+                  <SelectItem value="card">Card Payment</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCreatePaymentDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleCreatePayment} className="bg-blue-600 hover:bg-blue-700">
+              Create Payment
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Approval Dialog */}
       <Dialog open={showApprovalDialog} onOpenChange={setShowApprovalDialog}>
@@ -787,29 +1273,37 @@ export default function AdminPaymentsPage() {
               Please provide a reason for rejecting this payment.
             </DialogDescription>
           </DialogHeader>
-          {selectedPayment && (
-            <div className="space-y-4">
+          <div className="space-y-4">
+            {selectedPayment && (
               <div className="space-y-2">
                 <p><strong>User:</strong> {selectedPayment.userName}</p>
                 <p><strong>Amount:</strong> ₦{selectedPayment.amount.toLocaleString()}</p>
                 <p><strong>Reference:</strong> {selectedPayment.reference}</p>
               </div>
-              <div>
-                <Label htmlFor="reason">Rejection Reason</Label>
-                <Textarea
-                  id="reason"
-                  placeholder="Enter reason for rejection..."
-                  value={rejectionReason}
-                  onChange={(e) => setRejectionReason(e.target.value)}
-                  className="mt-2"
-                />
+            )}
+            {selectedUser && (
+              <div className="space-y-2">
+                <p><strong>User:</strong> {selectedUser.firstName} {selectedUser.lastName}</p>
+                <p><strong>Email:</strong> {selectedUser.email}</p>
+                <p><strong>Type:</strong> {selectedUser.userType}</p>
               </div>
+            )}
+            <div>
+              <Label htmlFor="reason">Rejection Reason</Label>
+              <Textarea
+                id="reason"
+                placeholder="Enter reason for rejection..."
+                value={rejectionReason}
+                onChange={(e) => setRejectionReason(e.target.value)}
+                className="mt-2"
+              />
             </div>
-          )}
+          </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => {
               setShowRejectionDialog(false)
               setRejectionReason("")
+              setSelectedUser(null)
             }}>
               Cancel
             </Button>
