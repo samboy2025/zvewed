@@ -171,4 +171,13 @@ export default defineSchema({
     createdAt: v.number(),
     updatedAt: v.number(),
   }),
+
+  admin_actions: defineTable({
+    adminId: v.id("users"),
+    action: v.string(),
+    targetType: v.string(),
+    targetId: v.optional(v.string()),
+    details: v.optional(v.string()),
+    timestamp: v.number(),
+  }),
 });
