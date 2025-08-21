@@ -246,7 +246,7 @@ export default function LeadershipPage() {
                     <p className="text-gray-600 mb-4">Get in touch with our founder and leadership team for strategic discussions and partnership opportunities.</p>
                     <p className="text-sm text-gray-500">
                       <strong>Email:</strong> <a href="mailto:wedzazzauversion@gmail.com" className="text-red-600">wedzazzauversion@gmail.com</a><br />
-                      <strong>WhatsApp:</strong> 08140135206
+                      <strong>WhatsApp:</strong> +2348109569323
                     </p>
                   </div>
                   <div>

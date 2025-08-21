@@ -211,7 +211,7 @@ export default function ParticipantPaymentPage() {
                   <div>
                     <h4 className="font-semibold mb-2">Contact Information</h4>
                     <p><strong>Email:</strong> <a href="mailto:wedzazzauversion@gmail.com" className="text-red-600 hover:underline">wedzazzauversion@gmail.com</a></p>
-                    <p><strong>WhatsApp:</strong> <a href="https://wa.me/08140135206" className="text-red-600 hover:underline">08140135206</a></p>
+                    <p><strong>WhatsApp:</strong> <a href="https://wa.me/2348109569323" className="text-red-600 hover:underline">+234 810 956 9323</a></p>
                   </div>
                   
                   <div>

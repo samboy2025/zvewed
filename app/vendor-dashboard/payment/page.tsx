@@ -40,7 +40,6 @@ export default function VendorPaymentPage() {
   const [isUploading, setIsUploading] = useState(false)
   const [paymentForm, setPaymentForm] = useState({
     amount: "12000", // Fixed amount for vendors
-    referenceNumber: "",
     paymentDate: new Date().toISOString().split('T')[0],
     bankName: "UBA Bank"
   })
@@ -76,7 +75,7 @@ export default function VendorPaymentPage() {
   ]
 
   // WhatsApp contact for receipt submission
-  const whatsappNumber = "08140135206"
+  const whatsappNumber = "+2348109569323"
 
   const handleCopyAccount = (accountNumber: string) => {
     navigator.clipboard.writeText(accountNumber)
@@ -134,11 +133,6 @@ export default function VendorPaymentPage() {
       return;
     }
 
-    if (!paymentForm.amount || !paymentForm.referenceNumber) {
-      alert("Please fill in all required fields");
-      return;
-    }
-
     try {
       // Upload payment receipt and update vendor status
       await submitVendorPayment({
@@ -147,7 +141,7 @@ export default function VendorPaymentPage() {
         paymentDetails: {
           amount: parseFloat(paymentForm.amount),
           paymentMethod: "Bank Transfer",
-          referenceNumber: paymentForm.referenceNumber,
+          referenceNumber: "Receipt Upload", // Default value since we removed the field
           paymentDate: paymentForm.paymentDate,
           bankName: paymentForm.bankName
         }
@@ -341,18 +335,6 @@ export default function VendorPaymentPage() {
                         </div>
                         
                         <div>
-                          <Label htmlFor="referenceNumber">Transaction Reference</Label>
-                          <Input
-                            id="referenceNumber"
-                            placeholder="e.g., Your company name or transaction ID"
-                            value={paymentForm.referenceNumber}
-                            onChange={(e) => setPaymentForm({...paymentForm, referenceNumber: e.target.value})}
-                            required
-                            disabled={isPaymentSubmitted}
-                          />
-                        </div>
-                        
-                        <div>
                           <Label htmlFor="bankName">Bank Name (From which you paid)</Label>
                           <Input
                             id="bankName"
@@ -403,7 +385,7 @@ export default function VendorPaymentPage() {
                         <Button
                           onClick={handleSubmitPayment}
                           className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                          disabled={isPaymentSubmitted || !uploadedReceipt || !paymentForm.referenceNumber || isUploading}
+                          disabled={isPaymentSubmitted || !uploadedReceipt || isUploading}
                         >
                           {isUploading ? "Uploading..." : "Submit Payment Confirmation"}
                         </Button>
@@ -423,11 +405,10 @@ export default function VendorPaymentPage() {
 
 Company: ${currentVendor.companyName}
 Amount Paid: ₦${paymentDetails.price.toLocaleString()}
-Reference: ${paymentForm.referenceNumber || 'Please provide reference number'}
 
 I will send the receipt image in the next message.`
 
-                              const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+                              const whatsappUrl = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(message)}`
                               window.open(whatsappUrl, '_blank')
                             }}
                             variant="outline"
@@ -507,10 +488,10 @@ I will send the receipt image in the next message.`
                 <CardContent className="space-y-3 text-sm">
                   <p>If you have any questions or issues with your payment, please contact our support team.</p>
                   <p>
-                    <strong>Email:</strong> <a href="mailto:support@zve.com" className="text-red-600 hover:underline">support@zve.com</a>
+                    <strong>Email:</strong> <a href="mailto:wedzazzauversion@gmail.com" className="text-red-600 hover:underline">wedzazzauversion@gmail.com</a>
                   </p>
                   <p>
-                    <strong>Phone:</strong> <a href="tel:+2348012345678" className="text-red-600 hover:underline">+234 801 234 5678</a>
+                    <strong>Phone:</strong> <a href="tel:+2348109569323" className="text-red-600 hover:underline">+234 810 956 9323</a>
                   </p>
                 </CardContent>
               </Card>

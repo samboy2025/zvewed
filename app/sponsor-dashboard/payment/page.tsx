@@ -24,7 +24,6 @@ export default function PaymentPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [paymentDetails, setPaymentDetails] = useState({
     amount: '',
-    transactionId: '',
     paymentMethod: '',
     paymentDate: '',
     notes: ''
@@ -135,6 +134,7 @@ export default function PaymentPage() {
           receiptURL,
           paymentDetails: {
             ...paymentDetails,
+            transactionId: "Receipt Upload", // Default value since we removed the field
             submittedAt: new Date().toISOString()
           }
         })
@@ -145,6 +145,7 @@ export default function PaymentPage() {
           paymentStatus: 'pending',
           paymentDetails: {
             ...paymentDetails,
+            transactionId: "Receipt Upload",
             receiptURL,
             submittedAt: new Date().toISOString()
           }
@@ -210,7 +211,6 @@ export default function PaymentPage() {
               <ul className="list-disc ml-5 space-y-1">
                 <li>Please make the payment to our official bank account</li>
                 <li>Upload a clear photo or PDF of your payment receipt</li>
-                <li>Include transaction ID for faster verification</li>
                 <li>Verification typically takes 24-48 hours</li>
               </ul>
             </div>
@@ -236,20 +236,6 @@ export default function PaymentPage() {
           <div className="border-b pb-6">
             <h2 className="text-xl font-semibold text-gray-700 mb-4">Payment Details</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Transaction ID
-                </label>
-                <input
-                  type="text"
-                  name="transactionId"
-                  value={paymentDetails.transactionId}
-                  onChange={handleInputChange}
-                  className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500"
-                  placeholder="Enter transaction reference"
-                  required
-                />
-              </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Payment Method

@@ -34,7 +34,6 @@ export function PaymentVerificationCard({ user, onPaymentSubmitted }: PaymentVer
   const [copiedAccount, setCopiedAccount] = useState("")
   const [paymentForm, setPaymentForm] = useState({
     amount: user?.userType === "participant" ? "7000" : "12000",
-    referenceNumber: "",
     paymentDate: new Date().toISOString().split('T')[0],
     bankName: "UBA Bank"
   })
@@ -50,7 +49,7 @@ export function PaymentVerificationCard({ user, onPaymentSubmitted }: PaymentVer
     accountNumber: "1027308809"
   }
 
-  const whatsappNumber = "08140135206"
+  const whatsappNumber = "+2348109569323"
   const paymentAmount = user?.userType === "participant" ? 7000 : 12000
 
   const copyToClipboard = async (text: string, type: string) => {
@@ -120,19 +119,13 @@ export function PaymentVerificationCard({ user, onPaymentSubmitted }: PaymentVer
         return
       }
 
-      // Validate reference number
-      if (!paymentForm.referenceNumber) {
-        alert("Please enter the payment reference number")
-        return
-      }
-
       const paymentData = {
         userId: user._id,
         receiptUrl: uploadedReceipt,
         paymentDetails: {
           amount: parseFloat(paymentForm.amount),
           paymentMethod: "Bank Transfer",
-          referenceNumber: paymentForm.referenceNumber,
+          referenceNumber: "Receipt Upload", // Default value since we removed the field
           paymentDate: paymentForm.paymentDate,
           bankName: paymentForm.bankName
         }
@@ -155,11 +148,10 @@ export function PaymentVerificationCard({ user, onPaymentSubmitted }: PaymentVer
 Name: ${user?.firstName} ${user?.lastName}
 User Type: ${user?.userType}
 Amount Paid: ₦${paymentAmount.toLocaleString()}
-Reference: ${paymentForm.referenceNumber || 'Please provide reference number'}
 
 I will send the receipt image in the next message.`
     
-    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`
+    const whatsappUrl = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
   }
 
@@ -210,7 +202,7 @@ I will send the receipt image in the next message.`
 
         {user?.paymentStatus === "rejected" && (
           <Alert className="border-red-200 bg-red-50">
-            <XCircle className="h-4 w-4 text-red-600" />
+            <XCircle className="h-4 w-4 text-red-800" />
             <AlertDescription className="text-red-800">
               Payment verification failed: {user?.paymentRejectionReason || "Please contact support"}
             </AlertDescription>
@@ -292,16 +284,6 @@ I will send the receipt image in the next message.`
                 
                 <div className="space-y-3">
                   <div>
-                    <Label htmlFor="reference">Payment Reference Number *</Label>
-                    <Input
-                      id="reference"
-                      value={paymentForm.referenceNumber}
-                      onChange={(e) => setPaymentForm(prev => ({ ...prev, referenceNumber: e.target.value }))}
-                      placeholder="Enter transaction reference"
-                    />
-                  </div>
-                  
-                  <div>
                     <Label htmlFor="receipt">Upload Receipt *</Label>
                     <Input
                       id="receipt"
@@ -316,7 +298,7 @@ I will send the receipt image in the next message.`
                   
                   <Button 
                     onClick={handleSubmitPayment}
-                    disabled={!uploadedReceipt || !paymentForm.referenceNumber || isUploading}
+                    disabled={!uploadedReceipt || isUploading}
                     className="w-full bg-red-600 hover:bg-red-700"
                   >
                     Submit Payment Receipt
