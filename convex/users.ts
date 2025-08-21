@@ -300,6 +300,26 @@ export const getUsersByPaymentStatus = query({
   },
 });
 
+// Get users who haven't submitted payments yet
+export const getUsersWithoutPayments = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("users")
+      .filter((q) => 
+        q.or(
+          q.eq(q.field("paymentStatus"), "unpaid"),
+          q.eq(q.field("paymentStatus"), undefined)
+        )
+      )
+      .filter((q) => 
+        q.neq(q.field("userType"), "admin")
+      )
+      .order("desc")
+      .collect();
+  },
+});
+
 // Initialize payment amount for user based on user type
 export const initializeUserPayment = mutation({
   args: { userId: v.id("users") },

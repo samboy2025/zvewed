@@ -83,14 +83,43 @@ export const getPaymentStats = query({
       pending: payments.filter(p => p.status === "pending").length,
       approved: payments.filter(p => p.status === "approved").length,
       rejected: payments.filter(p => p.status === "rejected").length,
+      pendingAmount: payments
+        .filter(p => p.status === "pending")
+        .reduce((sum, p) => sum + p.amount, 0),
       approvedAmount: payments
         .filter(p => p.status === "approved")
         .reduce((sum, p) => sum + p.amount, 0),
+      rejectedAmount: payments
+        .filter(p => p.status === "rejected")
+        .reduce((sum, p) => sum + p.amount, 0),
       byType: {
-        ticket: payments.filter(p => p.type === "ticket").length,
-        sponsorship: payments.filter(p => p.type === "sponsorship").length,
-        vendor_booth: payments.filter(p => p.type === "vendor_booth").length,
+        ticket: {
+          count: payments.filter(p => p.type === "ticket").length,
+          amount: payments.filter(p => p.type === "ticket").reduce((sum, p) => sum + p.amount, 0)
+        },
+        sponsorship: {
+          count: payments.filter(p => p.type === "sponsorship").length,
+          amount: payments.filter(p => p.type === "sponsorship").reduce((sum, p) => sum + p.amount, 0)
+        },
+        vendor_booth: {
+          count: payments.filter(p => p.type === "vendor_booth").length,
+          amount: payments.filter(p => p.type === "vendor_booth").reduce((sum, p) => sum + p.amount, 0)
+        }
       },
+      byUserType: {
+        participant: {
+          count: payments.filter(p => p.userType === "participant").length,
+          amount: payments.filter(p => p.userType === "participant").reduce((sum, p) => sum + p.amount, 0)
+        },
+        vendor: {
+          count: payments.filter(p => p.userType === "vendor").length,
+          amount: payments.filter(p => p.userType === "vendor").reduce((sum, p) => sum + p.amount, 0)
+        },
+        sponsor: {
+          count: payments.filter(p => p.userType === "sponsor").length,
+          amount: payments.filter(p => p.userType === "sponsor").reduce((sum, p) => sum + p.amount, 0)
+        }
+      }
     };
     
     return stats;
@@ -102,5 +131,22 @@ export const deletePayment = mutation({
   args: { paymentId: v.id("payments") },
   handler: async (ctx, args) => {
     await ctx.db.delete(args.paymentId);
+  },
+});
+
+// Get payments missing receipts
+export const getPaymentsMissingReceipts = query({
+  args: {},
+  handler: async (ctx) => {
+    return await ctx.db
+      .query("payments")
+      .filter((q) => 
+        q.and(
+          q.eq(q.field("status"), "approved"),
+          q.eq(q.field("receiptUrl"), undefined)
+        )
+      )
+      .order("desc")
+      .collect();
   },
 });
