@@ -237,7 +237,7 @@ export const deleteUser = mutation({
 export const submitPaymentReceipt = mutation({
   args: {
     userId: v.id("users"),
-    receiptUrl: v.string(),
+    receiptUrl: v.optional(v.string()),
     paymentDetails: v.object({
       amount: v.number(),
       paymentMethod: v.string(),
@@ -249,12 +249,46 @@ export const submitPaymentReceipt = mutation({
   handler: async (ctx, args) => {
     const { userId, receiptUrl, paymentDetails } = args;
 
-    await ctx.db.patch(userId, {
-      paymentReceipt: receiptUrl,
+    const updateData: any = {
       paymentDetails: paymentDetails,
       paymentStatus: "pending",
       paymentSubmittedAt: Date.now(),
       updatedAt: Date.now(),
+    };
+
+    // Only add receipt URL if provided
+    if (receiptUrl) {
+      updateData.paymentReceipt = receiptUrl;
+    }
+
+    await ctx.db.patch(userId, updateData);
+
+    return { success: true };
+  },
+});
+
+// Submit payment proof via WhatsApp (no receipt upload required)
+export const submitPaymentProofViaWhatsApp = mutation({
+  args: {
+    userId: v.id("users"),
+    paymentDetails: v.object({
+      amount: v.number(),
+      paymentMethod: v.string(),
+      referenceNumber: v.string(),
+      paymentDate: v.string(),
+      bankName: v.optional(v.string()),
+    }),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { userId, paymentDetails, notes } = args;
+
+    await ctx.db.patch(userId, {
+      paymentDetails: paymentDetails,
+      paymentStatus: "pending",
+      paymentSubmittedAt: Date.now(),
+      updatedAt: Date.now(),
+      paymentNotes: notes || "Payment proof submitted via WhatsApp",
     });
 
     return { success: true };

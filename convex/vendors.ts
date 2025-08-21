@@ -295,6 +295,56 @@ export const uploadPaymentReceipt = mutation({
   },
 });
 
+// Submit payment proof via WhatsApp (no receipt upload required)
+export const submitPaymentProofViaWhatsApp = mutation({
+  args: {
+    vendorId: v.union(v.id("vendors"), v.id("users")),
+    paymentDetails: v.object({
+      amount: v.number(),
+      paymentMethod: v.string(),
+      referenceNumber: v.string(),
+      paymentDate: v.string(),
+      bankName: v.optional(v.string()),
+    }),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const { vendorId, paymentDetails, notes } = args;
+    
+    // Try to update vendors table first, then users table if needed
+    try {
+      const vendor = await ctx.db.get(vendorId as any);
+      if (vendor) {
+        await ctx.db.patch(vendorId as any, {
+          paymentDetails: paymentDetails,
+          paymentStatus: "pending",
+          paymentSubmittedAt: Date.now(),
+          paymentNotes: notes || "Payment proof submitted via WhatsApp",
+        });
+        return;
+      }
+    } catch (error) {
+      // If it fails, it might be a user ID, try users table
+      try {
+        const user = await ctx.db.get(vendorId as any);
+        if (user) {
+          await ctx.db.patch(vendorId as any, {
+            paymentDetails: paymentDetails,
+            paymentStatus: "pending",
+            paymentSubmittedAt: Date.now(),
+            paymentNotes: notes || "Payment proof submitted via WhatsApp",
+          });
+          return;
+        }
+      } catch (userError) {
+        throw new Error("Invalid vendor or user ID");
+      }
+    }
+    
+    throw new Error("Vendor or user not found");
+  },
+});
+
 // Update vendor profile image
 export const updateProfileImage = mutation({
   args: {

@@ -78,6 +78,7 @@ export default function AdminPaymentsPage() {
     receiptUrl?: string;
     updatedAt?: number;
     approvedAt?: number;
+    notes?: string; // Added notes field
   }
 
   interface User {
@@ -740,6 +741,12 @@ export default function AdminPaymentsPage() {
                                     {formatDate(selectedPayment.createdAt)}
                                   </p>
                                 </div>
+                                {selectedPayment.notes && (
+                                  <div>
+                                    <Label>Notes</Label>
+                                    <p className="text-sm text-gray-700">{selectedPayment.notes}</p>
+                                  </div>
+                                )}
                               </div>
                               
                               {selectedPayment.receiptUrl && (
@@ -1140,6 +1147,11 @@ export default function AdminPaymentsPage() {
                         <div>
                           <div className="font-medium">{user.firstName} {user.lastName}</div>
                           <div className="text-sm text-gray-500">{user.email}</div>
+                          {user.paymentNotes && (
+                            <div className="text-xs text-blue-600 mt-1">
+                              Note: {user.paymentNotes}
+                            </div>
+                          )}
                         </div>
                       </TableCell>
                       <TableCell>

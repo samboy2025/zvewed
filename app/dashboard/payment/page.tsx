@@ -1,7 +1,6 @@
 "use client"
 
 import { DashboardLayout } from "../../components/DashboardLayout"
-import { PaymentVerificationCard } from "../../components/PaymentVerificationCard"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -12,7 +11,11 @@ import {
   CheckCircle,
   Clock,
   XCircle,
-  AlertCircle
+  AlertCircle,
+  ShoppingCart,
+  ArrowRight,
+  MessageCircle,
+  Phone
 } from "lucide-react"
 import Link from "next/link"
 import { useEffect, useState } from "react"
@@ -49,6 +52,25 @@ export default function ParticipantPaymentPage() {
   const handlePaymentSubmitted = () => {
     // Refresh user data after payment submission
     setRefreshKey(prev => prev + 1)
+  }
+
+  const handlePaystackPayment = () => {
+    // Open Paystack payment link in new tab
+    window.open("https://paystack.com/buy/regular-ticket-wed4", "_blank")
+  }
+
+  const openWhatsApp = () => {
+    const whatsappNumber = "+2348109569323"
+    const message = `Hello! I'm submitting my payment proof for WED 4.0.
+    
+Name: ${currentUser?.firstName} ${currentUser?.lastName}
+User Type: ${currentUser?.userType}
+Amount Paid: ₦${currentUser?.userType === "participant" ? 7000 : 12000}
+
+I will send the payment proof in the next message.`
+    
+    const whatsappUrl = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
   }
 
   if (isLoading) {
@@ -95,7 +117,7 @@ export default function ParticipantPaymentPage() {
         return {
           icon: <Clock className="h-6 w-6 text-yellow-600" />,
           title: "Payment Under Review",
-          description: "Your payment receipt is being reviewed. We'll notify you within 24-48 hours.",
+          description: "Your payment proof is being reviewed. We'll notify you within 24-48 hours.",
           alertType: "warning"
         }
       case "rejected":
@@ -189,11 +211,75 @@ export default function ParticipantPaymentPage() {
             </CardContent>
           </Card>
 
-          {/* Payment Verification Component */}
-          <PaymentVerificationCard 
-            user={currentUser} 
-            onPaymentSubmitted={handlePaymentSubmitted}
-          />
+          {/* Payment Section */}
+          {(!currentUser.paymentStatus || currentUser.paymentStatus === "unpaid") && (
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <CreditCard className="h-5 w-5 text-red-600" />
+                  Complete Your Payment
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* Payment Amount Display */}
+                <div className="bg-red-50 p-6 rounded-lg border border-red-200 text-center">
+                  <div className="text-3xl font-bold text-red-900 mb-2">
+                    ₦{paymentAmount.toLocaleString()}
+                  </div>
+                  <p className="text-red-800 font-medium">
+                    {currentUser.userType === "participant" ? "Participant Registration Fee" : "Vendor Booth Fee"}
+                  </p>
+                </div>
+
+                {/* Paystack Payment Button */}
+                <div className="text-center">
+                  <Button
+                    onClick={handlePaystackPayment}
+                    className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-6"
+                    size="lg"
+                  >
+                    <ShoppingCart className="h-6 w-6 mr-3" />
+                    Pay with Paystack
+                    <ArrowRight className="h-5 w-5 ml-3" />
+                  </Button>
+                  <p className="text-sm text-gray-500 mt-2">
+                    You will be redirected to Paystack's secure payment page
+                  </p>
+                </div>
+
+                {/* Payment Instructions */}
+                <div className="bg-gray-50 p-4 rounded-lg border">
+                  <h3 className="font-semibold text-gray-900 mb-3">Payment Instructions</h3>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                    <li>Click the "Pay with Paystack" button above</li>
+                    <li>You'll be redirected to Paystack's secure payment page</li>
+                    <li>Complete your payment using any of the available methods</li>
+                    <li>After successful payment, send proof to our WhatsApp</li>
+                    <li>We'll verify and update your status within 24 hours</li>
+                  </ol>
+                </div>
+
+                {/* WhatsApp Contact */}
+                <div className="border rounded-lg p-4">
+                  <h4 className="font-medium mb-3 flex items-center gap-2">
+                    <MessageCircle className="h-4 w-4" />
+                    Send Payment Proof via WhatsApp
+                  </h4>
+                  <p className="text-sm text-gray-600 mb-3">
+                    After completing your payment, send the payment proof to our WhatsApp number for verification.
+                  </p>
+                  <Button 
+                    onClick={openWhatsApp}
+                    variant="outline"
+                    className="w-full border-green-500 text-green-600 hover:bg-green-50"
+                  >
+                    <Phone className="h-4 w-4 mr-2" />
+                    Send to WhatsApp: +234 810 956 9323
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          )}
 
           {/* Help Section */}
           <Card className="mt-6">
@@ -219,6 +305,7 @@ export default function ParticipantPaymentPage() {
                     <ul className="list-disc list-inside space-y-1 text-gray-600">
                       <li>Ensure payment amount matches exactly</li>
                       <li>Keep your transaction receipt safe</li>
+                      <li>Send payment proof via WhatsApp</li>
                       <li>Allow 24-48 hours for verification</li>
                       <li>Contact support if payment is rejected</li>
                     </ul>

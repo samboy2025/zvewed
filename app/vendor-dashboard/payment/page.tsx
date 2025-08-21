@@ -20,34 +20,23 @@ import {
   Clock,
   FileText,
   Loader2,
-  Upload,
-  Image as ImageIcon,
   MessageCircle,
-  Phone
+  Phone,
+  ShoppingCart,
+  ArrowRight
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useMutation } from "convex/react"
 import { api } from "../../../convex/_generated/api"
-import { Input } from "@/components/ui/input"
 
 export default function VendorPaymentPage() {
   const [currentVendor, setCurrentVendor] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("bank_transfer")
-  const [copiedAccount, setCopiedAccount] = useState("")
-  const [uploadedReceipt, setUploadedReceipt] = useState<string>("")
-  const [isUploading, setIsUploading] = useState(false)
-  const [paymentForm, setPaymentForm] = useState({
-    amount: "12000", // Fixed amount for vendors
-    paymentDate: new Date().toISOString().split('T')[0],
-    bankName: "UBA Bank"
-  })
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("paystack")
 
   // Check if payment is already submitted
   const isPaymentSubmitted = currentVendor?.paymentStatus === "pending" || currentVendor?.paymentStatus === "approved"
-
-  const submitVendorPayment = useMutation(api.vendors.uploadPaymentReceipt)
 
   // Get vendor data from localStorage
   useEffect(() => {
@@ -64,113 +53,35 @@ export default function VendorPaymentPage() {
     description: "Vendor Booth Registration Fee"
   }
 
-  // Bank account details
-  const bankAccounts = [
-    {
-      bank: "UBA Bank",
-      accountName: "Zazzau Version Entrepreneurs",
-      accountNumber: "1027308809",
-      accountType: "Current Account"
-    }
-  ]
-
-  // WhatsApp contact for receipt submission
+  // WhatsApp contact for payment proof
   const whatsappNumber = "+2348109569323"
 
-  const handleCopyAccount = (accountNumber: string) => {
-    navigator.clipboard.writeText(accountNumber)
-    setCopiedAccount(accountNumber)
-    setTimeout(() => setCopiedAccount(""), 2000)
+  const handlePaystackPayment = () => {
+    // Open Paystack payment link in new tab
+    window.open("https://paystack.com/buy/vendor-stall-full-wed4", "_blank")
   }
 
-  const handleReceiptUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
+  const openWhatsApp = () => {
+    const message = `Hello! I'm submitting my payment proof for WED 4.0 Vendor Booth.
+    
+Company: ${currentVendor?.companyName}
+Contact Person: ${currentVendor?.contactPerson}
+Email: ${currentVendor?.email}
+Amount Paid: ₦${paymentDetails.price.toLocaleString()}
 
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-    if (!validTypes.includes(file.type)) {
-      alert('Please upload a valid image file (JPEG, PNG, or WebP)')
-      return
-    }
-
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('File size must be less than 5MB')
-      return
-    }
-
-    setIsUploading(true)
-
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!)
-
-    try {
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        {
-          method: 'POST',
-          body: formData,
-        }
-      )
-      const data = await response.json()
-
-      if (data.secure_url) {
-        setUploadedReceipt(data.secure_url)
-      }
-    } catch (error) {
-      console.error('Upload failed:', error)
-      alert('Failed to upload receipt. Please try again.')
-    } finally {
-      setIsUploading(false)
-    }
+I will send the payment proof in the next message.`
+    
+    const whatsappUrl = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(message)}`
+    window.open(whatsappUrl, '_blank')
   }
-
-  const handleSubmitPayment = async () => {
-    if (!currentVendor || !uploadedReceipt) {
-      alert("Please upload your payment receipt");
-      return;
-    }
-
-    try {
-      // Upload payment receipt and update vendor status
-      await submitVendorPayment({
-        vendorId: currentVendor._id,
-        receiptUrl: uploadedReceipt,
-        paymentDetails: {
-          amount: parseFloat(paymentForm.amount),
-          paymentMethod: "Bank Transfer",
-          referenceNumber: "Receipt Upload", // Default value since we removed the field
-          paymentDate: paymentForm.paymentDate,
-          bankName: paymentForm.bankName
-        }
-      });
-
-      alert("Payment receipt submitted successfully! Our team will verify it within 24-48 hours.");
-      
-      // Update local storage
-      const updatedVendor = {
-        ...currentVendor,
-        paymentStatus: "pending",
-        paymentReceipt: uploadedReceipt,
-        paymentSubmittedAt: Date.now()
-      };
-      localStorage.setItem('currentVendor', JSON.stringify(updatedVendor));
-      setCurrentVendor(updatedVendor);
-    } catch (error) {
-      console.error("Payment submission failed:", error);
-      alert("Failed to submit payment. Please ensure all details are correct and try again. If the problem persists, contact support.");
-    }
-  };
 
   if (isLoading) {
     return (
       <VendorDashboardLayout>
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="flex items-center gap-2">
-            <Loader2 className="h-6 w-6 animate-spin" />
-            <span>Loading payment details...</span>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <Clock className="h-8 w-8 mx-auto mb-4 text-gray-400 animate-spin" />
+            <p className="text-gray-500">Loading payment details...</p>
           </div>
         </div>
       </VendorDashboardLayout>
@@ -184,7 +95,7 @@ export default function VendorPaymentPage() {
           <Card className="w-full max-w-md">
             <CardContent className="pt-6 text-center">
               <h2 className="text-xl font-semibold mb-4">Access Denied</h2>
-              <p className="text-gray-600 mb-6">Please log in as a vendor to access this page.</p>
+              <p className="text-gray-600 mb-6">Please log in to access your payment page.</p>
               <Button asChild className="bg-red-600 hover:bg-red-700">
                 <Link href="/login">Go to Login</Link>
               </Button>
@@ -233,7 +144,7 @@ export default function VendorPaymentPage() {
               <Clock className="h-4 w-4 text-yellow-600" />
               <AlertTitle>Payment Pending Verification</AlertTitle>
               <AlertDescription>
-                We have received your payment receipt. Please allow up to 24 hours for verification.
+                We have received your payment proof. Please allow up to 24 hours for verification.
               </AlertDescription>
             </Alert>
           )}
@@ -253,246 +164,145 @@ export default function VendorPaymentPage() {
             <div className="lg:col-span-2 space-y-6">
               {/* Payment Method Tabs */}
               <Tabs value={selectedPaymentMethod} onValueChange={setSelectedPaymentMethod} className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="bank_transfer">
-                    <Building className="h-4 w-4 mr-2" />
-                    Bank Transfer
-                  </TabsTrigger>
-                  <TabsTrigger value="online_payment" disabled>
+                <TabsList className="grid w-full grid-cols-1">
+                  <TabsTrigger value="paystack">
                     <CreditCard className="h-4 w-4 mr-2" />
-                    Online Payment (Coming Soon)
+                    Paystack Payment
                   </TabsTrigger>
                 </TabsList>
 
-                {/* Bank Transfer Content */}
-                <TabsContent value="bank_transfer">
+                {/* Paystack Payment Content */}
+                <TabsContent value="paystack">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Bank Transfer Instructions</CardTitle>
+                      <CardTitle>Paystack Payment</CardTitle>
                       <CardDescription>
-                        Please transfer the total amount to one of the accounts below.
+                        Complete your payment securely through Paystack
                       </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
-                      <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-                        <h3 className="font-semibold text-blue-900 mb-2">Important Notice</h3>
-                        <p className="text-sm text-blue-800">
-                          Use your <strong className="font-bold">Company Name</strong> as the payment reference or narration.
-                        </p>
+                      {/* Payment Amount Display */}
+                      <div className="bg-blue-50 p-6 rounded-lg border border-blue-200 text-center">
+                        <div className="text-3xl font-bold text-blue-900 mb-2">
+                          ₦{paymentDetails.price.toLocaleString()}
+                        </div>
+                        <p className="text-blue-800 font-medium">{paymentDetails.description}</p>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        {bankAccounts.map((account, index) => (
-                          <div key={index} className="border p-4 rounded-lg">
-                            <h4 className="font-semibold">{account.bank}</h4>
-                            <p className="text-sm text-gray-500">{account.accountName}</p>
-                            <div className="flex items-center justify-between mt-2">
-                              <span className="text-lg font-mono tracking-wider">{account.accountNumber}</span>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleCopyAccount(account.accountNumber)}
-                              >
-                                <Copy className="h-4 w-4 mr-2" />
-                                {copiedAccount === account.accountNumber ? "Copied!" : "Copy"}
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Payment Submission Form */}
-                      <div className="space-y-4 pt-4 border-t">
-                        <h3 className="text-lg font-semibold">Confirm Your Payment</h3>
-                        <p className="text-sm text-gray-600">
-                          After making the transfer, please fill out this form and upload your payment receipt.
-                        </p>
-                        
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                          <div>
-                            <Label htmlFor="amount">Amount Paid (₦)</Label>
-                            <Input
-                              id="amount"
-                              type="number"
-                              placeholder={paymentDetails.price.toString()}
-                              value={paymentForm.amount}
-                              onChange={(e) => setPaymentForm({...paymentForm, amount: e.target.value})}
-                              required
-                              disabled={isPaymentSubmitted}
-                            />
-                          </div>
-                          <div>
-                            <Label htmlFor="paymentDate">Payment Date</Label>
-                            <Input
-                              id="paymentDate"
-                              type="date"
-                              value={paymentForm.paymentDate}
-                              onChange={(e) => setPaymentForm({...paymentForm, paymentDate: e.target.value})}
-                              required
-                              disabled={isPaymentSubmitted}
-                            />
-                          </div>
-                        </div>
-                        
-                        <div>
-                          <Label htmlFor="bankName">Bank Name (From which you paid)</Label>
-                          <Input
-                            id="bankName"
-                            placeholder="e.g., Access Bank, GTBank"
-                            value={paymentForm.bankName}
-                            onChange={(e) => setPaymentForm({...paymentForm, bankName: e.target.value})}
-                            disabled={isPaymentSubmitted}
-                          />
-                        </div>
-
-                        {/* Upload Receipt */}
-                        <div className="space-y-2">
-                          <Label htmlFor="receipt">Upload Payment Receipt *</Label>
-                          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                            <input
-                              type="file"
-                              id="receipt"
-                              className="hidden"
-                              accept="image/jpeg,image/png,image/webp"
-                              onChange={handleReceiptUpload}
-                              disabled={isPaymentSubmitted}
-                            />
-                            {isUploading ? (
-                              <div className="flex flex-col items-center justify-center">
-                                <Loader2 className="h-8 w-8 animate-spin text-gray-500 mb-2" />
-                                <p className="text-sm text-gray-600">Uploading...</p>
-                              </div>
-                            ) : uploadedReceipt ? (
-                              <div className="flex flex-col items-center justify-center">
-                                <ImageIcon className="h-8 w-8 text-green-500 mb-2" />
-                                <p className="text-sm font-medium text-green-600">Receipt Uploaded Successfully!</p>
-                                <Button variant="link" size="sm" onClick={() => document.getElementById('receipt')?.click()}>
-                                  Change file
-                                </Button>
-                              </div>
-                            ) : (
-                              <div className="flex flex-col items-center justify-center">
-                                <Upload className="h-8 w-8 text-gray-400 mb-2" />
-                                <Button variant="outline" size="sm" onClick={() => document.getElementById('receipt')?.click()}>
-                                  Choose File
-                                </Button>
-                                <p className="text-xs text-gray-500 mt-2">JPEG, PNG, or WebP (Max 5MB)</p>
-                              </div>
-                            )}
-                          </div>
-                        </div>
-
+                      {/* Paystack Payment Button */}
+                      <div className="text-center">
                         <Button
-                          onClick={handleSubmitPayment}
-                          className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                          disabled={isPaymentSubmitted || !uploadedReceipt || isUploading}
+                          onClick={handlePaystackPayment}
+                          className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-6"
+                          size="lg"
+                          disabled={isPaymentSubmitted}
                         >
-                          {isUploading ? "Uploading..." : "Submit Payment Confirmation"}
+                          <ShoppingCart className="h-6 w-6 mr-3" />
+                          Pay with Paystack
+                          <ArrowRight className="h-5 w-5 ml-3" />
                         </Button>
-
-                        {/* WhatsApp Alternative */}
-                        <div className="border-t pt-4 mt-4">
-                          <h4 className="font-medium mb-2 flex items-center gap-2">
-                            <MessageCircle className="h-4 w-4" />
-                            Alternative: Send via WhatsApp
-                          </h4>
-                          <p className="text-sm text-gray-600 mb-3">
-                            You can also send your payment receipt directly to our WhatsApp number
-                          </p>
-                          <Button
-                            onClick={() => {
-                              const message = `Hello! I'm submitting my payment receipt for WED 4.0 vendor booth.
-
-Company: ${currentVendor.companyName}
-Amount Paid: ₦${paymentDetails.price.toLocaleString()}
-
-I will send the receipt image in the next message.`
-
-                              const whatsappUrl = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(message)}`
-                              window.open(whatsappUrl, '_blank')
-                            }}
-                            variant="outline"
-                            className="w-full border-green-500 text-green-600 hover:bg-green-50"
-                          >
-                            <Phone className="h-4 w-4 mr-2" />
-                            Send to WhatsApp: {whatsappNumber}
-                          </Button>
-                        </div>
+                        <p className="text-sm text-gray-500 mt-2">
+                          You will be redirected to Paystack's secure payment page
+                        </p>
                       </div>
-                    </CardContent>
-                  </Card>
-                </TabsContent>
 
-                {/* Online Payment Content (Disabled) */}
-                <TabsContent value="online_payment">
-                  <Card>
-                    <CardContent className="pt-6 text-center">
-                      <CreditCard className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-semibold">Coming Soon</h3>
-                      <p className="text-sm text-gray-500 mt-2">
-                        Online payment with Paystack will be available shortly.
-                      </p>
+                      {/* Payment Instructions */}
+                      <div className="bg-gray-50 p-4 rounded-lg border">
+                        <h3 className="font-semibold text-gray-900 mb-3">Payment Instructions</h3>
+                        <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                          <li>Click the "Pay with Paystack" button above</li>
+                          <li>You'll be redirected to Paystack's secure payment page</li>
+                          <li>Complete your payment using any of the available methods</li>
+                          <li>After successful payment, send proof to our WhatsApp</li>
+                          <li>We'll verify and update your status within 24 hours</li>
+                        </ol>
+                      </div>
                     </CardContent>
                   </Card>
                 </TabsContent>
               </Tabs>
             </div>
-            
-            {/* Right side - Payment Summary */}
-            <div className="lg:col-span-1 space-y-6">
+
+            {/* Right side - Payment Status & Help */}
+            <div className="space-y-6">
+              {/* Payment Status Card */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5" />
-                    Payment Summary
+                    <Info className="h-5 w-5 text-blue-600" />
+                    Payment Status
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Company:</span>
-                    <span className="font-semibold">{currentVendor.companyName}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Booth Type:</span>
-                    <span className="font-semibold">{paymentDetails.description}</span>
-                  </div>
-                  <div className="border-t border-gray-200 my-2"></div>
-                  <div className="flex justify-between items-center text-lg">
-                    <span className="font-bold">Total Amount Due:</span>
-                    <span className="font-bold text-red-600">₦{paymentDetails.price.toLocaleString()}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-600">Payment Status:</span>
-                    <div>
-                      <Badge
-                        className={
-                          currentVendor.paymentStatus === "paid" ? "bg-green-100 text-green-800"
-                          : currentVendor.paymentStatus === "pending" ? "bg-yellow-100 text-yellow-800"
-                          : "bg-red-100 text-red-800"
-                        }
-                      >
-                        {(currentVendor.paymentStatus || "unpaid").toUpperCase()}
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Status:</span>
+                      <Badge className={
+                        currentVendor.paymentStatus === "paid" ? "bg-green-600" :
+                        currentVendor.paymentStatus === "pending" ? "bg-yellow-600" :
+                        "bg-red-600"
+                      }>
+                        {currentVendor.paymentStatus === "paid" ? "Paid" :
+                         currentVendor.paymentStatus === "pending" ? "Pending" :
+                         "Unpaid"}
                       </Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Amount:</span>
+                      <span className="font-semibold">₦{paymentDetails.price.toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-gray-600">Booth Type:</span>
+                      <span className="font-semibold capitalize">{currentVendor.boothSize}</span>
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
+              {/* WhatsApp Contact Card */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Info className="h-5 w-5" />
+                    <MessageCircle className="h-5 w-5 text-green-600" />
+                    Send Payment Proof
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-4">
+                    After completing your payment, please send the payment proof to our WhatsApp number for verification.
+                  </p>
+                  <Button
+                    onClick={openWhatsApp}
+                    className="w-full bg-green-600 hover:bg-green-700"
+                    disabled={isPaymentSubmitted}
+                  >
+                    <Phone className="h-4 w-4 mr-2" />
+                    Send to WhatsApp
+                  </Button>
+                  <p className="text-xs text-gray-500 mt-2 text-center">
+                    {whatsappNumber}
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Help Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Info className="h-5 w-5 text-blue-600" />
                     Need Help?
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-3 text-sm">
-                  <p>If you have any questions or issues with your payment, please contact our support team.</p>
-                  <p>
-                    <strong>Email:</strong> <a href="mailto:wedzazzauversion@gmail.com" className="text-red-600 hover:underline">wedzazzauversion@gmail.com</a>
-                  </p>
-                  <p>
-                    <strong>Phone:</strong> <a href="tel:+2348109569323" className="text-red-600 hover:underline">+234 810 956 9323</a>
-                  </p>
+                <CardContent>
+                  <div className="space-y-3 text-sm">
+                    <p className="text-gray-600">
+                      If you encounter any issues with payment or have questions, contact our support team.
+                    </p>
+                    <div className="space-y-2">
+                      <p><strong>Email:</strong> wedzazzauversion@gmail.com</p>
+                      <p><strong>WhatsApp:</strong> {whatsappNumber}</p>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
