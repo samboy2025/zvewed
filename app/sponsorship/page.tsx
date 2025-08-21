@@ -215,7 +215,7 @@ export default function SponsorshipPage() {
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-5 w-5 text-red-600" />
-                <span className="text-gray-700">08140135206, 09036625032, 07035877985</span>
+                <span className="text-gray-700">+2348109569323, 09036625032, 07035877985</span>
               </div>
             </div>
           </div>

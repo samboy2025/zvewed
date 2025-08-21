@@ -425,7 +425,7 @@ export default function WED4Page() {
                 </a>
               </p>
               <p>
-                <span className="font-semibold">WhatsApp:</span> 08140135206, 09036625032, 07035877985
+                <span className="font-semibold">WhatsApp:</span> +2348109569323, 09036625032, 07035877985
               </p>
             </div>
           </div>
