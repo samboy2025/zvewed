@@ -110,7 +110,7 @@ export default defineSchema({
     firstName: v.string(),
     lastName: v.string(),
     email: v.string(),
-    phone: v.optional(v.string()),
+    phone: v.string(), // Required for phone-based login
     organization: v.optional(v.string()),
     position: v.optional(v.string()),
     city: v.optional(v.string()),
@@ -128,7 +128,7 @@ export default defineSchema({
     status: v.string(), // active, inactive, suspended
     lastLogin: v.optional(v.number()),
     eventId: v.string(),
-    password: v.optional(v.string()), // For authentication
+    password: v.optional(v.string()), // Required for admin users, optional for others
     paymentStatus: v.optional(v.string()), // unpaid, pending, approved, rejected
     paymentAmount: v.optional(v.number()), // Required payment amount based on user type
     paymentReceipt: v.optional(v.string()), // URL to uploaded receipt
