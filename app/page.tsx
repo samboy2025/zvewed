@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { Calendar, MapPin, Users, Target, Lightbulb, Handshake, ArrowRight, Play, Store } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { TestimonialsSection } from "@/components/ui/testimonials-demo"
+import { TestimonialsSection } from "./components/TestimonialsSection"
 import BackToTopButton from "./components/BackToTopButton"
 
 export default function HomePage() {

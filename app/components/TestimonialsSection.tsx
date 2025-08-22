@@ -6,38 +6,38 @@ import Image from "next/image"
 const testimonials = [
   {
     name: "Aisha Abubakar",
-    title: "Founder, EcoInnovate",
-    quote: "WED was a game-changer for my startup. The mentorship and networking opportunities were invaluable.",
+    title: "Founder & CEO, EcoInnovate Solutions",
+    quote: "WED was a game-changer for my startup. The mentorship and networking opportunities were invaluable. We've grown from 5 to 25 employees since attending WED 2.0.",
     image: "/WED 2.0/Pictures WED 2.0/a9fdf12c-df22-4e26-8014-b060e6fa6042.jpg",
   },
   {
     name: "Bello Mohammed",
-    title: "Student Entrepreneur",
-    quote: "As a student, WED gave me the confidence and connections to pursue my business idea. Highly recommended!",
+    title: "Founder & Managing Director, Student Ventures",
+    quote: "As a student entrepreneur, WED gave me the confidence and connections to pursue my business idea. We've secured our first major client and are expanding rapidly.",
     image: "/WED 1.0/Pictures WED 1.0/DSC_2517_Original.jpg",
   },
   {
     name: "Fatima Yusuf",
-    title: "CEO, TechSavvy Solutions",
-    quote: "The pitch competition was intense but incredibly rewarding. We secured our first seed funding thanks to WED.",
-    image: "/WED 3.0/WED 3.0/1001640345.jpeg",
+    title: "Founder & CEO, TechSavvy Solutions",
+    quote: "The pitch competition was intense but incredibly rewarding. We secured our first seed funding thanks to WED. The investor connections alone were worth the experience.",
+    image: "/WED 2.0/Pictures WED 2.0/IMG_6296.JPG",
   },
   {
     name: "David Okon",
-    title: "Social Entrepreneur",
-    quote: "I met my co-founder at WED. It's more than a conference; it's a community of passionate innovators.",
+    title: "Founder & Executive Director, Social Impact Hub",
+    quote: "I met my co-founder at WED. It's more than a conference; it's a community of passionate innovators. Our social enterprise has impacted over 10,000 lives.",
     image: "/WED 2.0/Pictures WED 2.0/5d0a04c5-d840-469b-bad0-a71bfd322b8f.jpg",
   },
   {
     name: "Chiamaka Nwosu",
-    title: "Agri-Tech Innovator",
-    quote: "The workshops on sustainable agriculture were eye-opening. WED is relevant and forward-thinking.",
-    image: "/WED 3.0/WED 3.0/IMG_7851.JPG",
+    title: "Founder & CEO, AgriTech Innovations",
+    quote: "The workshops on sustainable agriculture were eye-opening. WED is relevant and forward-thinking. We've developed new farming technologies that are now used across 5 states.",
+    image: "/WED 3.0/WED 3.0/IMG_8111.JPG",
   },
   {
     name: "Usman Aliyu",
-    title: "Creative Director, Zaria Arts",
-    quote: "A fantastic platform for creative entrepreneurs to showcase their work and connect with a wider audience.",
+    title: "Founder & Creative Director, Zaria Arts Collective",
+    quote: "A fantastic platform for creative entrepreneurs to showcase their work and connect with a wider audience. We've expanded our business to three cities since WED 1.0.",
     image: "/WED 1.0/Pictures WED 1.0/DSC_2601_Original.JPG",
   },
 ]
@@ -51,7 +51,7 @@ export function TestimonialsSection() {
             What Our Community Says
           </h2>
           <p className="mt-6 text-xl text-gray-600 dark:text-gray-300">
-            Hear from entrepreneurs, innovators, and leaders who have been part of the WED journey.
+            Hear from business owners, entrepreneurs, and innovators who have been part of the WED journey.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
