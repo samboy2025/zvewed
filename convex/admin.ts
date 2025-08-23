@@ -48,10 +48,27 @@ export const getDashboardStats = query({
         .reduce((sum, p) => sum + p.amount, 0),
     };
 
+    // Add byUserType breakdown for detailed revenue analysis
+    const byUserType = {
+      participant: {
+        count: userVendorPayments.filter(p => p.userType === "participant").length,
+        amount: userVendorPayments.filter(p => p.userType === "participant").reduce((sum, p) => sum + p.amount, 0)
+      },
+      vendor: {
+        count: userVendorPayments.filter(p => p.userType === "vendor").length,
+        amount: userVendorPayments.filter(p => p.userType === "vendor").reduce((sum, p) => sum + p.amount, 0)
+      },
+      sponsor: {
+        count: payments.filter(p => p.userType === "sponsor").length,
+        amount: payments.filter(p => p.userType === "sponsor").reduce((sum, p) => sum + p.amount, 0)
+      }
+    };
+
     // Combine payment stats
     const combinedPaymentStats = {
       ...paymentStats,
       ...userVendorPaymentStats,
+      byUserType,
     };
 
     // Get registration statistics
