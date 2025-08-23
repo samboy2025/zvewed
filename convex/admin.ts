@@ -545,3 +545,100 @@ export const getUsersEligibleForManualVerification = query({
     return users;
   },
 });
+
+// Get vendors eligible for payment verification
+export const getVendorsEligibleForPaymentVerification = query({
+  args: {
+    searchTerm: v.optional(v.string()),
+    paymentStatusFilter: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    let vendors = await ctx.db.query("vendors").collect();
+    
+    // Filter vendors who don't have paid status
+    vendors = vendors.filter(vendor => 
+      vendor.paymentStatus !== "paid"
+    );
+    
+    // Apply search filter
+    if (args.searchTerm) {
+      const search = args.searchTerm.toLowerCase();
+      vendors = vendors.filter(vendor => 
+        vendor.companyName.toLowerCase().includes(search) ||
+        vendor.contactPerson.toLowerCase().includes(search) ||
+        vendor.email.toLowerCase().includes(search)
+      );
+    }
+    
+    // Apply payment status filter
+    if (args.paymentStatusFilter && args.paymentStatusFilter !== "all") {
+      vendors = vendors.filter(vendor => vendor.paymentStatus === args.paymentStatusFilter);
+    }
+    
+    // Sort by creation date (newest first)
+    vendors.sort((a, b) => b.createdAt - a.createdAt);
+    
+    return vendors;
+  },
+});
+
+// Verify vendor payment
+export const verifyVendorPayment = mutation({
+  args: {
+    vendorId: v.id("vendors"),
+    adminId: v.id("users"),
+    amount: v.number(),
+    paymentMethod: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Verify the admin exists and is an admin
+    const admin = await ctx.db.get(args.adminId);
+    if (!admin || admin.userType !== "admin") {
+      throw new Error("Unauthorized: User is not an admin");
+    }
+
+    // Get the vendor to verify
+    const vendor = await ctx.db.get(args.vendorId);
+    if (!vendor) {
+      throw new Error("Vendor not found");
+    }
+
+    // Create a payment record for verification
+    const paymentId = await ctx.db.insert("payments", {
+      userId: vendor.email, // Using email as userId for vendors
+      userType: "vendor",
+      userName: vendor.contactPerson,
+      userEmail: vendor.email,
+      amount: args.amount,
+      type: "vendor_booth",
+      reference: `VENDOR-${Date.now()}`,
+      status: "approved",
+      paymentMethod: args.paymentMethod || "manual_verification",
+      approvedAt: Date.now(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
+    // Update vendor payment status
+    await ctx.db.patch(args.vendorId, {
+      paymentStatus: "paid",
+      paymentAmount: args.amount,
+      paymentSubmittedAt: Date.now(),
+      paymentApprovedAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
+    // Log the admin action
+    await ctx.db.insert("admin_actions", {
+      adminId: args.adminId,
+      action: "vendor_payment_verification",
+      targetType: "vendor",
+      targetId: args.vendorId,
+      details: `Verified payment of ₦${args.amount} for vendor ${vendor.companyName} (${vendor.contactPerson}). ${args.notes || ""}`,
+      timestamp: Date.now(),
+    });
+
+    return { success: true, paymentId };
+  },
+});

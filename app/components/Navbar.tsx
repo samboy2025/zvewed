@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { Button } from '@/components/ui/button'
-import { Menu } from 'lucide-react'
+import { Menu, ChevronDown, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import {
   NavigationMenu,
@@ -42,6 +42,36 @@ const ListItem = React.forwardRef<
   )
 })
 ListItem.displayName = "ListItem"
+
+// Mobile Collapsible Section Component
+const MobileCollapsibleSection = ({ title, children, defaultOpen = false }: { 
+  title: string, 
+  children: React.ReactNode, 
+  defaultOpen?: boolean 
+}) => {
+  const [isOpen, setIsOpen] = React.useState(defaultOpen)
+  
+  return (
+    <div className="border-b border-gray-100 pb-4">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="flex items-center justify-between w-full text-left font-semibold text-gray-900 hover:text-red-600 transition-colors py-2"
+      >
+        {title}
+        {isOpen ? (
+          <ChevronDown className="h-4 w-4 text-gray-500" />
+        ) : (
+          <ChevronRight className="h-4 w-4 text-gray-500" />
+        )}
+      </button>
+      {isOpen && (
+        <div className="space-y-2 ml-4 mt-2">
+          {children}
+        </div>
+      )}
+    </div>
+  )
+}
 
 export default function Navbar() {
     return (
@@ -160,31 +190,45 @@ export default function Navbar() {
                                     </Link>
                                     
                                     <div className="space-y-4">
-                                        <Link href="/about" className="block font-medium text-gray-900 hover:text-red-600">About ZVE</Link>
+                                        <Link href="/about" className="block font-medium text-gray-900 hover:text-red-600 transition-colors py-2 border-b border-gray-100 pb-4">
+                                            About ZVE
+                                        </Link>
                                         
-                                        <div>
-                                            <h3 className="font-semibold text-gray-900 mb-2">Events</h3>
-                                            <div className="space-y-2 ml-4">
-                                                <Link href="/wed-overview" className="block text-gray-600 hover:text-red-600">WED Journey</Link>
-                                                <Link href="/wed-4" className="block text-red-600 font-medium hover:text-red-700">WED 4.0 (Current)</Link>
-                                                <Link href="/wed-3" className="block text-gray-600 hover:text-red-600">WED 3.0 (Completed)</Link>
-                                                <Link href="/wed-2" className="block text-gray-600 hover:text-red-600">WED 2.0 (Completed)</Link>
-                                                <Link href="/wed-1" className="block text-gray-600 hover:text-red-600">WED 1.0 (Completed)</Link>
-                                            </div>
-                                        </div>
+                                        {/* Collapsible Events Section */}
+                                        <MobileCollapsibleSection title="Events">
+                                            <Link href="/wed-overview" className="block text-gray-600 hover:text-red-600 transition-colors py-1">
+                                                WED Journey
+                                            </Link>
+                                            <Link href="/wed-4" className="block text-red-600 font-medium hover:text-red-700 transition-colors py-1">
+                                                WED 4.0 (Current)
+                                            </Link>
+                                            <Link href="/wed-3" className="block text-gray-600 hover:text-red-600 transition-colors py-1">
+                                                WED 3.0 (Completed)
+                                            </Link>
+                                            <Link href="/wed-2" className="block text-gray-600 hover:text-red-600 transition-colors py-1">
+                                                WED 2.0 (Completed)
+                                            </Link>
+                                            <Link href="/wed-1" className="block text-gray-600 hover:text-red-600 transition-colors py-1">
+                                                WED 1.0 (Completed)
+                                            </Link>
+                                        </MobileCollapsibleSection>
                                         
-                                        <Link href="/gallery" className="block font-medium text-gray-900 hover:text-red-600">Gallery</Link>
+                                        <Link href="/gallery" className="block font-medium text-gray-900 hover:text-red-600 transition-colors py-2 border-b border-gray-100 pb-4">
+                                            Gallery
+                                        </Link>
                                         
-                                        
-                                        
-                                        <div>
-                                            <h3 className="font-semibold text-gray-900 mb-2">Get Involved</h3>
-                                            <div className="space-y-2 ml-4">
-                                                <Link href="/sponsorship" className="block text-gray-600 hover:text-red-600">Sponsorship</Link>
-                                                <Link href="/vendor-registration" className="block text-gray-600 hover:text-red-600">Vendor Registration</Link>
-                                                <Link href="/leadership" className="block text-gray-600 hover:text-red-600">Leadership</Link>
-                                            </div>
-                                        </div>
+                                        {/* Collapsible Get Involved Section */}
+                                        <MobileCollapsibleSection title="Get Involved">
+                                            <Link href="/sponsorship" className="block text-gray-600 hover:text-red-600 transition-colors py-1">
+                                                Sponsorship
+                                            </Link>
+                                            <Link href="/vendor-registration" className="block text-gray-600 hover:text-red-600 transition-colors py-1">
+                                                Vendor Registration
+                                            </Link>
+                                            <Link href="/leadership" className="block text-gray-600 hover:text-red-600 transition-colors py-1">
+                                                Leadership
+                                            </Link>
+                                        </MobileCollapsibleSection>
                                     </div>
                                     
                                     <Button asChild className="bg-red-600 hover:bg-red-700 text-white mt-6">
