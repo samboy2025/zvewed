@@ -7,6 +7,7 @@ import Footer from "./components/Footer"
 import Navbar from "./components/Navbar"
 import { ConvexClientProvider } from "./ConvexClientProvider"
 import { usePathname } from "next/navigation"
+import { DebugScript } from "./components/DebugScript"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -42,6 +43,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className} suppressHydrationWarning={true}>
         <ConvexClientProvider>
+          <DebugScript />
           <LayoutContent>{children}</LayoutContent>
         </ConvexClientProvider>
       </body>

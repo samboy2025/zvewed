@@ -5,7 +5,7 @@ const cspConfig = {
   // Default source restrictions
   'default-src': ["'self'"],
   
-  // Script sources
+  // Script sources - More permissive for development
   'script-src': [
     "'self'",
     "'unsafe-inline'",
@@ -73,12 +73,20 @@ const cspConfig = {
     "'self'",
     "blob:",
   ],
+  
+  // Add nonce support for inline scripts
+  'nonce-source': ["'nonce-${nonce}'"],
 };
 
 // Convert to CSP string format
-function generateCSP() {
+function generateCSP(nonce = '') {
   return Object.entries(cspConfig)
-    .map(([key, values]) => `${key} ${values.join(' ')}`)
+    .map(([key, values]) => {
+      if (key === 'nonce-source') {
+        return `script-src ${values.join(' ')}`;
+      }
+      return `${key} ${values.join(' ')}`;
+    })
     .join('; ');
 }
 
