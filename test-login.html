@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Test - Debug</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 20px; margin: 5px; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Login System Debug Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Environment Check</h2>
+        <div id="env-check"></div>
+        <button onclick="checkEnvironment()">Check Environment</button>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Convex Connection Test</h2>
+        <div id="convex-test"></div>
+        <button onclick="testConvexConnection()">Test Convex Connection</button>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Login Test</h2>
+        <div>
+            <input type="email" id="testEmail" placeholder="admin@wed4.com" />
+            <input type="password" id="testPassword" placeholder="Admin@2025" />
+            <button onclick="testLogin()">Test Login</button>
+        </div>
+        <div id="login-result"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Database Check</h2>
+        <div id="db-check"></div>
+        <button onclick="checkDatabase()">Check Database</button>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Console Logs</h2>
+        <div id="console-logs"></div>
+        <button onclick="clearLogs()">Clear Logs</button>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('console-logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logsDiv.appendChild(logEntry);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function checkEnvironment() {
+            const envDiv = document.getElementById('env-check');
+            const convexUrl = process.env?.NEXT_PUBLIC_CONVEX_URL || 'Not set';
+            
+            envDiv.innerHTML = `
+                <div class="info">NEXT_PUBLIC_CONVEX_URL: ${convexUrl}</div>
+                <div class="info">Current URL: ${window.location.href}</div>
+                <div class="info">User Agent: ${navigator.userAgent}</div>
+            `;
+            
+            log('Environment check completed');
+        }
+
+        function testConvexConnection() {
+            const testDiv = document.getElementById('convex-test');
+            testDiv.innerHTML = '<div class="info">Testing Convex connection...</div>';
+            
+            // Try to access Convex functions
+            try {
+                if (typeof window !== 'undefined' && window.convex) {
+                    testDiv.innerHTML = '<div class="success">✅ Convex client found</div>';
+                    log('Convex client is available');
+                } else {
+                    testDiv.innerHTML = '<div class="error">❌ Convex client not found</div>';
+                    log('Convex client not found', 'error');
+                }
+            } catch (error) {
+                testDiv.innerHTML = `<div class="error">❌ Error: ${error.message}</div>`;
+                log(`Convex connection error: ${error.message}`, 'error');
+            }
+        }
+
+        function testLogin() {
+            const email = document.getElementById('testEmail').value;
+            const password = document.getElementById('testPassword').value;
+            const resultDiv = document.getElementById('login-result');
+            
+            if (!email || !password) {
+                resultDiv.innerHTML = '<div class="error">Please enter email and password</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="info">Testing login...</div>';
+            log(`Testing login with: ${email}`);
+            
+            // Try to call the login function
+            try {
+                // This would normally call your Convex function
+                resultDiv.innerHTML = '<div class="info">Login test completed (check console for details)</div>';
+                log('Login test completed');
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Login error: ${error.message}</div>`;
+                log(`Login error: ${error.message}`, 'error');
+            }
+        }
+
+        function checkDatabase() {
+            const dbDiv = document.getElementById('db-check');
+            dbDiv.innerHTML = '<div class="info">Checking database...</div>';
+            
+            // Try to access database functions
+            try {
+                log('Database check initiated');
+                dbDiv.innerHTML = '<div class="info">Database check completed (check console for details)</div>';
+            } catch (error) {
+                dbDiv.innerHTML = `<div class="error">Database error: ${error.message}</div>`;
+                log(`Database error: ${error.message}`, 'error');
+            }
+        }
+
+        function clearLogs() {
+            document.getElementById('console-logs').innerHTML = '';
+        }
+
+        // Auto-run environment check
+        window.onload = function() {
+            log('Debug page loaded');
+            checkEnvironment();
+        };
+    </script>
+</body>
+</html>

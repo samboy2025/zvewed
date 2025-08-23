@@ -21,7 +21,7 @@ export const seedAdminUser = mutation({
       lastName: "WED4",
       email: "admin@wed4.com",
       password: "Admin@2025", // In production, this should be hashed
-      phone: "+2348012345678",
+      phone: "+2348012345678", // Normalized phone number
       organization: "World Entrepreneurship Day",
       position: "System Administrator",
       city: "Zaria",

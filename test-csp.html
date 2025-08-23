@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSP Test - Convex Connection</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f5f5f5; }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .test-section { margin: 20px 0; padding: 20px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { color: #28a745; border-color: #28a745; background: #d4edda; }
+        .error { color: #dc3545; border-color: #dc3545; background: #f8d7da; }
+        .info { color: #17a2b8; border-color: #17a2b8; background: #d1ecf1; }
+        button { padding: 10px 20px; margin: 5px; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { opacity: 0.8; }
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .log { background: #f8f9fa; padding: 15px; border-radius: 5px; margin: 10px 0; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔒 CSP Test - Convex Connection</h1>
+        <p>This page tests if your Content Security Policy allows Convex connections.</p>
+        
+        <div class="test-section info">
+            <h2>📋 Test Information</h2>
+            <p><strong>Convex URL:</strong> https://courteous-koala-82.convex.cloud</p>
+            <p><strong>WebSocket URL:</strong> wss://courteous-koala-82.convex.cloud</p>
+            <p><strong>Purpose:</strong> Verify CSP allows Convex connections</p>
+        </div>
+
+        <div class="test-section">
+            <h2>🧪 Test 1: HTTP Connection to Convex</h2>
+            <p>Test if your CSP allows HTTP connections to Convex.</p>
+            <button class="btn-primary" onclick="testHttpConnection()">Test HTTP Connection</button>
+            <div id="http-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔌 Test 2: WebSocket Connection to Convex</h2>
+            <p>Test if your CSP allows WebSocket connections to Convex.</p>
+            <button class="btn-primary" onclick="testWebSocketConnection()">Test WebSocket Connection</button>
+            <div id="websocket-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📡 Test 3: Fetch API to Convex</h2>
+            <p>Test if your CSP allows fetch requests to Convex.</p>
+            <button class="btn-primary" onclick="testFetchConnection()">Test Fetch Connection</button>
+            <div id="fetch-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>🔍 Test 4: CSP Violation Check</h2>
+            <p>Check for any CSP violations in the console.</p>
+            <button class="btn-success" onclick="checkCSPViolations()">Check CSP Violations</button>
+            <div id="csp-result"></div>
+        </div>
+
+        <div class="test-section">
+            <h2>📝 Console Logs</h2>
+            <div id="console-logs" class="log"></div>
+            <button class="btn-danger" onclick="clearLogs()">Clear Logs</button>
+        </div>
+
+        <div class="test-section info">
+            <h2>📚 How to Fix CSP Issues</h2>
+            <p>If you see CSP violations:</p>
+            <ol>
+                <li>Update your <code>next.config.mjs</code> file</li>
+                <li>Add Convex URLs to <code>connect-src</code> directive</li>
+                <li>Include both HTTP and WebSocket protocols</li>
+                <li>Redeploy your app</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const logsDiv = document.getElementById('console-logs');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            logsDiv.appendChild(logEntry);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function testHttpConnection() {
+            const resultDiv = document.getElementById('http-result');
+            resultDiv.innerHTML = '<div class="info">Testing HTTP connection...</div>';
+            
+            log('Testing HTTP connection to Convex...');
+            
+            // Try to make a simple HTTP request to Convex
+            fetch('https://courteous-koala-82.convex.cloud/api/1.25.1/version', {
+                method: 'GET',
+                mode: 'cors'
+            })
+            .then(response => {
+                log('HTTP connection successful!', 'success');
+                resultDiv.innerHTML = '<div class="success">✅ HTTP connection successful!</div>';
+            })
+            .catch(error => {
+                log(`HTTP connection failed: ${error.message}`, 'error');
+                resultDiv.innerHTML = `<div class="error">❌ HTTP connection failed: ${error.message}</div>`;
+            });
+        }
+
+        function testWebSocketConnection() {
+            const resultDiv = document.getElementById('websocket-result');
+            resultDiv.innerHTML = '<div class="info">Testing WebSocket connection...</div>';
+            
+            log('Testing WebSocket connection to Convex...');
+            
+            try {
+                const ws = new WebSocket('wss://courteous-koala-82.convex.cloud/api/1.25.1/sync');
+                
+                ws.onopen = function() {
+                    log('WebSocket connection opened successfully!', 'success');
+                    resultDiv.innerHTML = '<div class="success">✅ WebSocket connection successful!</div>';
+                    ws.close();
+                };
+                
+                ws.onerror = function(error) {
+                    log(`WebSocket connection failed: ${error}`, 'error');
+                    resultDiv.innerHTML = `<div class="error">❌ WebSocket connection failed</div>`;
+                };
+                
+                ws.onclose = function() {
+                    log('WebSocket connection closed', 'info');
+                };
+                
+                // Timeout after 5 seconds
+                setTimeout(() => {
+                    if (ws.readyState === WebSocket.CONNECTING) {
+                        ws.close();
+                        log('WebSocket connection timed out', 'error');
+                        resultDiv.innerHTML = '<div class="error">❌ WebSocket connection timed out</div>';
+                    }
+                }, 5000);
+                
+            } catch (error) {
+                log(`WebSocket error: ${error.message}`, 'error');
+                resultDiv.innerHTML = `<div class="error">❌ WebSocket error: ${error.message}</div>`;
+            }
+        }
+
+        function testFetchConnection() {
+            const resultDiv = document.getElementById('fetch-result');
+            resultDiv.innerHTML = '<div class="info">Testing fetch connection...</div>';
+            
+            log('Testing fetch connection to Convex...');
+            
+            // Try to fetch from Convex
+            fetch('https://courteous-koala-82.convex.cloud/api/1.25.1/version', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                log('Fetch connection successful!', 'success');
+                resultDiv.innerHTML = '<div class="success">✅ Fetch connection successful!</div>';
+            })
+            .catch(error => {
+                log(`Fetch connection failed: ${error.message}`, 'error');
+                resultDiv.innerHTML = `<div class="error">❌ Fetch connection failed: ${error.message}</div>`;
+            });
+        }
+
+        function checkCSPViolations() {
+            const resultDiv = document.getElementById('csp-result');
+            resultDiv.innerHTML = '<div class="info">Checking for CSP violations...</div>';
+            
+            log('Checking CSP violations...');
+            
+            // Check if there are any CSP violations in the console
+            const hasViolations = console.error.toString().includes('CSP') || 
+                                 console.error.toString().includes('Content Security Policy');
+            
+            if (hasViolations) {
+                log('CSP violations detected in console', 'error');
+                resultDiv.innerHTML = '<div class="error">❌ CSP violations detected. Check console for details.</div>';
+            } else {
+                log('No CSP violations detected', 'success');
+                resultDiv.innerHTML = '<div class="success">✅ No CSP violations detected</div>';
+            }
+        }
+
+        function clearLogs() {
+            document.getElementById('console-logs').innerHTML = '';
+        }
+
+        // Auto-run tests on page load
+        window.onload = function() {
+            log('CSP test page loaded');
+            log('Ready to test Convex connections');
+        };
+    </script>
+</body>
+</html>
