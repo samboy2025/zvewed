@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { Crown, Award, Medal, Building, Target, Handshake, CheckCircle, AlertCircle } from "lucide-react"
+import Link from "next/link"
 
 export default function SponsorRegistrationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -167,8 +168,8 @@ export default function SponsorRegistrationPage() {
                   <p className="text-gray-600">
                     Your sponsorship application has been submitted successfully. We will review your application and contact you with next steps.
                   </p>
-                  <Button onClick={() => setSubmitStatus("idle")} className="bg-red-600 hover:bg-red-700">
-                    Submit Another Application
+                  <Button asChild className="bg-blue-600 hover:bg-blue-700">
+                    <Link href="/login">Login to Your Account</Link>
                   </Button>
                 </div>
               </CardContent>
