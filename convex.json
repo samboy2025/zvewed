@@ -1,0 +1,12 @@
+{
+  "project": "courteous-koala-82",
+  "team": "your-team-slug",
+  "prodUrl": "https://courteous-koala-82.convex.cloud",
+  "functions": "convex/",
+  "authInfo": [
+    {
+      "domain": "courteous-koala-82.convex.cloud",
+      "applicationID": "your-app-id"
+    }
+  ]
+}
