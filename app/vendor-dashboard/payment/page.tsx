@@ -23,33 +23,48 @@ import {
   MessageCircle,
   Phone,
   ShoppingCart,
-  ArrowRight
+  ArrowRight,
+  RefreshCw
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { useMutation } from "convex/react"
+import { useMutation, useQuery } from "convex/react"
 import { api } from "../../../convex/_generated/api"
 
 export default function VendorPaymentPage() {
   const [currentVendor, setCurrentVendor] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("paystack")
+  const [isRefreshing, setIsRefreshing] = useState(false)
+
+  // Get vendor data from database using email
+  const vendorEmail = typeof window !== 'undefined' ? localStorage.getItem('currentVendor') ? JSON.parse(localStorage.getItem('currentVendor')!).email : null : null
+  
+  const vendorData = useQuery(api.vendors.getVendorByEmail, 
+    vendorEmail ? { email: vendorEmail } : "skip"
+  )
+
+  // Update local vendor data when database data changes
+  useEffect(() => {
+    if (vendorData) {
+      setCurrentVendor(vendorData)
+      // Update localStorage with fresh data
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('currentVendor', JSON.stringify(vendorData))
+      }
+    }
+    setIsLoading(false)
+  }, [vendorData])
+
+  // Refresh vendor data
+  const refreshVendorData = async () => {
+    setIsRefreshing(true)
+    // Force a re-query by updating the component
+    setTimeout(() => setIsRefreshing(false), 1000)
+  }
 
   // Check if payment is already submitted
   const isPaymentSubmitted = currentVendor?.paymentStatus === "pending" || currentVendor?.paymentStatus === "paid"
-
-  // Get vendor data from localStorage and database
-  useEffect(() => {
-    const vendorData = localStorage.getItem('currentVendor')
-    if (vendorData) {
-      const localVendor = JSON.parse(vendorData)
-      setCurrentVendor(localVendor)
-      
-      // TODO: Fetch updated vendor data from database to get real-time payment status
-      // This would require creating a Convex query to get vendor by email/phone
-    }
-    setIsLoading(false)
-  }, [])
 
   // Fixed payment amount for vendors
   const paymentDetails = {
@@ -84,7 +99,7 @@ I will send the payment proof in the next message.`
       <VendorDashboardLayout>
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
-            <Clock className="h-8 w-8 mx-auto mb-4 text-gray-400 animate-spin" />
+            <Loader2 className="h-8 w-8 mx-auto mb-4 text-gray-400 animate-spin" />
             <p className="text-gray-500">Loading payment details...</p>
           </div>
         </div>
@@ -123,9 +138,21 @@ I will send the payment proof in the next message.`
               Complete your exhibition booth payment
             </p>
           </div>
-          <Button asChild variant="outline">
-            <Link href="/vendor-dashboard">Back to Dashboard</Link>
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button 
+              onClick={refreshVendorData}
+              variant="outline" 
+              size="sm"
+              disabled={isRefreshing}
+              className="flex items-center gap-2"
+            >
+              <RefreshCw className={`h-4 w-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/vendor-dashboard">Back to Dashboard</Link>
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -136,9 +163,9 @@ I will send the payment proof in the next message.`
           {currentVendor.paymentStatus === "paid" && (
             <Alert className="border-green-600 bg-green-50 text-green-900 mb-6">
               <CheckCircle2 className="h-4 w-4 text-green-600" />
-              <AlertTitle>Payment Confirmed</AlertTitle>
+              <AlertTitle>Payment Confirmed ✅</AlertTitle>
               <AlertDescription>
-                Thank you! Your payment has been confirmed. Your booth is reserved.
+                <strong>Congratulations!</strong> Your payment has been verified and confirmed. Your booth is now reserved and you can proceed with event preparations.
               </AlertDescription>
             </Alert>
           )}
@@ -146,9 +173,9 @@ I will send the payment proof in the next message.`
           {currentVendor.paymentStatus === "pending" && (
             <Alert className="border-yellow-600 bg-yellow-50 text-yellow-900 mb-6">
               <Clock className="h-4 w-4 text-yellow-600" />
-              <AlertTitle>Payment Pending Verification</AlertTitle>
+              <AlertTitle>Payment Pending Verification ⏳</AlertTitle>
               <AlertDescription>
-                We have received your payment proof. Please allow up to 24 hours for verification.
+                We have received your payment proof and it's currently under review. Please allow up to 24 hours for verification. You'll receive a notification once verified.
               </AlertDescription>
             </Alert>
           )}
@@ -156,9 +183,9 @@ I will send the payment proof in the next message.`
           {(!currentVendor.paymentStatus || currentVendor.paymentStatus === "unpaid") && (
             <Alert className="border-red-600 bg-red-50 text-red-900 mb-6">
               <AlertCircle className="h-4 w-4 text-red-600" />
-              <AlertTitle>Action Required: Complete Your Payment</AlertTitle>
+              <AlertTitle>Action Required: Complete Your Payment ❌</AlertTitle>
               <AlertDescription>
-                Your booth reservation is not complete until payment is received. Please complete the payment below.
+                Your booth reservation is not complete until payment is received and verified. Please complete the payment below and submit proof for verification.
               </AlertDescription>
             </Alert>
           )}
@@ -202,11 +229,14 @@ I will send the payment proof in the next message.`
                           disabled={isPaymentSubmitted}
                         >
                           <ShoppingCart className="h-6 w-6 mr-3" />
-                          Pay with Paystack
-                          <ArrowRight className="h-5 w-5 ml-3" />
+                          {currentVendor.paymentStatus === "paid" ? "Payment Completed" : "Pay with Paystack"}
+                          {currentVendor.paymentStatus !== "paid" && <ArrowRight className="h-5 w-5 ml-3" />}
                         </Button>
                         <p className="text-sm text-gray-500 mt-2">
-                          You will be redirected to Paystack's secure payment page
+                          {currentVendor.paymentStatus === "paid" 
+                            ? "Your payment has been verified successfully"
+                            : "You will be redirected to Paystack's secure payment page"
+                          }
                         </p>
                       </div>
 
@@ -246,9 +276,9 @@ I will send the payment proof in the next message.`
                         currentVendor.paymentStatus === "pending" ? "bg-yellow-600" :
                         "bg-red-600"
                       }>
-                        {currentVendor.paymentStatus === "paid" ? "Paid" :
-                         currentVendor.paymentStatus === "pending" ? "Pending" :
-                         "Unpaid"}
+                        {currentVendor.paymentStatus === "paid" ? "PAID ✅" :
+                         currentVendor.paymentStatus === "pending" ? "Pending ⏳" :
+                         "Unpaid ❌"}
                       </Badge>
                     </div>
                     <div className="flex items-center justify-between">
@@ -259,6 +289,13 @@ I will send the payment proof in the next message.`
                       <span className="text-sm text-gray-600">Booth Type:</span>
                       <span className="font-semibold capitalize">{currentVendor.boothSize}</span>
                     </div>
+                    {currentVendor.paymentStatus === "paid" && (
+                      <div className="pt-3 border-t border-gray-200">
+                        <div className="text-xs text-green-600 font-medium text-center">
+                          ✓ Payment verified and booth reserved
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -278,10 +315,10 @@ I will send the payment proof in the next message.`
                   <Button
                     onClick={openWhatsApp}
                     className="w-full bg-green-600 hover:bg-green-700"
-                    disabled={isPaymentSubmitted}
+                    disabled={currentVendor.paymentStatus === "paid"}
                   >
                     <Phone className="h-4 w-4 mr-2" />
-                    Send to WhatsApp
+                    {currentVendor.paymentStatus === "paid" ? "Payment Verified" : "Send to WhatsApp"}
                   </Button>
                   <p className="text-xs text-gray-500 mt-2 text-center">
                     {whatsappNumber}

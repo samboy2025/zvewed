@@ -430,3 +430,64 @@ export const deleteVendor = mutation({
     await ctx.db.delete(args.vendorId);
   },
 });
+
+// Verify vendor payment and update status
+export const verifyVendorPayment = mutation({
+  args: {
+    vendorId: v.id("vendors"),
+    adminId: v.id("users"),
+    amount: v.number(),
+    paymentMethod: v.optional(v.string()),
+    notes: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Verify the admin exists and is an admin
+    const admin = await ctx.db.get(args.adminId);
+    if (!admin || admin.userType !== "admin") {
+      throw new Error("Unauthorized: User is not an admin");
+    }
+
+    // Get the vendor to verify
+    const vendor = await ctx.db.get(args.vendorId);
+    if (!vendor) {
+      throw new Error("Vendor not found");
+    }
+
+    // Create a payment record for verification
+    const paymentId = await ctx.db.insert("payments", {
+      userId: vendor.email, // Using email as userId for vendors
+      userType: "vendor",
+      userName: vendor.contactPerson,
+      userEmail: vendor.email,
+      amount: args.amount,
+      type: "vendor_booth",
+      reference: `VENDOR-${Date.now()}`,
+      status: "approved",
+      paymentMethod: args.paymentMethod || "manual_verification",
+      approvedAt: Date.now(),
+      createdAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
+    // Update vendor payment status
+    await ctx.db.patch(args.vendorId, {
+      paymentStatus: "paid",
+      paymentAmount: args.amount,
+      paymentSubmittedAt: Date.now(),
+      paymentApprovedAt: Date.now(),
+      updatedAt: Date.now(),
+    });
+
+    // Log the admin action
+    await ctx.db.insert("admin_actions", {
+      adminId: args.adminId,
+      action: "vendor_payment_verification",
+      targetType: "vendor",
+      targetId: args.vendorId,
+      details: `Verified payment of ₦${args.amount} for vendor ${vendor.companyName} (${vendor.contactPerson}). ${args.notes || ""}`,
+      timestamp: Date.now(),
+    });
+
+    return { success: true, paymentId };
+  },
+});
