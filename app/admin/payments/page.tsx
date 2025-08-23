@@ -40,13 +40,9 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Search,
-  Filter,
   Eye,
   Check,
   X,
-  FileText,
-  Download,
   CreditCard,
   Building,
   Package,
@@ -56,11 +52,6 @@ import {
 } from "lucide-react"
 
 export default function AdminPaymentsPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [typeFilter, setTypeFilter] = useState("all")
-  const [dateRange, setDateRange] = useState("all") // all, today, week, month
-  
   // Define types for payments and users
   interface Payment {
     _id: Id<"payments">;
@@ -78,7 +69,7 @@ export default function AdminPaymentsPage() {
     receiptUrl?: string;
     updatedAt?: number;
     approvedAt?: number;
-    notes?: string; // Added notes field
+    notes?: string;
   }
 
   interface User {
@@ -99,19 +90,7 @@ export default function AdminPaymentsPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showApprovalDialog, setShowApprovalDialog] = useState(false);
   const [showRejectionDialog, setShowRejectionDialog] = useState(false);
-  const [showCreatePaymentDialog, setShowCreatePaymentDialog] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
-  
-  // Create payment form state
-  const [newPayment, setNewPayment] = useState({
-    userName: "",
-    userEmail: "",
-    amount: "",
-    type: "ticket",
-    userType: "participant",
-    reference: "",
-    paymentMethod: "bank_transfer"
-  });
   
   // Fetch real payment data from the database
   const payments = useQuery(api.payments.getAllPayments) || [];
@@ -127,35 +106,17 @@ export default function AdminPaymentsPage() {
   };
   
   const updatePaymentStatus = useMutation(api.payments.updatePaymentStatus);
-  const deletePayment = useMutation(api.payments.deletePayment);
-  const createPayment = useMutation(api.payments.createPayment);
-
-  // Get payments missing receipts
-  const paymentsMissingReceipts = useQuery(api.payments.getPaymentsMissingReceipts) || [];
 
   // Get real user payment data
   const allUsers = useQuery(api.users.getAllUsers) || [];
   const pendingUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "pending" }) || [];
   const approvedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "approved" }) || [];
   const rejectedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "rejected" }) || [];
-  const usersWithoutPayments = useQuery(api.users.getUsersWithoutPayments) || [];
   const updateUserPaymentStatus = useMutation(api.users.updateUserPaymentStatus);
-  const initializeUserPayment = useMutation(api.users.initializeUserPayment);
 
   // Get users eligible for manual payment verification
   const usersEligibleForManualVerification = useQuery(api.admin.getUsersEligibleForManualVerification, {}) || [];
   const manuallyVerifyUserPayment = useMutation(api.admin.manuallyVerifyUserPayment);
-
-  // Debug logging for convex functions
-  console.log("Convex API functions loaded:", {
-    payments: !!api.payments,
-    users: !!api.users,
-    admin: !!api.admin,
-    getPaymentsMissingReceipts: !!api.payments?.getPaymentsMissingReceipts,
-    getUsersByPaymentStatus: !!api.users?.getUsersByPaymentStatus,
-    getUsersWithoutPayments: !!api.users?.getUsersWithoutPayments,
-    getUsersEligibleForManualVerification: !!api.admin?.getUsersEligibleForManualVerification,
-  });
 
   // Manual verification form state
   const [showManualVerificationDialog, setShowManualVerificationDialog] = useState(false);
@@ -166,89 +127,20 @@ export default function AdminPaymentsPage() {
     notes: ""
   });
 
-  // Generate unique reference number
-  const generateReference = () => {
-    const timestamp = Date.now().toString(36);
-    const random = Math.random().toString(36).substr(2, 5);
-    return `WED-${timestamp}-${random}`.toUpperCase();
-  };
+  // Calculate participant and vendor specific stats
+  const participantPayments = allUsers.filter(user => 
+    user.userType === "participant" && user.paymentStatus === "approved"
+  );
+  const vendorPayments = allUsers.filter(user => 
+    user.userType === "vendor" && user.paymentStatus === "approved"
+  );
 
-  // Handle creating new payment
-  const handleCreatePayment = async () => {
-    if (!newPayment.userName || !newPayment.userEmail || !newPayment.amount || !newPayment.reference) {
-      alert("Please fill in all required fields");
-      return;
-    }
-
-    try {
-      await createPayment({
-        userId: `admin-created-${Date.now()}`,
-        userName: newPayment.userName,
-        userEmail: newPayment.userEmail,
-        amount: parseFloat(newPayment.amount),
-        type: newPayment.type,
-        userType: newPayment.userType,
-        reference: newPayment.reference,
-        status: "pending",
-        paymentMethod: newPayment.paymentMethod,
-      });
-
-      // Reset form
-      setNewPayment({
-        userName: "",
-        userEmail: "",
-        amount: "",
-        type: "ticket",
-        userType: "participant",
-        reference: "",
-        paymentMethod: "bank_transfer"
-      });
-      setShowCreatePaymentDialog(false);
-      alert("Payment created successfully!");
-    } catch (error) {
-      console.error("Error creating payment:", error);
-      alert("Failed to create payment");
-    }
-  };
-
-  // Filter real payments from database
-  const filteredPayments = payments?.filter((payment) => {
-    if (!payment || !payment.userName || !payment.userEmail || !payment.reference) {
-      return false;
-    }
-
-    const matchesSearch =
-      payment.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.userEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      payment.reference.toLowerCase().includes(searchTerm.toLowerCase())
-
-    const matchesStatus = statusFilter === "all" || payment.status === statusFilter
-    const matchesType = typeFilter === "all" || payment.type === typeFilter
-
-    // Date filtering
-    let matchesDate = true;
-    if (dateRange !== "all") {
-      const paymentDate = new Date(payment.createdAt);
-      const now = new Date();
-      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
-      const monthAgo = new Date(today.getFullYear(), today.getMonth() - 1, today.getDate());
-
-      switch (dateRange) {
-        case "today":
-          matchesDate = paymentDate >= today;
-          break;
-        case "week":
-          matchesDate = paymentDate >= weekAgo;
-          break;
-        case "month":
-          matchesDate = paymentDate >= monthAgo;
-          break;
-      }
-    }
-
-    return matchesSearch && matchesStatus && matchesType && matchesDate
-  }) || []
+  const participantRevenue = participantPayments.reduce((sum, user) => 
+    sum + (user.paymentAmount || 7000), 0
+  );
+  const vendorRevenue = vendorPayments.reduce((sum, user) => 
+    sum + (user.paymentAmount || 12000), 0
+  );
 
   // Handle payment approval
   const handleApprove = async () => {
@@ -346,20 +238,6 @@ export default function AdminPaymentsPage() {
     }
   }
 
-  // Get type icon
-  const getTypeIcon = (type: string) => {
-    switch (type) {
-      case "ticket":
-        return <Ticket className="h-4 w-4 text-blue-600" />
-      case "sponsorship":
-        return <Building className="h-4 w-4 text-purple-600" />
-      case "vendor_booth":
-        return <Package className="h-4 w-4 text-orange-600" />
-      default:
-        return <CreditCard className="h-4 w-4 text-gray-600" />
-    }
-  }
-
   // Format date
   const formatDate = (timestamp: number) => {
     return new Date(timestamp).toLocaleDateString("en-US", {
@@ -370,19 +248,6 @@ export default function AdminPaymentsPage() {
       minute: "2-digit",
     })
   }
-
-  // Prepare export data
-  const exportData = filteredPayments.map((payment: Payment) => ({
-    Date: formatDate(payment.createdAt),
-    Name: payment.userName,
-    Email: payment.userEmail,
-    Type: payment.type,
-    Amount: payment.amount,
-    Reference: payment.reference,
-    Status: payment.status,
-    Method: payment.paymentMethod || "N/A",
-    ApprovedAt: payment.approvedAt ? formatDate(payment.approvedAt) : "N/A",
-  }))
 
   // Handle loading state
   if (!payments || !paymentStats || !allUsers) {
@@ -406,23 +271,9 @@ export default function AdminPaymentsPage() {
             Review and manage all payment transactions
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button
-            onClick={() => setShowCreatePaymentDialog(true)}
-            className="bg-blue-600 hover:bg-blue-700"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create Payment
-          </Button>
-          <ExcelExportButton
-            data={exportData}
-            filename="payments"
-            buttonText="Export Payments"
-          />
-        </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Stats Cards - Updated to count only participant and vendor payments */}
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -431,10 +282,10 @@ export default function AdminPaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ₦{paymentStats.totalAmount.toLocaleString()}
+              ₦{(participantRevenue + vendorRevenue).toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
-              From {paymentStats.total} payments
+              From {(participantPayments.length + vendorPayments.length)} payments
             </p>
           </CardContent>
         </Card>
@@ -446,10 +297,10 @@ export default function AdminPaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {paymentStats.approved}
+              {(participantPayments.length + vendorPayments.length)}
             </div>
             <p className="text-xs text-muted-foreground">
-              ₦{paymentStats.approvedAmount.toLocaleString()}
+              ₦{(participantRevenue + vendorRevenue).toLocaleString()}
             </p>
           </CardContent>
         </Card>
@@ -461,10 +312,10 @@ export default function AdminPaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
-              {paymentStats.pending}
+              {pendingUserPayments.length}
             </div>
             <p className="text-xs text-muted-foreground">
-              ₦{paymentStats.pendingAmount.toLocaleString()}
+              Awaiting verification
             </p>
           </CardContent>
         </Card>
@@ -476,7 +327,7 @@ export default function AdminPaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-red-600">
-              {paymentStats.rejected}
+              {rejectedUserPayments.length}
             </div>
             <p className="text-xs text-muted-foreground">
               Payment issues
@@ -485,7 +336,7 @@ export default function AdminPaymentsPage() {
         </Card>
       </div>
 
-      {/* Revenue Breakdown */}
+      {/* Revenue Breakdown - Updated to show only participant and vendor */}
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
           <CardHeader>
@@ -502,8 +353,8 @@ export default function AdminPaymentsPage() {
                   <span>Participants</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-semibold">₦{paymentStats.byUserType?.participant?.amount?.toLocaleString() || 0}</div>
-                  <div className="text-sm text-gray-500">{paymentStats.byUserType?.participant?.count || 0} payments</div>
+                  <div className="font-semibold">₦{participantRevenue.toLocaleString()}</div>
+                  <div className="text-sm text-gray-500">{participantPayments.length} payments</div>
                 </div>
               </div>
               <div className="flex items-center justify-between">
@@ -512,18 +363,8 @@ export default function AdminPaymentsPage() {
                   <span>Vendors</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-semibold">₦{paymentStats.byUserType?.vendor?.amount?.toLocaleString() || 0}</div>
-                  <div className="text-sm text-gray-500">{paymentStats.byUserType?.vendor?.count || 0} payments</div>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-                  <span>Sponsors</span>
-                </div>
-                <div className="text-right">
-                  <div className="font-semibold">₦{paymentStats.byUserType?.sponsor?.amount?.toLocaleString() || 0}</div>
-                  <div className="text-sm text-gray-500">{paymentStats.byUserType?.sponsor?.count || 0} payments</div>
+                  <div className="font-semibold">₦{vendorRevenue.toLocaleString()}</div>
+                  <div className="text-sm text-gray-500">{vendorPayments.length} payments</div>
                 </div>
               </div>
             </div>
@@ -534,7 +375,7 @@ export default function AdminPaymentsPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <CreditCard className="h-5 w-5" />
-              Revenue by Payment Type
+              Payment Status Overview
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -542,31 +383,21 @@ export default function AdminPaymentsPage() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Ticket className="h-4 w-4 text-blue-600" />
-                  <span>Event Tickets</span>
+                  <span>Pending Verification</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-semibold">₦{paymentStats.byType?.ticket?.amount?.toLocaleString() || 0}</div>
-                  <div className="text-sm text-gray-500">{paymentStats.byType?.ticket?.count || 0} payments</div>
+                  <div className="font-semibold">{pendingUserPayments.length}</div>
+                  <div className="text-sm text-gray-500">users</div>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Package className="h-4 w-4 text-orange-600" />
-                  <span>Vendor Booths</span>
+                  <span>Total Verified</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-semibold">₦{paymentStats.byType?.vendor_booth?.amount?.toLocaleString() || 0}</div>
-                  <div className="text-sm text-gray-500">{paymentStats.byType?.vendor_booth?.count || 0} payments</div>
-                </div>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Building className="h-4 w-4 text-purple-600" />
-                  <span>Sponsorships</span>
-                </div>
-                <div className="text-right">
-                  <div className="font-semibold">₦{paymentStats.byType?.sponsorship?.amount?.toLocaleString() || 0}</div>
-                  <div className="text-sm text-gray-500">{paymentStats.byType?.sponsorship?.count || 0} payments</div>
+                  <div className="font-semibold">{(participantPayments.length + vendorPayments.length)}</div>
+                  <div className="text-sm text-gray-500">users</div>
                 </div>
               </div>
             </div>
@@ -574,270 +405,7 @@ export default function AdminPaymentsPage() {
         </Card>
       </div>
 
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filters
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                <Input
-                  placeholder="Search by name, email, or reference..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="approved">Approved</SelectItem>
-                <SelectItem value="rejected">Rejected</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={typeFilter} onValueChange={setTypeFilter}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Types</SelectItem>
-                <SelectItem value="ticket">Tickets</SelectItem>
-                <SelectItem value="sponsorship">Sponsorships</SelectItem>
-                <SelectItem value="vendor_booth">Vendor Booths</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={dateRange} onValueChange={setDateRange}>
-              <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Filter by date" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Time</SelectItem>
-                <SelectItem value="today">Today</SelectItem>
-                <SelectItem value="week">This Week</SelectItem>
-                <SelectItem value="month">This Month</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Payments Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Payment Transactions ({filteredPayments.length})</CardTitle>
-          <CardDescription>
-            All payment records with approval controls
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Type</TableHead>
-                <TableHead>Amount</TableHead>
-                <TableHead>Reference</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredPayments.map((payment) => (
-                <TableRow key={payment._id}>
-                  <TableCell>
-                    <div className="text-sm">
-                      {formatDate(payment.createdAt)}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div>
-                      <div className="font-medium">{payment.userName}</div>
-                      <div className="text-sm text-gray-500">{payment.userEmail}</div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-2">
-                      {getTypeIcon(payment.type)}
-                      <span className="capitalize">{payment.type.replace('_', ' ')}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-medium">
-                      ₦{payment.amount.toLocaleString()}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="font-mono text-sm">
-                      {payment.reference}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {getStatusBadge(payment.status)}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setSelectedPayment(payment)}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Payment Details</DialogTitle>
-                            <DialogDescription>
-                              Transaction #{payment.reference}
-                            </DialogDescription>
-                          </DialogHeader>
-                          {selectedPayment && (
-                            <div className="space-y-4">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <Label>User</Label>
-                                  <p className="text-sm">{selectedPayment.userName}</p>
-                                  <p className="text-xs text-gray-500">{selectedPayment.userEmail}</p>
-                                </div>
-                                <div>
-                                  <Label>Amount</Label>
-                                  <p className="text-lg font-bold">
-                                    ₦{selectedPayment.amount.toLocaleString()}
-                                  </p>
-                                </div>
-                                <div>
-                                  <Label>Type</Label>
-                                  <p className="text-sm capitalize">
-                                    {selectedPayment.type.replace('_', ' ')}
-                                  </p>
-                                </div>
-                                <div>
-                                  <Label>Status</Label>
-                                  <div>{getStatusBadge(selectedPayment.status)}</div>
-                                </div>
-                                <div>
-                                  <Label>Payment Method</Label>
-                                  <p className="text-sm">
-                                    {selectedPayment.paymentMethod || "Bank Transfer"}
-                                  </p>
-                                </div>
-                                <div>
-                                  <Label>Date</Label>
-                                  <p className="text-sm">
-                                    {formatDate(selectedPayment.createdAt)}
-                                  </p>
-                                </div>
-                                {selectedPayment.notes && (
-                                  <div>
-                                    <Label>Notes</Label>
-                                    <p className="text-sm text-gray-700">{selectedPayment.notes}</p>
-                                  </div>
-                                )}
-                              </div>
-                              
-                              {selectedPayment.receiptUrl && (
-                                <div>
-                                  <Label>Payment Receipt</Label>
-                                  <img 
-                                    src={selectedPayment.receiptUrl} 
-                                    alt="Payment receipt" 
-                                    className="mt-2 max-w-full rounded border"
-                                  />
-                                </div>
-                              )}
-                              
-                              {selectedPayment.rejectionReason && (
-                                <div>
-                                  <Label>Rejection Reason</Label>
-                                  <p className="text-sm text-red-600">
-                                    {selectedPayment.rejectionReason}
-                                  </p>
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </DialogContent>
-                      </Dialog>
-
-                      {payment.status === "pending" && (
-                        <>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-green-600"
-                            onClick={() => {
-                              setSelectedPayment(payment)
-                              setShowApprovalDialog(true)
-                            }}
-                          >
-                            <Check className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-red-600"
-                            onClick={() => {
-                              setSelectedPayment(payment)
-                              setShowRejectionDialog(true)
-                            }}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </>
-                      )}
-                      {payment.status === "pending" && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-blue-600"
-                          title="Mark as payment received (for offline payments)"
-                          onClick={async () => {
-                            try {
-                              await updatePaymentStatus({
-                                paymentId: payment._id,
-                                status: "approved",
-                              })
-                              alert("Payment marked as received successfully!");
-                            } catch (error) {
-                              console.error("Error updating payment:", error)
-                              alert("Failed to update payment")
-                            }
-                          }}
-                        >
-                          <DollarSign className="h-4 w-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-
-          {filteredPayments.length === 0 && (
-            <div className="text-center py-8">
-              <CreditCard className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-500">No payments found matching your criteria</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* User Payment Management Section */}
+      {/* User Payment Management Section - Top Section Only */}
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -982,135 +550,6 @@ export default function AdminPaymentsPage() {
         </CardContent>
       </Card>
 
-      {/* Users Without Payments Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <UserPlus className="h-5 w-5" />
-            Users Without Payment Submissions
-          </CardTitle>
-          <CardDescription>
-            Users who haven't submitted payment receipts yet
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {usersWithoutPayments && usersWithoutPayments.length > 0 ? (
-            <div>
-              <div className="mb-4 flex items-center justify-between">
-                <Badge variant="outline" className="text-orange-600">
-                  {usersWithoutPayments.length} users need to submit payments
-                </Badge>
-                <Button
-                  variant="outline"
-                  onClick={async () => {
-                    try {
-                      let successCount = 0;
-                      for (const user of usersWithoutPayments) {
-                        try {
-                          await initializeUserPayment({ userId: user._id });
-                          successCount++;
-                        } catch (error) {
-                          console.error(`Failed to initialize payment for ${user.email}:`, error);
-                        }
-                      }
-                      alert(`Successfully initialized payment amounts for ${successCount} out of ${usersWithoutPayments.length} users`);
-                    } catch (error) {
-                      console.error("Error in bulk initialization:", error);
-                      alert("Failed to initialize payment amounts");
-                    }
-                  }}
-                >
-                  <Download className="h-4 w-4 mr-2" />
-                  Initialize All Payment Amounts
-                </Button>
-              </div>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Required Amount</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {usersWithoutPayments.map((user) => (
-                    <TableRow key={user._id}>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{user.firstName} {user.lastName}</div>
-                          <div className="text-sm text-gray-500">{user.email}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="capitalize">
-                          {user.userType}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="font-medium">
-                          ₦{(user.paymentAmount || (user.userType === "participant" ? 7000 : 12000)).toLocaleString()}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="text-orange-600">
-                          Payment Required
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => {
-                              setNewPayment({
-                                userName: `${user.firstName} ${user.lastName}`,
-                                userEmail: user.email,
-                                amount: (user.paymentAmount || (user.userType === "participant" ? 7000 : 12000)).toString(),
-                                type: user.userType === "participant" ? "ticket" : "vendor_booth",
-                                userType: user.userType,
-                                reference: generateReference(),
-                                paymentMethod: "bank_transfer"
-                              });
-                              setShowCreatePaymentDialog(true);
-                            }}
-                          >
-                            <Plus className="h-4 w-4 mr-2" />
-                            Create Payment
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={async () => {
-                              try {
-                                await initializeUserPayment({ userId: user._id });
-                                alert("Payment amount initialized successfully!");
-                              } catch (error) {
-                                console.error("Error initializing payment amount:", error);
-                                alert("Failed to initialize payment amount");
-                              }
-                            }}
-                          >
-                            <Download className="h-4 w-4 mr-2" />
-                            Initialize Amount
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          ) : (
-            <div className="text-center py-8">
-              <CheckCircle className="h-12 w-12 mx-auto mb-4 text-green-400" />
-              <p className="text-gray-500">All users have submitted payments or are exempt</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
       {/* Manual Payment Verification Section */}
       <Card>
         <CardHeader>
@@ -1202,207 +641,6 @@ export default function AdminPaymentsPage() {
           )}
         </CardContent>
       </Card>
-
-      {/* Payments Missing Receipts Section */}
-      {paymentsMissingReceipts && paymentsMissingReceipts.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Payments Missing Receipts
-            </CardTitle>
-            <CardDescription>
-              Approved payments that don't have receipt files uploaded
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="mb-4">
-              <Badge variant="outline" className="text-orange-600">
-                {paymentsMissingReceipts.length} payments missing receipts
-              </Badge>
-            </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Date</TableHead>
-                  <TableHead>User</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Amount</TableHead>
-                  <TableHead>Reference</TableHead>
-                  <TableHead>Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paymentsMissingReceipts.map((payment) => (
-                  <TableRow key={payment._id}>
-                    <TableCell>
-                      <div className="text-sm">
-                        {formatDate(payment.createdAt)}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div>
-                        <div className="font-medium">{payment.userName}</div>
-                        <div className="text-sm text-gray-500">{payment.userEmail}</div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center gap-2">
-                        {getTypeIcon(payment.type)}
-                        <span className="capitalize">{payment.type.replace('_', ' ')}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-medium">
-                        ₦{payment.amount.toLocaleString()}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="font-mono text-sm">
-                        {payment.reference}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedPayment(payment);
-                            setShowApprovalDialog(false);
-                            setShowRejectionDialog(false);
-                          }}
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-blue-600"
-                          onClick={() => {
-                            // This could open a dialog to upload receipt
-                            alert("Receipt upload functionality can be added here");
-                          }}
-                        >
-                          <FileText className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Create Payment Dialog */}
-      <Dialog open={showCreatePaymentDialog} onOpenChange={setShowCreatePaymentDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>Create New Payment Record</DialogTitle>
-            <DialogDescription>
-              Manually create a payment record for a user
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="userName">User Name</Label>
-              <Input
-                id="userName"
-                value={newPayment.userName}
-                onChange={(e) => setNewPayment({...newPayment, userName: e.target.value})}
-                placeholder="Enter user's full name"
-              />
-            </div>
-            <div>
-              <Label htmlFor="userEmail">User Email</Label>
-              <Input
-                id="userEmail"
-                type="email"
-                value={newPayment.userEmail}
-                onChange={(e) => setNewPayment({...newPayment, userEmail: e.target.value})}
-                placeholder="Enter user's email"
-              />
-            </div>
-            <div>
-              <Label htmlFor="amount">Amount (₦)</Label>
-              <Input
-                id="amount"
-                type="number"
-                value={newPayment.amount}
-                onChange={(e) => setNewPayment({...newPayment, amount: e.target.value})}
-                placeholder="Enter payment amount"
-              />
-            </div>
-            <div>
-              <Label htmlFor="type">Payment Type</Label>
-              <Select value={newPayment.type} onValueChange={(value) => setNewPayment({...newPayment, type: value})}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="ticket">Event Ticket</SelectItem>
-                  <SelectItem value="sponsorship">Sponsorship</SelectItem>
-                  <SelectItem value="vendor_booth">Vendor Booth</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="userType">User Type</Label>
-              <Select value={newPayment.userType} onValueChange={(value) => setNewPayment({...newPayment, userType: value})}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="participant">Participant</SelectItem>
-                  <SelectItem value="vendor">Vendor</SelectItem>
-                  <SelectItem value="sponsor">Sponsor</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="reference">Reference Number</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="reference"
-                  value={newPayment.reference}
-                  onChange={(e) => setNewPayment({...newPayment, reference: e.target.value})}
-                  placeholder="Payment reference"
-                />
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setNewPayment({...newPayment, reference: generateReference()})}
-                >
-                  Generate
-                </Button>
-              </div>
-            </div>
-            <div>
-              <Label htmlFor="paymentMethod">Payment Method</Label>
-              <Select value={newPayment.paymentMethod} onValueChange={(value) => setNewPayment({...newPayment, paymentMethod: value})}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="bank_transfer">Bank Transfer</SelectItem>
-                  <SelectItem value="cash">Cash</SelectItem>
-                  <SelectItem value="card">Card Payment</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowCreatePaymentDialog(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleCreatePayment} className="bg-blue-600 hover:bg-blue-700">
-              Create Payment
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Approval Dialog */}
       <Dialog open={showApprovalDialog} onOpenChange={setShowApprovalDialog}>
