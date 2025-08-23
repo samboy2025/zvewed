@@ -36,13 +36,17 @@ export default function VendorPaymentPage() {
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState("paystack")
 
   // Check if payment is already submitted
-  const isPaymentSubmitted = currentVendor?.paymentStatus === "pending" || currentVendor?.paymentStatus === "approved"
+  const isPaymentSubmitted = currentVendor?.paymentStatus === "pending" || currentVendor?.paymentStatus === "paid"
 
-  // Get vendor data from localStorage
+  // Get vendor data from localStorage and database
   useEffect(() => {
     const vendorData = localStorage.getItem('currentVendor')
     if (vendorData) {
-      setCurrentVendor(JSON.parse(vendorData))
+      const localVendor = JSON.parse(vendorData)
+      setCurrentVendor(localVendor)
+      
+      // TODO: Fetch updated vendor data from database to get real-time payment status
+      // This would require creating a Convex query to get vendor by email/phone
     }
     setIsLoading(false)
   }, [])

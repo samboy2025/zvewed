@@ -110,6 +110,9 @@ export default function AdminPaymentsPage() {
     rejectedAmount: 0
   };
   
+  // Fetch dashboard stats to ensure consistency with dashboard page
+  const dashboardStats = useQuery(api.admin.getDashboardStats);
+  
   const updatePaymentStatus = useMutation(api.payments.updatePaymentStatus);
 
   // Get real user payment data
@@ -146,27 +149,12 @@ export default function AdminPaymentsPage() {
     notes: ""
   });
 
-  // Calculate participant and vendor specific stats
-  const participantPayments = allUsers.filter(user => 
-    user.userType === "participant" && user.paymentStatus === "approved"
-  );
-  const vendorPayments = allUsers.filter(user => 
-    user.userType === "vendor" && user.paymentStatus === "approved"
-  );
-
-  // Calculate pending and rejected payments
+  // Calculate pending and rejected payments for display purposes
   const pendingUserPayments = allUsers.filter(user => 
     user.paymentStatus === "pending"
   );
   const rejectedUserPayments = allUsers.filter(user => 
     user.paymentStatus === "rejected"
-  );
-
-  const participantRevenue = participantPayments.reduce((sum, user) => 
-    sum + (user.paymentAmount || 7000), 0
-  );
-  const vendorRevenue = vendorPayments.reduce((sum, user) => 
-    sum + (user.paymentAmount || 12000), 0
   );
 
   // Handle payment approval
@@ -288,6 +276,18 @@ export default function AdminPaymentsPage() {
     )
   }
 
+  // Loading state for dashboard stats
+  if (!dashboardStats) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <Clock className="h-8 w-8 mx-auto mb-4 text-gray-400 animate-spin" />
+          <p className="text-gray-500">Loading payment data...</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="container mx-auto px-4 space-y-6">
       {/* Page Header */}
@@ -309,10 +309,10 @@ export default function AdminPaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ₦{(participantRevenue + vendorRevenue).toLocaleString()}
+              ₦{dashboardStats?.payments?.userVendorRevenue?.toLocaleString() || '0'}
             </div>
             <p className="text-xs text-muted-foreground">
-              From {(participantPayments.length + vendorPayments.length)} payments
+              From {dashboardStats?.payments?.userVendorApproved || 0} approved payments
             </p>
           </CardContent>
         </Card>
@@ -324,10 +324,10 @@ export default function AdminPaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              {(participantPayments.length + vendorPayments.length)}
+              {dashboardStats?.payments?.userVendorApproved || 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              ₦{(participantRevenue + vendorRevenue).toLocaleString()}
+              ₦{dashboardStats?.payments?.userVendorRevenue?.toLocaleString() || '0'}
             </p>
           </CardContent>
         </Card>
@@ -339,10 +339,10 @@ export default function AdminPaymentsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-yellow-600">
-              {pendingUserPayments.length}
+              {dashboardStats?.payments?.userVendorPending || 0}
             </div>
             <p className="text-xs text-muted-foreground">
-              Awaiting verification
+              ₦{dashboardStats?.payments?.userVendorPendingAmount?.toLocaleString() || '0'} awaiting verification
             </p>
           </CardContent>
         </Card>
@@ -380,18 +380,18 @@ export default function AdminPaymentsPage() {
                   <span>Participants</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-semibold">₦{participantRevenue.toLocaleString()}</div>
-                  <div className="text-sm text-gray-500">{participantPayments.length} payments</div>
+                  <div className="font-semibold">₦{dashboardStats?.payments?.byUserType?.participant?.amount?.toLocaleString() || '0'}</div>
+                  <div className="text-sm text-gray-500">{dashboardStats?.payments?.byUserType?.participant?.count || 0} payments</div>
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 bg-orange-500 rounded-full"></div>
+                  <div className="w-3 h-4 bg-orange-500 rounded-full"></div>
                   <span>Vendors</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-semibold">₦{vendorRevenue.toLocaleString()}</div>
-                  <div className="text-sm text-gray-500">{vendorPayments.length} payments</div>
+                  <div className="font-semibold">₦{dashboardStats?.payments?.byUserType?.vendor?.amount?.toLocaleString() || '0'}</div>
+                  <div className="text-sm text-gray-500">{dashboardStats?.payments?.byUserType?.vendor?.count || 0} payments</div>
                 </div>
               </div>
             </div>
@@ -423,7 +423,7 @@ export default function AdminPaymentsPage() {
                   <span>Total Verified</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-semibold">{(participantPayments.length + vendorPayments.length)}</div>
+                  <div className="font-semibold">{dashboardStats?.payments?.userVendorApproved || 0}</div>
                   <div className="text-sm text-gray-500">users</div>
                 </div>
               </div>

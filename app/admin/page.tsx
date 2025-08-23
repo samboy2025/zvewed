@@ -143,7 +143,7 @@ export default function AdminDashboard() {
     },
     {
       title: "Total Revenue",
-      value: `₦${(paymentStats?.totalAmount || 0).toLocaleString()}`,
+      value: `₦${(paymentStats?.userVendorRevenue || 0).toLocaleString()}`,
       change: "+18%",
       changeType: "positive",
       icon: DollarSign,

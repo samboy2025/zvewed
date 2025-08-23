@@ -37,50 +37,53 @@ export default function VendorBoothDetailsPage() {
     setIsLoading(false)
   }, [])
 
-  // Mock booth assignment data based on vendor status
+  // Get booth details from vendor data or generate default
   const getBoothDetails = () => {
-    if (!currentVendor || currentVendor.status !== 'approved') {
+    if (!currentVendor) {
       return null
     }
 
-    // Generate booth details based on vendor data
-    const boothSizes = {
-      small: { dimensions: "3m x 2m", area: "6 sqm" },
-      medium: { dimensions: "3m x 3m", area: "9 sqm" },
-      large: { dimensions: "3m x 4m", area: "12 sqm" },
-      custom: { dimensions: "Custom", area: "Varies" }
+    // If vendor has booth assigned, use that data
+    if (currentVendor.boothAssigned && currentVendor.boothNumber) {
+      const boothSizes = {
+        small: { dimensions: "3m x 2m", area: "6 sqm" },
+        medium: { dimensions: "3m x 3m", area: "9 sqm" },
+        large: { dimensions: "3m x 4m", area: "12 sqm" },
+        custom: { dimensions: "Custom", area: "Varies" }
+      }
+
+      const boothSize = boothSizes[currentVendor.boothSize as keyof typeof boothSizes] || boothSizes.medium
+
+      return {
+        boothNumber: currentVendor.boothNumber,
+        section: currentVendor.boothSection || 'Main Exhibition Hall',
+        size: boothSize.dimensions,
+        area: boothSize.area,
+        location: currentVendor.boothLocation || "Ground Floor, Main Exhibition Hall",
+        setupDate: "October 3, 2025",
+        setupTime: "6:00 PM - 10:00 PM",
+        eventDates: "October 4-5, 2025",
+        eventTime: "9:00 AM - 6:00 PM daily",
+        includes: [
+          "1 table (180cm x 75cm)",
+          "2 chairs",
+          "Company name board",
+          "1 power socket (220V)",
+          "Basic lighting",
+          "Wi-Fi access"
+        ],
+        additionalServices: [
+          { name: "Extra table", price: "₦5,000" },
+          { name: "Extra chair", price: "₦2,500" },
+          { name: "Banner stand", price: "₦10,000" },
+          { name: "TV/Monitor rental", price: "₦25,000" },
+          { name: "Additional power socket", price: "₦5,000" }
+        ]
+      }
     }
 
-    const boothSize = boothSizes[currentVendor.boothSize as keyof typeof boothSizes] || boothSizes.medium
-
-    return {
-      boothNumber: `B-${Math.floor(Math.random() * 50) + 1}`,
-      section: currentVendor.industry === 'technology' ? 'Technology Zone' : 
-               currentVendor.industry === 'manufacturing' ? 'Manufacturing Hall' :
-               currentVendor.industry === 'services' ? 'Services Pavilion' : 'Main Exhibition Hall',
-      size: boothSize.dimensions,
-      area: boothSize.area,
-      location: "Ground Floor, Main Exhibition Hall",
-      setupDate: "October 3, 2025",
-      setupTime: "6:00 PM - 10:00 PM",
-      eventDates: "October 4-5, 2025",
-      eventTime: "9:00 AM - 6:00 PM daily",
-      includes: [
-        "1 table (180cm x 75cm)",
-        "2 chairs",
-        "Company name board",
-        "1 power socket (220V)",
-        "Basic lighting",
-        "Wi-Fi access"
-      ],
-      additionalServices: [
-        { name: "Extra table", price: "₦5,000" },
-        { name: "Extra chair", price: "₦2,500" },
-        { name: "Banner stand", price: "₦10,000" },
-        { name: "TV/Monitor rental", price: "₦25,000" },
-        { name: "Additional power socket", price: "₦5,000" }
-      ]
-    }
+    // If no booth assigned, return null
+    return null
   }
 
   const boothDetails = getBoothDetails()
@@ -138,13 +141,20 @@ export default function VendorBoothDetailsPage() {
       {/* Main Content */}
       <div className="px-3 sm:px-6 space-y-6 pb-6">
         <div className="max-w-6xl mx-auto">
-          {currentVendor.status !== 'approved' ? (
+          {!boothDetails ? (
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertTitle>Booth Assignment Pending</AlertTitle>
               <AlertDescription>
-                Your booth will be assigned once your vendor application is approved and payment is confirmed.
-                Current status: <Badge className="ml-2" variant="secondary">{currentVendor.status}</Badge>
+                {currentVendor.status !== 'approved' ? (
+                  <>Your booth will be assigned once your vendor application is approved and payment is confirmed.
+                  Current status: <Badge className="ml-2" variant="secondary">{currentVendor.status}</Badge></>
+                ) : currentVendor.paymentStatus !== 'paid' ? (
+                  <>Your booth will be assigned once your payment is confirmed.
+                  Current payment status: <Badge className="ml-2" variant="secondary">{currentVendor.paymentStatus}</Badge></>
+                ) : (
+                  <>Your booth assignment is being processed. Please check back later or contact our support team.</>
+                )}
               </AlertDescription>
             </Alert>
           ) : (

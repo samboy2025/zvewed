@@ -41,6 +41,16 @@ const sidebarItems = [
     icon: CreditCard,
   },
   {
+    title: "Vendors",
+    href: "/admin/vendors",
+    icon: Users,
+  },
+  {
+    title: "Booths",
+    href: "/admin/booths",
+    icon: Calendar,
+  },
+  {
     title: "Events",
     href: "/admin/events",
     icon: Calendar,
