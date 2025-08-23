@@ -2,26 +2,20 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { 
   CreditCard, 
-  Upload, 
-  Copy, 
-  Check, 
-  AlertCircle, 
-  Clock, 
   CheckCircle, 
+  Clock, 
   XCircle,
   MessageCircle,
   Phone,
-  Banknote
+  Banknote,
+  ShoppingCart,
+  ArrowRight
 } from "lucide-react"
 import { useState } from "react"
-import { useMutation } from "convex/react"
-import { api } from "../../convex/_generated/api"
 
 interface PaymentVerificationCardProps {
   user: any
@@ -29,127 +23,22 @@ interface PaymentVerificationCardProps {
 }
 
 export function PaymentVerificationCard({ user, onPaymentSubmitted }: PaymentVerificationCardProps) {
-  const [isUploading, setIsUploading] = useState(false)
-  const [uploadedReceipt, setUploadedReceipt] = useState<string>("")
-  const [copiedAccount, setCopiedAccount] = useState("")
-  const [paymentForm, setPaymentForm] = useState({
-    amount: user?.userType === "participant" ? "7000" : "12000",
-    paymentDate: new Date().toISOString().split('T')[0],
-    bankName: "UBA Bank"
-  })
-
-  // Check if payment is already submitted
-  const isPaymentSubmitted = user?.paymentStatus === "pending" || user?.paymentStatus === "approved"
-
-  const submitPaymentReceipt = useMutation(api.users.submitPaymentReceipt)
-
-  const bankDetails = {
-    accountName: "Zazzau Version Entrepreneurs",
-    bankName: "UBA Bank",
-    accountNumber: "1027308809"
-  }
-
   const whatsappNumber = "+2348109569323"
   const paymentAmount = user?.userType === "participant" ? 7000 : 12000
 
-  const copyToClipboard = async (text: string, type: string) => {
-    await navigator.clipboard.writeText(text)
-    setCopiedAccount(type)
-    setTimeout(() => setCopiedAccount(""), 2000)
-  }
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0]
-    if (!file) return
-
-    // Validate file type
-    const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'application/pdf']
-    if (!validTypes.includes(file.type)) {
-      alert('Please upload a valid image file (JPEG, PNG, WebP) or PDF')
-      return
-    }
-
-    // Validate file size (5MB max)
-    if (file.size > 5 * 1024 * 1024) {
-      alert('File size must be less than 5MB')
-      return
-    }
-
-    setIsUploading(true)
-
-    try {
-      const formData = new FormData()
-      formData.append('file', file)
-      formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!)
-
-      const response = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        {
-          method: 'POST',
-          body: formData,
-        }
-      )
-
-      if (!response.ok) {
-        const errorText = await response.text()
-        throw new Error(`Upload failed: ${response.status}`)
-      }
-
-      const data = await response.json()
-      setUploadedReceipt(data.secure_url)
-      setIsUploading(false)
-    } catch (error) {
-      console.error("Upload failed:", error)
-      alert("Failed to upload receipt. Please try again.")
-      setIsUploading(false)
-    }
-  }
-
-  const handleSubmitPayment = async () => {
-    try {
-      // Validate user
-      if (!user?._id) {
-        alert("User information is missing. Please log in again.")
-        return
-      }
-
-      // Validate receipt
-      if (!uploadedReceipt) {
-        alert("Please upload your payment receipt")
-        return
-      }
-
-      const paymentData = {
-        userId: user._id,
-        receiptUrl: uploadedReceipt,
-        paymentDetails: {
-          amount: parseFloat(paymentForm.amount),
-          paymentMethod: "Bank Transfer",
-          referenceNumber: "Receipt Upload", // Default value since we removed the field
-          paymentDate: paymentForm.paymentDate,
-          bankName: paymentForm.bankName
-        }
-      }
-
-      // Submit payment receipt to the database
-      await submitPaymentReceipt(paymentData)
-
-      alert("Payment receipt submitted successfully! Our team will verify it within 24-48 hours.")
-      onPaymentSubmitted?.()
-    } catch (error) {
-      console.error("Payment submission failed:", error)
-      alert("Failed to submit payment receipt. Please ensure all details are correct and try again. If the problem persists, contact support.")
-    }
+  const handlePaystackPayment = () => {
+    // Open Paystack payment link in new tab
+    window.open("https://paystack.com/buy/regular-ticket-wed4", "_blank")
   }
 
   const openWhatsApp = () => {
-    const message = `Hello! I'm submitting my payment receipt for WED 4.0.
+    const message = `Hello! I'm submitting my payment proof for WED 4.0.
     
 Name: ${user?.firstName} ${user?.lastName}
 User Type: ${user?.userType}
 Amount Paid: ₦${paymentAmount.toLocaleString()}
 
-I will send the receipt image in the next message.`
+I will send the payment proof in the next message.`
     
     const whatsappUrl = `https://wa.me/${whatsappNumber.replace('+', '')}?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
@@ -164,7 +53,7 @@ I will send the receipt image in the next message.`
       case "rejected":
         return <Badge className="bg-red-600 text-white"><XCircle className="h-3 w-3 mr-1" />Rejected</Badge>
       default:
-        return <Badge variant="outline"><AlertCircle className="h-3 w-3 mr-1" />Payment Required</Badge>
+        return <Badge variant="outline"><CreditCard className="h-3 w-3 mr-1" />Payment Required</Badge>
     }
   }
 
@@ -225,105 +114,51 @@ I will send the receipt image in the next message.`
               </p>
             </div>
 
-            {/* Bank Details */}
-            <div className="bg-gray-50 p-4 rounded-lg border">
-              <h3 className="font-semibold mb-3 text-gray-800">Bank Transfer Details</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Account Name:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{bankDetails.accountName}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(bankDetails.accountName, "name")}
-                    >
-                      {copiedAccount === "name" ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Bank:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{bankDetails.bankName}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(bankDetails.bankName, "bank")}
-                    >
-                      {copiedAccount === "bank" ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Account Number:</span>
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium text-lg">{bankDetails.accountNumber}</span>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => copyToClipboard(bankDetails.accountNumber, "account")}
-                    >
-                      {copiedAccount === "account" ? <Check className="h-4 w-4 text-green-600" /> : <Copy className="h-4 w-4" />}
-                    </Button>
-                  </div>
-                </div>
-              </div>
+            {/* Paystack Payment Button */}
+            <div className="text-center">
+              <Button
+                onClick={handlePaystackPayment}
+                className="w-full bg-green-600 hover:bg-green-700 text-white text-lg py-6"
+                size="lg"
+              >
+                <ShoppingCart className="h-6 w-6 mr-3" />
+                Pay with Paystack
+                <ArrowRight className="h-5 w-5 ml-3" />
+              </Button>
+              <p className="text-sm text-gray-500 mt-2">
+                You will be redirected to Paystack's secure payment page
+              </p>
             </div>
 
-            {/* Payment Submission Options */}
-            <div className="space-y-4">
-              <h3 className="font-semibold text-gray-800">Submit Payment Receipt</h3>
-              
-              {/* Option 1: Upload Receipt */}
-              <div className="border rounded-lg p-4">
-                <h4 className="font-medium mb-3 flex items-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  Option 1: Upload Receipt
-                </h4>
-                
-                <div className="space-y-3">
-                  <div>
-                    <Label htmlFor="receipt">Upload Receipt *</Label>
-                    <Input
-                      id="receipt"
-                      type="file"
-                      accept="image/*,.pdf"
-                      onChange={handleFileUpload}
-                      disabled={isUploading || isPaymentSubmitted}
-                    />
-                    {isUploading && <p className="text-sm text-gray-500 mt-1">Uploading...</p>}
-                    {uploadedReceipt && <p className="text-sm text-green-600 mt-1">Receipt uploaded successfully!</p>}
-                  </div>
-                  
-                  <Button 
-                    onClick={handleSubmitPayment}
-                    disabled={!uploadedReceipt || isUploading}
-                    className="w-full bg-red-600 hover:bg-red-700"
-                  >
-                    Submit Payment Receipt
-                  </Button>
-                </div>
-              </div>
+            {/* Payment Instructions */}
+            <div className="bg-gray-50 p-4 rounded-lg border">
+              <h3 className="font-semibold text-gray-900 mb-3">Payment Instructions</h3>
+              <ol className="list-decimal list-inside space-y-2 text-sm text-gray-700">
+                <li>Click the "Pay with Paystack" button above</li>
+                <li>You'll be redirected to Paystack's secure payment page</li>
+                <li>Complete your payment using any of the available methods</li>
+                <li>After successful payment, send proof to our WhatsApp</li>
+                <li>We'll verify and update your status within 24 hours</li>
+              </ol>
+            </div>
 
-              {/* Option 2: WhatsApp */}
-              <div className="border rounded-lg p-4">
-                <h4 className="font-medium mb-3 flex items-center gap-2">
-                  <MessageCircle className="h-4 w-4" />
-                  Option 2: Send via WhatsApp
-                </h4>
-                <p className="text-sm text-gray-600 mb-3">
-                  Send your payment receipt directly to our WhatsApp number
-                </p>
-                <Button 
-                  onClick={openWhatsApp}
-                  variant="outline"
-                  className="w-full border-green-500 text-green-600 hover:bg-green-50"
-                >
-                  <Phone className="h-4 w-4 mr-2" />
-                  Send to WhatsApp: {whatsappNumber}
-                </Button>
-              </div>
+            {/* WhatsApp Contact */}
+            <div className="border rounded-lg p-4">
+              <h4 className="font-medium mb-3 flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" />
+                Send Payment Proof via WhatsApp
+              </h4>
+              <p className="text-sm text-gray-600 mb-3">
+                After completing your payment, send the payment proof to our WhatsApp number for verification.
+              </p>
+              <Button 
+                onClick={openWhatsApp}
+                variant="outline"
+                className="w-full border-green-500 text-green-600 hover:bg-green-50"
+              >
+                <Phone className="h-4 w-4 mr-2" />
+                Send to WhatsApp: {whatsappNumber}
+              </Button>
             </div>
           </>
         )}
