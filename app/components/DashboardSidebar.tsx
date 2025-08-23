@@ -77,8 +77,7 @@ export function DashboardSidebar({ userType, currentPath, className }: Dashboard
   const userNavItems = [
     { href: "/dashboard", icon: Home, label: "Dashboard", badge: null },
     { href: "/dashboard/profile", icon: User, label: "Profile", badge: null },
-    { href: "/dashboard/payment", icon: CreditCard, label: "Payment", badge: null },
-    { href: "/dashboard/events", icon: Calendar, label: "My Events", badge: "2" },
+    { href: "/dashboard/events", icon: Calendar, label: "My Events", badge: "1" },
   ]
 
   const adminNavItems = [

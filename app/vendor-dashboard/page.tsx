@@ -243,135 +243,65 @@ export default function VendorDashboard() {
             </Card>
           </div>
 
-          {/* Company Information */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-            {/* Company Details */}
-            <Card>
-              <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
-                  <Store className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
-                  <span className="truncate">Company Information</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
+          {/* Booth Details */}
+          <Card className="mb-4 sm:mb-6">
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
+                <Package className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
+                <span className="truncate">Exhibition Details</span>
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
                 <div>
-                  <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-1 sm:mb-2 line-clamp-2">
-                    {currentVendor.companyName}
-                  </h3>
-                  <p className="text-gray-600 text-xs sm:text-sm line-clamp-3">
-                    {currentVendor.productServices}
-                  </p>
+                  <p className="text-[10px] sm:text-xs text-gray-500">Business Type</p>
+                  <p className="text-xs sm:text-sm font-medium capitalize truncate">{currentVendor.businessType}</p>
                 </div>
+                <div>
+                  <p className="text-[10px] sm:text-xs text-gray-500">Industry</p>
+                  <p className="text-xs sm:text-sm font-medium capitalize truncate">{currentVendor.industry}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] sm:text-xs text-gray-500">Years in Business</p>
+                  <p className="text-xs sm:text-sm font-medium">{currentVendor.yearsInBusiness}</p>
+                </div>
+                <div>
+                  <p className="text-[10px] sm:text-xs text-gray-500">Booth Size</p>
+                  <p className="text-xs sm:text-sm font-medium capitalize">{currentVendor.boothSize}</p>
+                </div>
+              </div>
 
-                <div className="space-y-2 sm:space-y-3">
-                  <div className="flex items-start gap-2 text-xs sm:text-sm">
-                    <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                    <span className="font-medium flex-shrink-0">Contact:</span>
-                    <span className="truncate">{currentVendor.contactPerson}</span>
-                  </div>
-                  
-                  <div className="flex items-start gap-2 text-xs sm:text-sm">
-                    <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                    <span className="font-medium flex-shrink-0">Phone:</span>
-                    <span className="truncate">{currentVendor.phone}</span>
-                  </div>
-                  
-                  <div className="flex items-start gap-2 text-xs sm:text-sm">
-                    <Mail className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                    <span className="font-medium flex-shrink-0">Email:</span>
-                    <span className="truncate break-all">{currentVendor.email}</span>
-                  </div>
-                  
-                  {currentVendor.website && (
-                    <div className="flex items-start gap-2 text-xs sm:text-sm">
-                      <Globe className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                      <span className="font-medium flex-shrink-0">Website:</span>
-                      <a 
-                        href={currentVendor.website} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-red-600 hover:text-red-700 underline truncate"
-                      >
-                        {currentVendor.website}
-                      </a>
-                    </div>
-                  )}
-                  
-                  <div className="flex items-start gap-2 text-xs sm:text-sm">
-                    <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-gray-400 flex-shrink-0 mt-0.5" />
-                    <span className="font-medium flex-shrink-0">Location:</span>
-                    <span className="truncate">{currentVendor.city}, {currentVendor.state}</span>
+              {currentVendor.status === 'approved' && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
+                  <h4 className="font-medium text-green-800 text-sm sm:text-base mb-1.5 sm:mb-2">Booth Assignment</h4>
+                  <div className="space-y-0.5 sm:space-y-1 text-xs sm:text-sm text-green-700">
+                    <p><strong>Booth:</strong> {boothInfo.boothNumber}</p>
+                    <p><strong>Section:</strong> {boothInfo.section}</p>
+                    <p><strong>Size:</strong> {boothInfo.size}</p>
+                    <p className="text-[10px] sm:text-xs"><strong>Setup Time:</strong> {boothInfo.setupTime}</p>
                   </div>
                 </div>
+              )}
 
-                <div className="pt-3 sm:pt-4 border-t border-gray-200">
+              {currentVendor.objectives && (
+                <div>
+                  <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">Exhibition Objectives</p>
+                  <p className="text-xs sm:text-sm line-clamp-3">{currentVendor.objectives}</p>
+                </div>
+              )}
+
+              <div className="pt-3 sm:pt-4 border-t border-gray-200 space-y-2">
+                <Button asChild className="w-full bg-red-600 hover:bg-red-700 text-xs sm:text-sm">
+                  <Link href="/vendor-dashboard/guidelines">Exhibition Guidelines</Link>
+                </Button>
+                {currentVendor.paymentStatus === 'unpaid' && (
                   <Button asChild variant="outline" className="w-full text-xs sm:text-sm">
-                    <Link href="/vendor-dashboard/profile">Edit Company Information</Link>
+                    <Link href="/vendor-dashboard/payment">Complete Payment</Link>
                   </Button>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Booth Details */}
-            <Card>
-              <CardHeader className="p-4 sm:p-6">
-                <CardTitle className="flex items-center gap-2 text-base sm:text-lg md:text-xl">
-                  <Package className="h-4 w-4 sm:h-5 sm:w-5 text-red-600" />
-                  <span className="truncate">Exhibition Details</span>
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6 pt-0 space-y-3 sm:space-y-4">
-                <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                  <div>
-                    <p className="text-[10px] sm:text-xs text-gray-500">Business Type</p>
-                    <p className="text-xs sm:text-sm font-medium capitalize truncate">{currentVendor.businessType}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] sm:text-xs text-gray-500">Industry</p>
-                    <p className="text-xs sm:text-sm font-medium capitalize truncate">{currentVendor.industry}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] sm:text-xs text-gray-500">Years in Business</p>
-                    <p className="text-xs sm:text-sm font-medium">{currentVendor.yearsInBusiness}</p>
-                  </div>
-                  <div>
-                    <p className="text-[10px] sm:text-xs text-gray-500">Booth Size</p>
-                    <p className="text-xs sm:text-sm font-medium capitalize">{currentVendor.boothSize}</p>
-                  </div>
-                </div>
-
-                {currentVendor.status === 'approved' && (
-                  <div className="bg-green-50 border border-green-200 rounded-lg p-3 sm:p-4">
-                    <h4 className="font-medium text-green-800 text-sm sm:text-base mb-1.5 sm:mb-2">Booth Assignment</h4>
-                    <div className="space-y-0.5 sm:space-y-1 text-xs sm:text-sm text-green-700">
-                      <p><strong>Booth:</strong> {boothInfo.boothNumber}</p>
-                      <p><strong>Section:</strong> {boothInfo.section}</p>
-                      <p><strong>Size:</strong> {boothInfo.size}</p>
-                      <p className="text-[10px] sm:text-xs"><strong>Setup Time:</strong> {boothInfo.setupTime}</p>
-                    </div>
-                  </div>
                 )}
-
-                {currentVendor.objectives && (
-                  <div>
-                    <p className="text-xs sm:text-sm text-gray-500 mb-0.5 sm:mb-1">Exhibition Objectives</p>
-                    <p className="text-xs sm:text-sm line-clamp-3">{currentVendor.objectives}</p>
-                  </div>
-                )}
-
-                <div className="pt-3 sm:pt-4 border-t border-gray-200 space-y-2">
-                  <Button asChild className="w-full bg-red-600 hover:bg-red-700 text-xs sm:text-sm">
-                    <Link href="/vendor-dashboard/guidelines">Exhibition Guidelines</Link>
-                  </Button>
-                  {currentVendor.paymentStatus === 'unpaid' && (
-                    <Button asChild variant="outline" className="w-full text-xs sm:text-sm">
-                      <Link href="/vendor-dashboard/payment">Complete Payment</Link>
-                    </Button>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* Event Information */}
           <Card className="mt-4 sm:mt-6">
