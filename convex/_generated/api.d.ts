@@ -15,10 +15,12 @@ import type {
 } from "convex/server";
 import type * as admin from "../admin.js";
 import type * as auth from "../auth.js";
+import type * as booths from "../booths.js";
 import type * as events from "../events.js";
 import type * as payments from "../payments.js";
 import type * as registrations from "../registrations.js";
 import type * as seedAdmin from "../seedAdmin.js";
+import type * as seedBooths from "../seedBooths.js";
 import type * as sponsors from "../sponsors.js";
 import type * as users from "../users.js";
 import type * as vendors from "../vendors.js";
@@ -34,10 +36,12 @@ import type * as vendors from "../vendors.js";
 declare const fullApi: ApiFromModules<{
   admin: typeof admin;
   auth: typeof auth;
+  booths: typeof booths;
   events: typeof events;
   payments: typeof payments;
   registrations: typeof registrations;
   seedAdmin: typeof seedAdmin;
+  seedBooths: typeof seedBooths;
   sponsors: typeof sponsors;
   users: typeof users;
   vendors: typeof vendors;
