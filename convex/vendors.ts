@@ -472,10 +472,13 @@ export const verifyVendorPayment = mutation({
     // Update vendor payment status
     await ctx.db.patch(args.vendorId, {
       paymentStatus: "paid",
-      paymentAmount: args.amount,
+      paymentDetails: {
+        amount: args.amount,
+        paymentMethod: args.paymentMethod || "manual_verification",
+        referenceNumber: `VENDOR-${Date.now()}`,
+        paymentDate: new Date().toISOString(),
+      },
       paymentSubmittedAt: Date.now(),
-      paymentApprovedAt: Date.now(),
-      updatedAt: Date.now(),
     });
 
     // Log the admin action

@@ -8,7 +8,7 @@ export const createUser = mutation({
     lastName: v.string(),
     email: v.string(),
     password: v.string(),
-    phone: v.optional(v.string()),
+    phone: v.string(),
     organization: v.optional(v.string()),
     position: v.optional(v.string()),
     city: v.optional(v.string()),
@@ -22,13 +22,14 @@ export const createUser = mutation({
     agreeToMarketing: v.boolean(),
   },
   handler: async (ctx, args) => {
-    const userId = await ctx.db.insert("users", {
-      ...args,
-      createdAt: Date.now(),
-      status: "active", // active, inactive, suspended
-      lastLogin: undefined,
-      eventId: "wed-4.0",
-    });
+      const userId = await ctx.db.insert("users", {
+    ...args,
+    createdAt: Date.now(),
+    status: "active", // active, inactive, suspended
+    lastLogin: undefined,
+    eventId: "wed-4.0",
+    updatedAt: Date.now(),
+  });
     
     return userId;
   },
