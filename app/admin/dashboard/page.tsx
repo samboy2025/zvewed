@@ -97,15 +97,18 @@ export default function AdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
-            <DollarSign className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Actual Revenue</CardTitle>
+            <DollarSign className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">
+            <div className="text-2xl font-bold text-green-600">
               ₦{dashboardStats.payments.approvedAmount.toLocaleString()}
             </div>
             <p className="text-xs text-muted-foreground">
               {dashboardStats.payments.approved} approved payments
+            </p>
+            <p className="text-xs text-green-600 font-medium mt-1">
+              +₦{dashboardStats.payments.totalAmount.toLocaleString()} total processed
             </p>
           </CardContent>
         </Card>
@@ -125,13 +128,16 @@ export default function AdminDashboard() {
 
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Registrations</CardTitle>
-            <UserCheck className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Actual User Registrations</CardTitle>
+            <UserCheck className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardStats.registrations.total}</div>
+            <div className="text-2xl font-bold text-blue-600">{dashboardStats.registrations.total}</div>
             <p className="text-xs text-muted-foreground">
               {dashboardStats.registrations.vendors} vendors, {dashboardStats.registrations.sponsors} sponsors
+            </p>
+            <p className="text-xs text-blue-600 font-medium mt-1">
+              +{dashboardStats.users.total} total users registered
             </p>
           </CardContent>
         </Card>
@@ -229,35 +235,44 @@ export default function AdminDashboard() {
         {/* Payment Summary */}
         <Card>
           <CardHeader>
-            <CardTitle>Payment Overview</CardTitle>
+            <CardTitle>Actual Payment Overview</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-green-500" />
-                  <span className="text-sm">Approved</span>
+                  <span className="text-sm font-medium">Approved Revenue</span>
                 </div>
-                <div className="text-sm font-medium">
-                  {dashboardStats.payments.approved} (₦{dashboardStats.payments.approvedAmount.toLocaleString()})
+                <div className="text-sm font-bold text-green-600">
+                  ₦{dashboardStats.payments.approvedAmount.toLocaleString()}
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-yellow-500" />
-                  <span className="text-sm">Pending</span>
+                  <span className="text-sm font-medium">Pending Payments</span>
                 </div>
-                <div className="text-sm font-medium">
-                  {dashboardStats.payments.pending}
+                <div className="text-sm font-bold text-yellow-600">
+                  {dashboardStats.payments.pending} (₦{dashboardStats.payments.pendingAmount?.toLocaleString() || '0'})
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-red-500" />
-                  <span className="text-sm">Total Revenue</span>
+                  <div className="h-3 w-3 rounded-full bg-blue-500" />
+                  <span className="text-sm font-medium">Total Processed</span>
                 </div>
-                <div className="text-sm font-medium">
+                <div className="text-sm font-bold text-blue-600">
                   ₦{dashboardStats.payments.totalAmount.toLocaleString()}
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-3 w-3 rounded-full bg-purple-500" />
+                  <span className="text-sm font-medium">Payment Success Rate</span>
+                </div>
+                <div className="text-sm font-bold text-purple-600">
+                  {dashboardStats.payments.total > 0 ? Math.round((dashboardStats.payments.approved / dashboardStats.payments.total) * 100) : 0}%
                 </div>
               </div>
             </div>

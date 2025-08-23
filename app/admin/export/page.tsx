@@ -20,6 +20,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { ExcelExportButton } from "../components/ExcelExportButton"
+import { PdfExportButton } from "../components/PdfExportButton"
 import { 
   Download,
   Users,
@@ -282,11 +283,18 @@ export default function AdminExportPage() {
               </div>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-4 space-y-3">
               <ExcelExportButton
                 data={exportData}
                 filename={`wed4-${exportType}-${format(new Date(), "yyyy-MM-dd")}`}
                 buttonText="Export to Excel"
+                className="w-full"
+              />
+              <PdfExportButton
+                data={exportData}
+                filename={`wed4-${exportType}-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export to PDF"
+                variant="outline"
                 className="w-full"
               />
             </div>
@@ -385,84 +393,175 @@ export default function AdminExportPage() {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            <ExcelExportButton
-              data={users?.map(user => ({
-                "Name": `${user.firstName} ${user.lastName}`,
-                "Email": user.email,
-                "Type": user.userType,
-                "Status": user.status,
-              })) || []}
-              filename={`wed4-users-${format(new Date(), "yyyy-MM-dd")}`}
-              buttonText="Export All Users"
-              variant="outline"
-              className="w-full"
-            />
+            <div className="space-y-2">
+              <ExcelExportButton
+                data={users?.map(user => ({
+                  "Name": `${user.firstName} ${user.lastName}`,
+                  "Email": user.email,
+                  "Type": user.userType,
+                  "Status": user.status,
+                })) || []}
+                filename={`wed4-users-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export All Users"
+                variant="outline"
+                className="w-full"
+              />
+              <PdfExportButton
+                data={users?.map(user => ({
+                  "Name": `${user.firstName} ${user.lastName}`,
+                  "Email": user.email,
+                  "Type": user.userType,
+                  "Status": user.status,
+                })) || []}
+                filename={`wed4-users-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export All Users (PDF)"
+                variant="outline"
+                size="sm"
+                className="w-full"
+              />
+            </div>
 
-            <ExcelExportButton
-              data={payments?.filter(p => p.status === "approved").map(payment => ({
-                "Date": format(new Date(payment.createdAt), "dd/MM/yyyy"),
-                "User": payment.userName,
-                "Amount": payment.amount,
-                "Type": payment.type,
-              })) || []}
-              filename={`wed4-approved-payments-${format(new Date(), "yyyy-MM-dd")}`}
-              buttonText="Export Approved Payments"
-              variant="outline"
-              className="w-full"
-            />
+            <div className="space-y-2">
+              <ExcelExportButton
+                data={payments?.filter(p => p.status === "approved").map(payment => ({
+                  "Date": format(new Date(payment.createdAt), "dd/MM/yyyy"),
+                  "User": payment.userName,
+                  "Amount": payment.amount,
+                  "Type": payment.type,
+                })) || []}
+                filename={`wed4-approved-payments-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export Approved Payments"
+                variant="outline"
+                className="w-full"
+              />
+              <PdfExportButton
+                data={payments?.filter(p => p.status === "approved").map(payment => ({
+                  "Date": format(new Date(payment.createdAt), "dd/MM/yyyy"),
+                  "User": payment.userName,
+                  "Amount": payment.amount,
+                  "Type": payment.type,
+                })) || []}
+                filename={`wed4-approved-payments-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export Approved Payments (PDF)"
+                variant="outline"
+                size="sm"
+                className="w-full"
+              />
+            </div>
 
-            <ExcelExportButton
-              data={vendors?.filter(v => v.status === "approved").map(vendor => ({
-                "Company": vendor.companyName,
-                "Contact": vendor.contactPerson,
-                "Email": vendor.email,
-                "Phone": vendor.phone,
-              })) || []}
-              filename={`wed4-approved-vendors-${format(new Date(), "yyyy-MM-dd")}`}
-              buttonText="Export Approved Vendors"
-              variant="outline"
-              className="w-full"
-            />
+            <div className="space-y-2">
+              <ExcelExportButton
+                data={vendors?.filter(v => v.status === "approved").map(vendor => ({
+                  "Company": vendor.companyName,
+                  "Contact": vendor.contactPerson,
+                  "Email": vendor.email,
+                  "Phone": vendor.phone,
+                })) || []}
+                filename={`wed4-approved-vendors-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export Approved Vendors"
+                variant="outline"
+                className="w-full"
+              />
+              <PdfExportButton
+                data={vendors?.filter(v => v.status === "approved").map(vendor => ({
+                  "Company": vendor.companyName,
+                  "Contact": vendor.contactPerson,
+                  "Email": vendor.email,
+                  "Phone": vendor.phone,
+                })) || []}
+                filename={`wed4-approved-vendors-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export Approved Vendors (PDF)"
+                variant="outline"
+                size="sm"
+                className="w-full"
+              />
+            </div>
 
-            <ExcelExportButton
-              data={sponsors?.filter(s => s.status === "approved").map(sponsor => ({
-                "Organization": sponsor.organizationName,
-                "Contact": sponsor.contactPerson,
-                "Level": sponsor.sponsorshipLevel,
-                "Amount": sponsor.sponsorshipAmount,
-              })) || []}
-              filename={`wed4-approved-sponsors-${format(new Date(), "yyyy-MM-dd")}`}
-              buttonText="Export Approved Sponsors"
-              variant="outline"
-              className="w-full"
-            />
+            <div className="space-y-2">
+              <ExcelExportButton
+                data={sponsors?.filter(s => s.status === "approved").map(sponsor => ({
+                  "Organization": sponsor.organizationName,
+                  "Contact": sponsor.contactPerson,
+                  "Level": sponsor.sponsorshipLevel,
+                  "Amount": sponsor.sponsorshipAmount,
+                })) || []}
+                filename={`wed4-approved-sponsors-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export Approved Sponsors"
+                variant="outline"
+                className="w-full"
+              />
+              <PdfExportButton
+                data={sponsors?.filter(s => s.status === "approved").map(sponsor => ({
+                  "Organization": sponsor.organizationName,
+                  "Contact": sponsor.contactPerson,
+                  "Level": sponsor.sponsorshipLevel,
+                  "Amount": sponsor.sponsorshipAmount,
+                })) || []}
+                filename={`wed4-approved-sponsors-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export Approved Sponsors (PDF)"
+                variant="outline"
+                size="sm"
+                className="w-full"
+              />
+            </div>
 
-            <ExcelExportButton
-              data={registrations?.map(reg => ({
-                "Name": `${reg.firstName} ${reg.lastName}`,
-                "Email": reg.email,
-                "Category": reg.category,
-                "Status": reg.status,
-              })) || []}
-              filename={`wed4-registrations-${format(new Date(), "yyyy-MM-dd")}`}
-              buttonText="Export All Registrations"
-              variant="outline"
-              className="w-full"
-            />
+            <div className="space-y-2">
+              <ExcelExportButton
+                data={registrations?.map(reg => ({
+                  "Name": `${reg.firstName} ${reg.lastName}`,
+                  "Email": reg.email,
+                  "Category": reg.category,
+                  "Status": reg.status,
+                })) || []}
+                filename={`wed4-registrations-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export All Registrations"
+                variant="outline"
+                className="w-full"
+              />
+              <PdfExportButton
+                data={registrations?.map(reg => ({
+                  "Name": `${reg.firstName} ${reg.lastName}`,
+                  "Email": reg.email,
+                  "Category": reg.category,
+                  "Status": reg.status,
+                })) || []}
+                filename={`wed4-registrations-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export All Registrations (PDF)"
+                variant="outline"
+                size="sm"
+                className="w-full"
+              />
+            </div>
 
-            <ExcelExportButton
-              data={events?.map(event => ({
-                "Title": event.title,
-                "Theme": event.theme,
-                "Date": event.date,
-                "Location": event.location,
-                "Status": event.status,
-              })) || []}
-              filename={`wed4-events-${format(new Date(), "yyyy-MM-dd")}`}
-              buttonText="Export All Events"
-              variant="outline"
-              className="w-full"
-            />
+            <div className="space-y-2">
+              <ExcelExportButton
+                data={events?.map(event => ({
+                  "Title": event.title,
+                  "Theme": event.theme,
+                  "Date": event.date,
+                  "Location": event.location,
+                  "Status": event.status,
+                })) || []}
+                filename={`wed4-events-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export All Events"
+                variant="outline"
+                className="w-full"
+              />
+              <PdfExportButton
+                data={events?.map(event => ({
+                  "Title": event.title,
+                  "Theme": event.theme,
+                  "Date": event.date,
+                  "Location": event.location,
+                  "Status": event.status,
+                })) || []}
+                filename={`wed4-events-${format(new Date(), "yyyy-MM-dd")}`}
+                buttonText="Export All Events (PDF)"
+                variant="outline"
+                size="sm"
+                className="w-full"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>

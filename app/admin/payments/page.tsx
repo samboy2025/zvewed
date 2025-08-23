@@ -92,6 +92,11 @@ export default function AdminPaymentsPage() {
   const [showRejectionDialog, setShowRejectionDialog] = useState(false);
   const [rejectionReason, setRejectionReason] = useState("");
   
+  // Search and filter states for Manual Payment Verification
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterUserType, setFilterUserType] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  
   // Fetch real payment data from the database
   const payments = useQuery(api.payments.getAllPayments) || [];
   const paymentStats = useQuery(api.payments.getPaymentStats) || {
@@ -109,14 +114,28 @@ export default function AdminPaymentsPage() {
 
   // Get real user payment data
   const allUsers = useQuery(api.users.getAllUsers) || [];
-  const pendingUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "pending" }) || [];
-  const approvedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "approved" }) || [];
-  const rejectedUserPayments = useQuery(api.users.getUsersByPaymentStatus, { status: "rejected" }) || [];
+
   const updateUserPaymentStatus = useMutation(api.users.updateUserPaymentStatus);
 
   // Get users eligible for manual payment verification
   const usersEligibleForManualVerification = useQuery(api.admin.getUsersEligibleForManualVerification, {}) || [];
   const manuallyVerifyUserPayment = useMutation(api.admin.manuallyVerifyUserPayment);
+
+  // Filter users for Manual Payment Verification
+  const filteredUsers = usersEligibleForManualVerification?.filter(user => {
+    const matchesSearch = searchTerm === "" || 
+      user.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesUserType = filterUserType === "all" || user.userType === filterUserType;
+    
+    const matchesStatus = filterStatus === "all" || 
+      (filterStatus === "pending" && user.paymentStatus === "pending") ||
+      (filterStatus === "no_payment" && user.paymentStatus !== "pending");
+    
+    return matchesSearch && matchesUserType && matchesStatus;
+  }) || [];
 
   // Manual verification form state
   const [showManualVerificationDialog, setShowManualVerificationDialog] = useState(false);
@@ -386,7 +405,7 @@ export default function AdminPaymentsPage() {
                   <span>Pending Verification</span>
                 </div>
                 <div className="text-right">
-                  <div className="font-semibold">{pendingUserPayments.length}</div>
+                  <div className="font-semibold">{usersEligibleForManualVerification?.length || 0}</div>
                   <div className="text-sm text-gray-500">users</div>
                 </div>
               </div>
@@ -405,150 +424,7 @@ export default function AdminPaymentsPage() {
         </Card>
       </div>
 
-      {/* User Payment Management Section - Top Section Only */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <CreditCard className="h-5 w-5" />
-            User Payment Verification
-          </CardTitle>
-          <CardDescription>
-            Review and approve participant and vendor payment submissions
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {/* User Payment Stats */}
-          <div className="grid gap-4 md:grid-cols-3 mb-6">
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pending User Payments</CardTitle>
-                <Clock className="h-4 w-4 text-yellow-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-yellow-600">
-                  {(pendingUserPayments?.length || 0)}
-                </div>
-              </CardContent>
-            </Card>
 
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Approved User Payments</CardTitle>
-                <CheckCircle className="h-4 w-4 text-green-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-green-600">
-                  {(approvedUserPayments?.length || 0)}
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Rejected User Payments</CardTitle>
-                <XCircle className="h-4 w-4 text-red-600" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-red-600">
-                  {(rejectedUserPayments?.length || 0)}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* User Payments Table */}
-          {pendingUserPayments && pendingUserPayments.length > 0 && (
-            <div>
-              <h3 className="text-lg font-semibold mb-4">Pending User Payments</h3>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Submitted</TableHead>
-                    <TableHead>Receipt</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {pendingUserPayments.map((user) => (
-                    <TableRow key={user._id}>
-                      <TableCell>
-                        <div>
-                          <div className="font-medium">{user.firstName} {user.lastName}</div>
-                          <div className="text-sm text-gray-500">{user.email}</div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge variant="outline" className="capitalize">
-                          {user.userType}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        ₦{(user.paymentAmount || (user.userType === "participant" ? 7000 : 12000)).toLocaleString()}
-                      </TableCell>
-                      <TableCell>
-                        {user.paymentSubmittedAt ? formatDate(user.paymentSubmittedAt) : "Not submitted"}
-                      </TableCell>
-                      <TableCell>
-                        {user.paymentReceipt && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => window.open(user.paymentReceipt, '_blank')}
-                          >
-                            <Eye className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex gap-2">
-                          <Button
-                            size="sm"
-                            className="bg-green-600 hover:bg-green-700"
-                            onClick={async () => {
-                              try {
-                                await updateUserPaymentStatus({
-                                  userId: user._id,
-                                  status: "approved"
-                                })
-                                alert("Payment approved successfully!")
-                              } catch (error) {
-                                console.error("Error approving payment:", error)
-                                alert("Failed to approve payment")
-                              }
-                            }}
-                          >
-                            <Check className="h-4 w-4" />
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="destructive"
-                            onClick={() => {
-                              setSelectedUser(user);
-                              setShowRejectionDialog(true)
-                            }}
-                          >
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          )}
-
-          {(!pendingUserPayments || pendingUserPayments.length === 0) && (
-            <div className="text-center py-8">
-              <CheckCircle className="h-12 w-12 mx-auto mb-4 text-gray-400" />
-              <p className="text-gray-500">No pending user payments to review</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
 
       {/* Manual Payment Verification Section */}
       <Card>
@@ -564,10 +440,74 @@ export default function AdminPaymentsPage() {
         <CardContent>
           {usersEligibleForManualVerification && usersEligibleForManualVerification.length > 0 ? (
             <div>
-              <div className="mb-4 flex items-center justify-between">
-                <Badge variant="outline" className="text-blue-600">
-                  {usersEligibleForManualVerification.length} users eligible for manual verification
-                </Badge>
+              {/* Search and Filter Controls */}
+              <div className="mb-6 space-y-4">
+                <div className="flex flex-col sm:flex-row gap-4">
+                  {/* Search Input */}
+                  <div className="flex-1">
+                    <Label htmlFor="search-users">Search Users</Label>
+                    <Input
+                      id="search-users"
+                      placeholder="Search by name or email..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="mt-1"
+                    />
+                  </div>
+                  
+                  {/* User Type Filter */}
+                  <div className="w-full sm:w-48">
+                    <Label htmlFor="filter-user-type">User Type</Label>
+                    <Select value={filterUserType} onValueChange={setFilterUserType}>
+                      <SelectTrigger id="filter-user-type" className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Types</SelectItem>
+                        <SelectItem value="participant">Participants</SelectItem>
+                        <SelectItem value="vendor">Vendors</SelectItem>
+                        <SelectItem value="sponsor">Sponsors</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  {/* Status Filter */}
+                  <div className="w-full sm:w-48">
+                    <Label htmlFor="filter-status">Payment Status</Label>
+                    <Select value={filterStatus} onValueChange={setFilterStatus}>
+                      <SelectTrigger id="filter-status" className="mt-1">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="all">All Statuses</SelectItem>
+                        <SelectItem value="pending">Pending Receipt</SelectItem>
+                        <SelectItem value="no_payment">No Payment</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                {/* Results Count */}
+                <div className="flex items-center justify-between">
+                  <Badge variant="outline" className="text-blue-600">
+                    {filteredUsers.length} of {usersEligibleForManualVerification.length} users match filters
+                  </Badge>
+                  
+                  {/* Clear Filters Button */}
+                  {(searchTerm !== "" || filterUserType !== "all" || filterStatus !== "all") && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setSearchTerm("");
+                        setFilterUserType("all");
+                        setFilterStatus("all");
+                      }}
+                    >
+                      Clear Filters
+                    </Button>
+                  )}
+                </div>
               </div>
               <Table>
                 <TableHeader>
@@ -580,7 +520,7 @@ export default function AdminPaymentsPage() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {usersEligibleForManualVerification.map((user) => (
+                  {filteredUsers.map((user) => (
                     <TableRow key={user._id}>
                       <TableCell>
                         <div>
