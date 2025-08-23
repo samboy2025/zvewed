@@ -154,6 +154,14 @@ export default function AdminPaymentsPage() {
     user.userType === "vendor" && user.paymentStatus === "approved"
   );
 
+  // Calculate pending and rejected payments
+  const pendingUserPayments = allUsers.filter(user => 
+    user.paymentStatus === "pending"
+  );
+  const rejectedUserPayments = allUsers.filter(user => 
+    user.paymentStatus === "rejected"
+  );
+
   const participantRevenue = participantPayments.reduce((sum, user) => 
     sum + (user.paymentAmount || 7000), 0
   );
