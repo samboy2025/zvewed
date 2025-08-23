@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { Store, Package, Users, Zap, CheckCircle, AlertCircle } from "lucide-react"
+import Link from "next/link"
 
 export default function VendorRegistrationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -126,8 +127,8 @@ export default function VendorRegistrationPage() {
                   <p className="text-gray-600">
                     Your vendor registration has been submitted successfully. We will review your application and contact you with booth assignment and payment details.
                   </p>
-                  <Button onClick={() => setSubmitStatus("idle")} className="bg-red-600 hover:bg-red-700">
-                    Submit Another Registration
+                  <Button asChild className="bg-blue-600 hover:bg-blue-700">
+                    <Link href="/login">Login to Your Account</Link>
                   </Button>
                 </div>
               </CardContent>

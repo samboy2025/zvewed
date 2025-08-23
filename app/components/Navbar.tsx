@@ -165,7 +165,7 @@ export default function Navbar() {
                     <div className="flex items-center gap-4">
                         <Button
                             asChild
-                            className="hidden sm:flex bg-blue-600 hover:bg-blue-700 text-white">
+                            className="bg-blue-600 hover:bg-blue-700 text-white">
                             <Link href="/login">Login</Link>
                         </Button>
                         <Button
@@ -231,9 +231,14 @@ export default function Navbar() {
                                         </MobileCollapsibleSection>
                                     </div>
                                     
-                                    <Button asChild className="bg-red-600 hover:bg-red-700 text-white mt-6">
-                                        <Link href="/register">Register for WED 4.0</Link>
-                                    </Button>
+                                    <div className="flex flex-col gap-3 mt-6">
+                                        <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white">
+                                            <Link href="/login">Login</Link>
+                                        </Button>
+                                        <Button asChild className="bg-red-600 hover:bg-red-700 text-white">
+                                            <Link href="/register">Register for WED 4.0</Link>
+                                        </Button>
+                                    </div>
                                 </div>
                             </SheetContent>
                         </Sheet>

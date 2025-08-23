@@ -15,6 +15,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { User, CheckCircle, AlertCircle } from "lucide-react"
 import BackToTopButton from "../components/BackToTopButton"
+import Link from "next/link"
 
 export default function RegisterPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -157,8 +158,8 @@ export default function RegisterPage() {
                   <p className="text-gray-600">
                     Your registration has been submitted successfully. You will receive a confirmation email shortly.
                   </p>
-                  <Button onClick={() => setSubmitStatus("idle")} className="bg-red-600 hover:bg-red-700">
-                    Register Another Participant
+                  <Button asChild className="bg-blue-600 hover:bg-blue-700">
+                    <Link href="/login">Login to Your Account</Link>
                   </Button>
                 </div>
               </CardContent>
