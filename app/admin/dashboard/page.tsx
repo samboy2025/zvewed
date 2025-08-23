@@ -108,7 +108,7 @@ export default function AdminDashboard() {
               {dashboardStats.payments.approved} approved payments
             </p>
             <p className="text-xs text-green-600 font-medium mt-1">
-              +₦{dashboardStats.payments.totalAmount.toLocaleString()} total processed
+              {dashboardStats.payments.pending > 0 && `+₦${dashboardStats.payments.pendingAmount?.toLocaleString() || '0'} pending`}
             </p>
           </CardContent>
         </Card>
@@ -132,12 +132,12 @@ export default function AdminDashboard() {
             <UserCheck className="h-4 w-4 text-blue-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{dashboardStats.registrations.total}</div>
+            <div className="text-2xl font-bold text-blue-600">{dashboardStats.registrations.approved || 0}</div>
             <p className="text-xs text-muted-foreground">
               {dashboardStats.registrations.vendors} vendors, {dashboardStats.registrations.sponsors} sponsors
             </p>
             <p className="text-xs text-blue-600 font-medium mt-1">
-              +{dashboardStats.users.total} total users registered
+              {dashboardStats.registrations.total} total registrations
             </p>
           </CardContent>
         </Card>

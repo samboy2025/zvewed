@@ -26,6 +26,9 @@ export const getDashboardStats = query({
       approvedAmount: payments
         .filter(p => p.status === "approved")
         .reduce((sum, p) => sum + p.amount, 0),
+      pendingAmount: payments
+        .filter(p => p.status === "pending")
+        .reduce((sum, p) => sum + p.amount, 0),
     };
 
     // Get registration statistics
@@ -83,6 +86,9 @@ export const getDashboardStats = query({
         participants: registrations.length,
         vendors: vendors.length,
         sponsors: sponsors.length,
+        approved: registrations.filter(r => r.status === "approved").length + 
+                 vendors.filter(v => v.status === "approved").length + 
+                 sponsors.filter(s => s.status === "approved").length,
       },
       events: eventStats,
       recentActivity,
