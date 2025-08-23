@@ -149,6 +149,47 @@ export const updateVendorStatus = mutation({
   },
 });
 
+// Update vendor booth assignment
+export const updateVendorBoothAssignment = mutation({
+  args: {
+    vendorId: v.id("vendors"),
+    boothNumber: v.string(),
+    boothSection: v.string(),
+    boothLocation: v.string(),
+    boothNotes: v.optional(v.string()),
+    adminId: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.vendorId, {
+      boothAssigned: true,
+      boothNumber: args.boothNumber,
+      boothSection: args.boothSection,
+      boothLocation: args.boothLocation,
+      boothAssignedAt: Date.now(),
+      boothAssignedBy: args.adminId,
+      boothNotes: args.boothNotes,
+    });
+  },
+});
+
+// Remove vendor booth assignment
+export const removeVendorBoothAssignment = mutation({
+  args: {
+    vendorId: v.id("vendors"),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.vendorId, {
+      boothAssigned: false,
+      boothNumber: undefined,
+      boothSection: undefined,
+      boothLocation: undefined,
+      boothAssignedAt: undefined,
+      boothAssignedBy: undefined,
+      boothNotes: undefined,
+    });
+  },
+});
+
 // Get vendor statistics
 export const getVendorStats = query({
   args: {},

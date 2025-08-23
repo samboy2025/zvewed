@@ -104,6 +104,14 @@ export default defineSchema({
     paymentSubmittedAt: v.optional(v.number()),
     paymentNotes: v.optional(v.string()), // Notes about payment proof submission
     eventId: v.string(),
+    // Booth assignment fields
+    boothAssigned: v.optional(v.boolean()), // Whether booth has been assigned
+    boothNumber: v.optional(v.string()), // Assigned booth number
+    boothSection: v.optional(v.string()), // Assigned booth section/area
+    boothLocation: v.optional(v.string()), // Specific location details
+    boothAssignedAt: v.optional(v.number()), // When booth was assigned
+    boothAssignedBy: v.optional(v.string()), // Admin who assigned the booth
+    boothNotes: v.optional(v.string()), // Additional booth notes
   }),
   
   users: defineTable({
@@ -182,5 +190,21 @@ export default defineSchema({
     targetId: v.optional(v.string()),
     details: v.optional(v.string()),
     timestamp: v.number(),
+  }),
+
+  booths: defineTable({
+    boothNumber: v.string(), // Unique booth identifier
+    section: v.string(), // Exhibition section/area
+    location: v.string(), // Specific location details
+    size: v.string(), // Booth dimensions
+    area: v.string(), // Area in square meters
+    status: v.string(), // available, assigned, reserved
+    vendorId: v.optional(v.string()), // ID of assigned vendor
+    vendorName: v.optional(v.string()), // Name of assigned vendor
+    assignedAt: v.optional(v.number()), // When booth was assigned
+    assignedBy: v.optional(v.string()), // Admin who assigned the booth
+    notes: v.optional(v.string()), // Additional notes
+    createdAt: v.number(),
+    updatedAt: v.number(),
   }),
 });
