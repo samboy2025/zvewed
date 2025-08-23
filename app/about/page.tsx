@@ -50,9 +50,6 @@ export default function AboutPage() {
                   <Button asChild className="bg-red-600 hover:bg-red-700 text-white rounded-full px-8 py-3">
                     <Link href="/wed-4">Explore WED 4.0</Link>
                   </Button>
-                  <Button asChild variant="outline" className="border-red-600 text-red-600 hover:bg-red-600 hover:text-white rounded-full px-8 py-3">
-                    <Link href="/register">Join Our Community</Link>
-                  </Button>
                 </div>
               </div>
               
