@@ -102,13 +102,13 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-green-600">
-              ₦{dashboardStats.payments.approvedAmount.toLocaleString()}
+              ₦{dashboardStats.payments.userVendorRevenue?.toLocaleString() || '0'}
             </div>
             <p className="text-xs text-muted-foreground">
-              {dashboardStats.payments.approved} approved payments
+              {dashboardStats.payments.userVendorApproved || 0} approved payments
             </p>
             <p className="text-xs text-green-600 font-medium mt-1">
-              {dashboardStats.payments.pending > 0 && `+₦${dashboardStats.payments.pendingAmount?.toLocaleString() || '0'} pending`}
+              {dashboardStats.payments.userVendorPending > 0 && `+₦${dashboardStats.payments.userVendorPendingAmount?.toLocaleString() || '0'} pending`}
             </p>
           </CardContent>
         </Card>
@@ -242,28 +242,28 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-green-500" />
-                  <span className="text-sm font-medium">Approved Revenue</span>
+                  <span className="text-sm font-medium">User & Vendor Revenue</span>
                 </div>
                 <div className="text-sm font-bold text-green-600">
-                  ₦{dashboardStats.payments.approvedAmount.toLocaleString()}
+                  ₦{dashboardStats.payments.userVendorRevenue?.toLocaleString() || '0'}
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-yellow-500" />
-                  <span className="text-sm font-medium">Pending Payments</span>
+                  <span className="text-sm font-medium">Pending User & Vendor</span>
                 </div>
                 <div className="text-sm font-bold text-yellow-600">
-                  {dashboardStats.payments.pending} (₦{dashboardStats.payments.pendingAmount?.toLocaleString() || '0'})
+                  {dashboardStats.payments.userVendorPending || 0} (₦{dashboardStats.payments.userVendorPendingAmount?.toLocaleString() || '0'})
                 </div>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-blue-500" />
-                  <span className="text-sm font-medium">Total Processed</span>
+                  <span className="text-sm font-medium">Total User & Vendor</span>
                 </div>
                 <div className="text-sm font-bold text-blue-600">
-                  ₦{dashboardStats.payments.totalAmount.toLocaleString()}
+                  ₦{dashboardStats.payments.userVendorTotalAmount?.toLocaleString() || '0'}
                 </div>
               </div>
               <div className="flex items-center justify-between">
@@ -272,7 +272,7 @@ export default function AdminDashboard() {
                   <span className="text-sm font-medium">Payment Success Rate</span>
                 </div>
                 <div className="text-sm font-bold text-purple-600">
-                  {dashboardStats.payments.total > 0 ? Math.round((dashboardStats.payments.approved / dashboardStats.payments.total) * 100) : 0}%
+                  {dashboardStats.payments.userVendorTotal > 0 ? Math.round((dashboardStats.payments.userVendorApproved || 0) / (dashboardStats.payments.userVendorTotal || 1) * 100) : 0}%
                 </div>
               </div>
             </div>

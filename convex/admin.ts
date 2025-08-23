@@ -31,6 +31,29 @@ export const getDashboardStats = query({
         .reduce((sum, p) => sum + p.amount, 0),
     };
 
+    // Get user and vendor payment statistics specifically
+    const userVendorPayments = payments.filter(p => 
+      p.userType === "participant" || p.userType === "vendor"
+    );
+    const userVendorPaymentStats = {
+      userVendorTotal: userVendorPayments.length,
+      userVendorTotalAmount: userVendorPayments.reduce((sum, p) => sum + p.amount, 0),
+      userVendorApproved: userVendorPayments.filter(p => p.status === "approved").length,
+      userVendorPending: userVendorPayments.filter(p => p.status === "pending").length,
+      userVendorRevenue: userVendorPayments
+        .filter(p => p.status === "approved")
+        .reduce((sum, p) => sum + p.amount, 0),
+      userVendorPendingAmount: userVendorPayments
+        .filter(p => p.status === "pending")
+        .reduce((sum, p) => sum + p.amount, 0),
+    };
+
+    // Combine payment stats
+    const combinedPaymentStats = {
+      ...paymentStats,
+      ...userVendorPaymentStats,
+    };
+
     // Get registration statistics
     const registrations = await ctx.db.query("registrations").collect();
     const vendors = await ctx.db.query("vendors").collect();
@@ -80,7 +103,7 @@ export const getDashboardStats = query({
 
     return {
       users: userStats,
-      payments: paymentStats,
+      payments: combinedPaymentStats,
       registrations: {
         total: registrations.length + vendors.length + sponsors.length,
         participants: registrations.length,
