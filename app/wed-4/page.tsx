@@ -1,9 +1,12 @@
+"use client"
+
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Calendar, Users, Target, DollarSign, Award, ArrowRight, Lightbulb, TrendingUp, Handshake } from "lucide-react"
 import Link from "next/link"
 import BackToTopButton from "../components/BackToTopButton"
+import EventGallery from "../components/EventGallery"
 
 export default function WED4Page() {
   const objectives = [
@@ -31,12 +34,12 @@ export default function WED4Page() {
 
   const expectedOutcomes = [
     {
-      metric: "400+",
-      description: "Participants Expected",
+      metric: "300+",
+      description: "Participants Attended",
     },
     {
       metric: "₦3.37M+",
-      description: "Sponsorship Target",
+      description: "Sponsorship Achieved",
     },
     {
       metric: "100+",
@@ -125,6 +128,81 @@ export default function WED4Page() {
     }
   ]
 
+  const wed4Gallery = [
+    {
+      src: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.34_f02e294f.jpg",
+      alt: "Panel Discussion on Business Foundations",
+      title: "Resilience Panel Session",
+      category: "ceremony",
+    },
+    {
+      src: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.35_3e862169.jpg",
+      alt: "SME Domain Workshops",
+      title: "Interactive SME Masterclass",
+      category: "workshops",
+    },
+    {
+      src: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.35_c34d51ee.jpg",
+      alt: "Exhibitor stalls and commerce mapping",
+      title: "Vendor Exhibition booths",
+      category: "exhibition",
+    },
+    {
+      src: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.35_d6d26545.jpg",
+      alt: "Audience engaging in risk sessions",
+      title: "Audience Interaction",
+      category: "networking",
+    },
+    {
+      src: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.35_d8cb4136.jpg",
+      alt: "Expert speaker keynote on local economy",
+      title: "Keynote Address",
+      category: "speakers",
+    },
+    {
+      src: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.36_6d4e05d7.jpg",
+      alt: "Cross-sector resilience network",
+      title: "Domain Experts Networking",
+      category: "networking",
+    },
+    {
+      src: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.36_be1495c8.jpg",
+      alt: "Enterprise exhibition marketplace",
+      title: "SME Exhibition Showcase",
+      category: "exhibition",
+    },
+    {
+      src: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.36_eb2fdace.jpg",
+      alt: "SME pitch award and advisory board",
+      title: "SME Grant Funding",
+      category: "ceremony",
+    },
+    {
+      src: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.37_50de0369.jpg",
+      alt: "Interactive workshop cohort",
+      title: "Group Workshop Sessions",
+      category: "workshops",
+    },
+    {
+      src: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.37_9a019650.jpg",
+      alt: "Investor pitch presentation preliminary",
+      title: "Pitch Competition Finals",
+      category: "ceremony",
+    },
+    {
+      src: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.38_6950c980.jpg",
+      alt: "Domain expert explaining technology tools",
+      title: "Tech Innovation Masterclass",
+      category: "workshops",
+    },
+    {
+      src: "/WED PARTICIPANT IMAGES/WhatsApp Image 2025-07-27 at 15.31.39_0595aef4.jpg",
+      alt: "Winner of SME pitch contest",
+      title: "Ecosystem Award Ceremony",
+      category: "ceremony",
+    }
+  ]
+
   return (
     <div className="min-h-screen">
       <BackToTopButton />
@@ -150,7 +228,7 @@ export default function WED4Page() {
               </div>
               <div className="flex items-center gap-3 bg-white/10 backdrop-blur-sm rounded-full px-6 py-3">
                 <Users className="h-6 w-6" />
-                <span className="text-xl font-medium">400+ Expected</span>
+                <span className="text-xl font-medium">300+ Attended</span>
               </div>
             </div>
           </div>
@@ -215,6 +293,13 @@ export default function WED4Page() {
               </Card>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Real Photos Event Gallery */}
+      <section className="py-12 bg-white">
+        <div className="container mx-auto">
+          <EventGallery eventName="WED 4.0" images={wed4Gallery} />
         </div>
       </section>
 
@@ -433,4 +518,4 @@ export default function WED4Page() {
       </section>
     </div>
   )
-} 
+}
