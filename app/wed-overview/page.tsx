@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Users, Globe, Target, Award, ArrowRight } from "lucide-react"
+import { Users, Globe, Target, Award, ArrowRight, Lightbulb, Store, DollarSign } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
 
@@ -11,7 +11,7 @@ export default function WEDOverviewPage() {
       version: "WED 1.0",
       year: "2022",
       theme: "Transition in the Entrepreneurship Landscape: Exploring Opportunities and Network",
-      participants: 70,
+      participants: "70",
       highlights: [
         "Foundation of the WED movement in Zazzau",
         "Focus on exploring entrepreneurial opportunities",
@@ -25,7 +25,7 @@ export default function WEDOverviewPage() {
       version: "WED 2.0",
       year: "2023",
       theme: "Empowering the Next Generation of Entrepreneurs: Building Bridges to Success",
-      participants: 200,
+      participants: "200+",
       highlights: [
         "Significant growth in participation",
         "Focus on youth entrepreneurship",
@@ -40,7 +40,7 @@ export default function WEDOverviewPage() {
       version: "WED 3.0",
       year: "2024",
       theme: "Innovate Locally, Impact Globally: Empowering Entrepreneurs for a Sustainable Future",
-      participants: "300+ Attended",
+      participants: "350+",
       highlights: [
         "Successful sustainable entrepreneurship showcase",
         "Global impact achieved through local innovation",
@@ -55,7 +55,7 @@ export default function WEDOverviewPage() {
       version: "WED 4.0",
       year: "2025",
       theme: "Rebuild, Reinvent, Rise: Navigating the Current Economy with Resilience",
-      participants: "400+ Expected",
+      participants: "300+",
       highlights: [
         "Focus on economic resilience and business sustainability",
         "Strategic rebuilding and reinvention workshops",
@@ -65,6 +65,21 @@ export default function WEDOverviewPage() {
       ],
       image: "/WED 3.0/WED 3.0/IMG_8075.JPG",
       link: "/wed-4",
+    },
+    {
+      version: "WED 5.0",
+      year: "2026",
+      theme: "Building Resilient Enterprises for the Future (5th Anniversary Edition)",
+      participants: "400 - 500 Expected",
+      highlights: [
+        "Transition from annual event to structured enterprise development ecosystem",
+        "Expanded for the first time to an innovative two-day format",
+        "Four concurrent, sector-specific Enterprise Pavilions (Day One)",
+        "Business Pitch finals for 6 pre-selected SMEs with NGN 3M grant pool (Day Two)",
+        "Minimum 30 exhibitor booths across a multi-day live marketplace",
+      ],
+      image: "/WED 2.0/Pictures WED 2.0/IMG_6195.JPG",
+      link: "/wed-5",
     },
   ]
 
@@ -83,8 +98,8 @@ export default function WEDOverviewPage() {
               <span className="text-red-200">Initiative</span>
             </h1>
             <p className="text-xl md:text-2xl mb-12 text-red-100 font-light leading-relaxed">
-              Celebrating and empowering entrepreneurs across three transformative events, building a sustainable
-              ecosystem for innovation and growth.
+              Celebrating and empowering entrepreneurs across five transformative events, building a sustainable
+              ecosystem for innovation and growth in Northern Nigeria.
             </p>
           </div>
         </div>
@@ -126,7 +141,7 @@ export default function WEDOverviewPage() {
                   className="rounded-3xl shadow-2xl"
                 />
                 <div className="absolute -bottom-6 -left-6 bg-red-600 text-white p-6 rounded-2xl">
-                  <div className="text-3xl font-bold">600+</div>
+                  <div className="text-3xl font-bold">1,000+</div>
                   <div className="text-red-200">Entrepreneurs Impacted</div>
                 </div>
               </div>
@@ -141,24 +156,24 @@ export default function WEDOverviewPage() {
           <h2 className="text-4xl font-bold text-center mb-16">Our Collective Impact</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
             <div className="text-center">
-              <div className="text-5xl font-bold text-red-500 mb-4">4</div>
+              <div className="text-5xl font-bold text-red-500 mb-4">5</div>
               <div className="text-xl text-gray-300 mb-2">WED Events</div>
-              <div className="text-sm text-gray-500">2022 - 2025</div>
+              <div className="text-sm text-gray-500">2022 - 2026</div>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-red-500 mb-4">600+</div>
+              <div className="text-5xl font-bold text-red-500 mb-4">1,000+</div>
               <div className="text-xl text-gray-300 mb-2">Entrepreneurs Reached</div>
-              <div className="text-sm text-gray-500">Across all events</div>
+              <div className="text-sm text-gray-500">Across all editions</div>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-red-500 mb-4">50+</div>
-              <div className="text-xl text-gray-300 mb-2">Expert Speakers</div>
-              <div className="text-sm text-gray-500">Industry leaders</div>
+              <div className="text-5xl font-bold text-red-500 mb-4">₦3.0M</div>
+              <div className="text-xl text-gray-300 mb-2">Pitch Grant Pool</div>
+              <div className="text-sm text-gray-500">For WED 5.0</div>
             </div>
             <div className="text-center">
-              <div className="text-5xl font-bold text-red-500 mb-4">₦3.37M+</div>
-              <div className="text-xl text-gray-300 mb-2">Sponsorship Target</div>
-              <div className="text-sm text-gray-500">For WED 4.0</div>
+              <div className="text-5xl font-bold text-red-500 mb-4">₦12.65M</div>
+              <div className="text-xl text-gray-300 mb-2">WED 5.0 Budget</div>
+              <div className="text-sm text-gray-500">100% ecosystem focused</div>
             </div>
           </div>
         </div>
@@ -170,7 +185,7 @@ export default function WEDOverviewPage() {
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-6 text-black">WED Events Journey</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Explore the evolution of World Entrepreneurship Day from its inception through WED 3.0's success to the upcoming WED 4.0
+              Explore the evolution of World Entrepreneurship Day from its community launch through phases of growth, innovation, resilience, up to our massive WED 5.0 anniversary event.
             </p>
           </div>
 
@@ -232,21 +247,21 @@ export default function WEDOverviewPage() {
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center mb-16 text-black">Our Core Values</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            <Card className="text-center hover-lift border-0 shadow-lg">
+            <Card className="text-center hover-lift border-0 shadow-lg bg-gray-50">
               <CardHeader>
                 <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Target className="h-8 w-8 text-white" />
+                  <Lightbulb className="h-8 w-8 text-white" />
                 </div>
                 <CardTitle className="text-xl text-black">Innovation</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">
+                <p className="text-gray-600 text-sm">
                   Fostering creative solutions and breakthrough thinking in entrepreneurship
                 </p>
               </CardContent>
             </Card>
 
-            <Card className="text-center hover-lift border-0 shadow-lg">
+            <Card className="text-center hover-lift border-0 shadow-lg bg-gray-50">
               <CardHeader>
                 <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="h-8 w-8 text-white" />
@@ -254,11 +269,11 @@ export default function WEDOverviewPage() {
                 <CardTitle className="text-xl text-black">Collaboration</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">Building strong networks and partnerships for mutual growth and success</p>
+                <p className="text-gray-600 text-sm">Building strong networks and partnerships for mutual growth and success</p>
               </CardContent>
             </Card>
 
-            <Card className="text-center hover-lift border-0 shadow-lg">
+            <Card className="text-center hover-lift border-0 shadow-lg bg-gray-50">
               <CardHeader>
                 <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Globe className="h-8 w-8 text-white" />
@@ -266,11 +281,11 @@ export default function WEDOverviewPage() {
                 <CardTitle className="text-xl text-black">Sustainability</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">Promoting business practices that create lasting positive impact</p>
+                <p className="text-gray-600 text-sm">Promoting business practices that create lasting positive impact</p>
               </CardContent>
             </Card>
 
-            <Card className="text-center hover-lift border-0 shadow-lg">
+            <Card className="text-center hover-lift border-0 shadow-lg bg-gray-50">
               <CardHeader>
                 <div className="w-16 h-16 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Award className="h-8 w-8 text-white" />
@@ -278,7 +293,7 @@ export default function WEDOverviewPage() {
                 <CardTitle className="text-xl text-black">Excellence</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600">Striving for the highest standards in all our programs and initiatives</p>
+                <p className="text-gray-600 text-sm">Striving for the highest standards in all our programs and initiatives</p>
               </CardContent>
             </Card>
           </div>
@@ -288,10 +303,9 @@ export default function WEDOverviewPage() {
       {/* Call to Action */}
       <section className="py-24 gradient-red text-white">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-8">Join WED 4.0</h2>
-          <p className="text-xl mb-12 max-w-3xl mx-auto font-light leading-relaxed">
-            Be part of the next evolution in our entrepreneurial journey. Join WED 4.0 and learn to rebuild, reinvent, 
-            and rise through economic challenges with resilience.
+          <h2 className="text-4xl font-bold mb-8">Join WED 5.0</h2>
+          <p className="text-xl mb-12 max-w-3xl mx-auto font-light leading-relaxed text-red-100">
+            Be part of the next evolution in our entrepreneurial journey. Join the WED 5.0 anniversary event and learn how to build resilient enterprises for the future.
           </p>
           <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Button
@@ -299,7 +313,7 @@ export default function WEDOverviewPage() {
               size="lg"
               className="bg-white text-red-600 hover:bg-red-50 font-semibold text-lg px-8 py-4 rounded-full"
             >
-              <Link href="/register">Register for WED 4.0</Link>
+              <Link href="/register">Register for WED 5.0</Link>
             </Button>
             <Button
               asChild
@@ -307,7 +321,7 @@ export default function WEDOverviewPage() {
               variant="outline"
               className="border-white text-white hover:bg-white hover:text-red-600 font-semibold text-lg px-8 py-4 rounded-full"
             >
-              <Link href="/wed-4">Learn About WED 4.0</Link>
+              <Link href="/wed-5">Learn About WED 5.0</Link>
             </Button>
           </div>
         </div>

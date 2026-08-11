@@ -13,15 +13,16 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { Crown, Award, Medal, Building, Target, Handshake, CheckCircle, AlertCircle } from "lucide-react"
+import { Handshake, CheckCircle, AlertCircle } from "lucide-react"
+import BackToTopButton from "../components/BackToTopButton"
 import Link from "next/link"
 
 export default function SponsorRegistrationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const [errorMessage, setErrorMessage] = useState("")
-  
-  const createSponsorRegistration = useMutation(api.sponsors.createSponsorRegistration)
+
+  const createSponsor = useMutation(api.sponsors.createSponsor)
 
   const [formData, setFormData] = useState({
     organizationName: "",
@@ -41,8 +42,6 @@ export default function SponsorRegistrationPage() {
     targetAudience: "",
     previousSponsorship: "",
     specialRequests: "",
-    logoFile: "",
-    marketingMaterials: "",
     speakerNomination: "",
     networkingPreferences: "",
     agreeToTerms: false,
@@ -51,7 +50,7 @@ export default function SponsorRegistrationPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!formData.agreeToTerms) {
       setErrorMessage("You must agree to the terms and conditions")
       setSubmitStatus("error")
@@ -60,9 +59,9 @@ export default function SponsorRegistrationPage() {
 
     setIsSubmitting(true)
     setErrorMessage("")
-    
+
     try {
-      const sponsorId = await createSponsorRegistration({
+      const sponsorId = await createSponsor({
         organizationName: formData.organizationName,
         contactPerson: formData.contactPerson,
         position: formData.position,
@@ -80,20 +79,42 @@ export default function SponsorRegistrationPage() {
         targetAudience: formData.targetAudience || undefined,
         previousSponsorship: formData.previousSponsorship || undefined,
         specialRequests: formData.specialRequests || undefined,
-        logoFile: formData.logoFile || undefined,
-        marketingMaterials: formData.marketingMaterials || undefined,
         speakerNomination: formData.speakerNomination || undefined,
         networkingPreferences: formData.networkingPreferences || undefined,
         agreeToTerms: formData.agreeToTerms,
         agreeToMarketing: formData.agreeToMarketing,
       })
-      
-      console.log("Sponsor registration created with ID:", sponsorId)
+
+      console.log("Sponsor created with ID:", sponsorId)
       setSubmitStatus("success")
-      
+
+      // Reset form
+      setFormData({
+        organizationName: "",
+        contactPerson: "",
+        position: "",
+        email: "",
+        phone: "",
+        website: "",
+        address: "",
+        city: "",
+        state: "",
+        organizationType: "",
+        industry: "",
+        sponsorshipLevel: "",
+        sponsorshipAmount: "",
+        marketingObjectives: "",
+        targetAudience: "",
+        previousSponsorship: "",
+        specialRequests: "",
+        speakerNomination: "",
+        networkingPreferences: "",
+        agreeToTerms: false,
+        agreeToMarketing: false,
+      })
     } catch (error) {
       console.error("Sponsor registration error:", error)
-      setErrorMessage("Failed to submit sponsorship application. Please try again.")
+      setErrorMessage("Failed to submit sponsor application. Please try again.")
       setSubmitStatus("error")
     } finally {
       setIsSubmitting(false)
@@ -112,64 +133,29 @@ export default function SponsorRegistrationPage() {
     }
   }
 
-  const sponsorshipLevels = [
-    {
-      value: "platinum",
-      label: "Platinum Sponsor",
-      amount: "₦1,000,000+",
-      icon: Crown,
-      color: "text-purple-600",
-      benefits: ["Logo on all materials", "Full booth", "Speaking slot"],
-    },
-    {
-      value: "gold",
-      label: "Gold Sponsor",
-      amount: "₦500,000 – ₦999,999",
-      icon: Award,
-      color: "text-yellow-600",
-      benefits: ["Logo visibility", "Booth space", "Media recognition"],
-    },
-    {
-      value: "silver",
-      label: "Silver Sponsor",
-      amount: "₦250,000 – ₦499,999",
-      icon: Medal,
-      color: "text-gray-600",
-      benefits: ["Social media mention", "Branded materials", "Program recognition"],
-    },
-    {
-      value: "in-kind",
-      label: "In-Kind Partner",
-      amount: "Value-based",
-      icon: Handshake,
-      color: "text-blue-600",
-      benefits: ["Provide services/products", "Customized branding benefits", "Official partnership recognition"],
-    },
-  ]
-
-  // Success message component
   if (submitStatus === "success") {
     return (
-      <div className="min-h-screen py-12 bg-gray-50">
+      <div className="min-h-screen py-12 bg-gray-50 text-black">
+        <BackToTopButton />
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
-            <Card className="text-center">
+            <Card className="text-center bg-white border border-gray-100 shadow-xl">
               <CardHeader>
                 <div className="flex justify-center mb-4">
                   <CheckCircle className="h-16 w-16 text-green-500" />
                 </div>
-                <CardTitle className="text-2xl text-green-700">Sponsorship Application Submitted!</CardTitle>
+                <CardTitle className="text-2xl text-green-700">Application Submitted!</CardTitle>
                 <CardDescription className="text-lg">
-                  Thank you for your interest in sponsoring WED 4.0. Our team will contact you within 24 hours.
+                  Thank you for your interest in sponsoring WED 5.0. Our team will contact you within 24 hours.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <p className="text-gray-600">
-                    Your sponsorship application has been submitted successfully. We will review your application and contact you with next steps.
+                    Your sponsorship application has been received successfully. Our partnership team will review your application and schedule a follow-up call to finalize your corporate benefits and guide you on the next steps.
                   </p>
-                  <Button asChild className="bg-blue-600 hover:bg-blue-700">
-                    <Link href="/login">Login to Your Account</Link>
+                  <Button asChild className="bg-red-600 hover:bg-red-700 text-white rounded-full">
+                    <Link href="/login">Login to Your Sponsor Portal</Link>
                   </Button>
                 </div>
               </CardContent>
@@ -181,83 +167,26 @@ export default function SponsorRegistrationPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 bg-gray-50">
+    <div className="min-h-screen py-12 bg-gray-50 text-black">
+      <BackToTopButton />
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
-            <Badge className="mb-4 bg-red-600 text-white">WED 4.0 Sponsor Registration</Badge>
-            <h1 className="text-3xl font-bold mb-4">Become a WED 4.0 Sponsor</h1>
-            <p className="text-gray-600">Partner with us to empower entrepreneurs to rebuild, reinvent, and rise through economic challenges</p>
+            <Badge className="mb-4 bg-red-600 text-white">WED 5.0 Sponsor Registration</Badge>
+            <h1 className="text-3xl font-bold mb-4 text-black">Become a WED 5.0 Sponsor</h1>
+            <p className="text-gray-600">
+              Invest in Northern Nigeria's premier entrepreneurship platform during our historic 5th Anniversary (October 3–4, 2026).
+            </p>
           </div>
 
-          {/* Sponsorship Levels Overview */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-            <Card className="text-center">
-              <CardHeader className="pb-2">
-                <Crown className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                <CardTitle className="text-sm">Platinum Sponsor</CardTitle>
-                <CardDescription className="font-bold text-lg text-gray-900">₦1,000,000+</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <ul className="text-xs text-gray-600 space-y-1">
-                  <li>• Logo on all materials</li>
-                  <li>• Full booth</li>
-                  <li>• Speaking slot</li>
-                </ul>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardHeader className="pb-2">
-                <Award className="h-8 w-8 text-yellow-600 mx-auto mb-2" />
-                <CardTitle className="text-sm">Gold Sponsor</CardTitle>
-                <CardDescription className="font-bold text-lg text-gray-900">₦500k – ₦999k</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <ul className="text-xs text-gray-600 space-y-1">
-                  <li>• Logo visibility</li>
-                  <li>• Booth space</li>
-                  <li>• Media recognition</li>
-                </ul>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardHeader className="pb-2">
-                <Medal className="h-8 w-8 text-gray-600 mx-auto mb-2" />
-                <CardTitle className="text-sm">Silver Sponsor</CardTitle>
-                <CardDescription className="font-bold text-lg text-gray-900">₦250k – ₦499k</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <ul className="text-xs text-gray-600 space-y-1">
-                  <li>• Social media mention</li>
-                  <li>• Branded materials</li>
-                  <li>• Program recognition</li>
-                </ul>
-              </CardContent>
-            </Card>
-            <Card className="text-center">
-              <CardHeader className="pb-2">
-                <Handshake className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                <CardTitle className="text-sm">In-Kind Partner</CardTitle>
-                <CardDescription className="font-bold text-lg text-gray-900">Services/Goods</CardDescription>
-              </CardHeader>
-              <CardContent className="pt-0">
-                <ul className="text-xs text-gray-600 space-y-1">
-                  <li>• Provide services</li>
-                  <li>• Customized benefits</li>
-                  <li>• Partnership recognition</li>
-                </ul>
-              </CardContent>
-            </Card>
-          </div>
-
-          <Card>
+          <Card className="bg-white border border-gray-100 shadow-lg">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Handshake className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-black">
+                <Handshake className="h-5 w-5 text-red-600" />
                 Sponsorship Application Form
               </CardTitle>
-              <CardDescription>Complete this form to begin your sponsorship partnership with WED 4.0</CardDescription>
-              
+              <CardDescription>Complete this form to begin your sponsorship partnership with WED 5.0</CardDescription>
+
               {/* Error Message */}
               {submitStatus === "error" && (
                 <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md">
@@ -270,45 +199,45 @@ export default function SponsorRegistrationPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Organization Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-bold border-b pb-2 flex items-center gap-2">
-                    <Building className="h-5 w-5" />
-                    Organization Information
-                  </h3>
+                  <h3 className="text-lg font-semibold border-b pb-2 border-red-100 text-black">Organization Details</h3>
                   <div>
-                    <Label htmlFor="organizationName">Organization Name *</Label>
+                    <Label htmlFor="organizationName" className="text-black">Organization/Company Name *</Label>
                     <Input
                       id="organizationName"
                       value={formData.organizationName}
                       onChange={(e) => handleInputChange("organizationName", e.target.value)}
                       required
                       disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black"
                     />
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="contactPerson">Primary Contact Person *</Label>
+                      <Label htmlFor="contactPerson" className="text-black">Contact Person *</Label>
                       <Input
                         id="contactPerson"
                         value={formData.contactPerson}
                         onChange={(e) => handleInputChange("contactPerson", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="position">Position/Title *</Label>
+                      <Label htmlFor="position" className="text-black">Position/Title *</Label>
                       <Input
                         id="position"
                         value={formData.position}
                         onChange={(e) => handleInputChange("position", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
                       />
                     </div>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="email">Email Address *</Label>
+                      <Label htmlFor="email" className="text-black">Email Address *</Label>
                       <Input
                         id="email"
                         type="email"
@@ -316,10 +245,11 @@ export default function SponsorRegistrationPage() {
                         onChange={(e) => handleInputChange("email", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="phone">Phone Number *</Label>
+                      <Label htmlFor="phone" className="text-black">Phone Number *</Label>
                       <Input
                         id="phone"
                         type="tel"
@@ -327,168 +257,149 @@ export default function SponsorRegistrationPage() {
                         onChange={(e) => handleInputChange("phone", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
                       />
                     </div>
                   </div>
-                  <div>
-                    <Label htmlFor="website">Website URL</Label>
-                    <Input
-                      id="website"
-                      type="url"
-                      value={formData.website}
-                      onChange={(e) => handleInputChange("website", e.target.value)}
-                      placeholder="https://www.yourorganization.com"
-                      disabled={isSubmitting}
-                    />
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="website" className="text-black">Website URL</Label>
+                      <Input
+                        id="website"
+                        value={formData.website}
+                        onChange={(e) => handleInputChange("website", e.target.value)}
+                        placeholder="https://..."
+                        disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="organizationType" className="text-black">Organization Type *</Label>
+                      <Select
+                        onValueChange={(value) => handleInputChange("organizationType", value)}
+                        disabled={isSubmitting}
+                      >
+                        <SelectTrigger className="bg-white border-gray-300 text-black">
+                          <SelectValue placeholder="Select type" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white text-black">
+                          <SelectItem value="corporate">Corporate Organization</SelectItem>
+                          <SelectItem value="sme">Small/Medium Enterprise</SelectItem>
+                          <SelectItem value="ngo">NGO/Foundation</SelectItem>
+                          <SelectItem value="government">Government Agency</SelectItem>
+                          <SelectItem value="other">Other</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   <div>
-                    <Label htmlFor="address">Organization Address *</Label>
+                    <Label htmlFor="address" className="text-black">Address *</Label>
                     <Input
                       id="address"
                       value={formData.address}
                       onChange={(e) => handleInputChange("address", e.target.value)}
                       required
                       disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black"
                     />
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="city">City *</Label>
+                      <Label htmlFor="city" className="text-black">City *</Label>
                       <Input
                         id="city"
                         value={formData.city}
                         onChange={(e) => handleInputChange("city", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="state">State *</Label>
+                      <Label htmlFor="state" className="text-black">State *</Label>
                       <Input
                         id="state"
                         value={formData.state}
                         onChange={(e) => handleInputChange("state", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
                       />
-                    </div>
-                  </div>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="organizationType">Organization Type *</Label>
-                      <Select onValueChange={(value) => handleInputChange("organizationType", value)} disabled={isSubmitting}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select organization type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="corporation">Corporation</SelectItem>
-                          <SelectItem value="startup">Startup</SelectItem>
-                          <SelectItem value="sme">Small/Medium Enterprise</SelectItem>
-                          <SelectItem value="nonprofit">Non-Profit Organization</SelectItem>
-                          <SelectItem value="government">Government Agency</SelectItem>
-                          <SelectItem value="educational">Educational Institution</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="industry">Industry *</Label>
-                      <Select onValueChange={(value) => handleInputChange("industry", value)} disabled={isSubmitting}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select industry" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="technology">Technology</SelectItem>
-                          <SelectItem value="finance">Finance/Banking</SelectItem>
-                          <SelectItem value="healthcare">Healthcare</SelectItem>
-                          <SelectItem value="education">Education</SelectItem>
-                          <SelectItem value="manufacturing">Manufacturing</SelectItem>
-                          <SelectItem value="retail">Retail/Commerce</SelectItem>
-                          <SelectItem value="agriculture">Agriculture</SelectItem>
-                          <SelectItem value="energy">Energy</SelectItem>
-                          <SelectItem value="telecommunications">Telecommunications</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
                     </div>
                   </div>
                 </div>
 
-                {/* Sponsorship Details */}
+                {/* Partnership Details */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-bold border-b pb-2 flex items-center gap-2">
-                    <Target className="h-5 w-5" />
-                    Sponsorship Details
-                  </h3>
+                  <h3 className="text-lg font-semibold border-b pb-2 border-red-100 text-black">Sponsorship Details</h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="sponsorshipLevel">Sponsorship Level *</Label>
-                      <Select onValueChange={(value) => handleInputChange("sponsorshipLevel", value)} disabled={isSubmitting}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select sponsorship level" />
+                      <Label htmlFor="sponsorshipLevel" className="text-black">Sponsorship Tier *</Label>
+                      <Select
+                        onValueChange={(value) => handleInputChange("sponsorshipLevel", value)}
+                        disabled={isSubmitting}
+                      >
+                        <SelectTrigger className="bg-white border-gray-300 text-black">
+                          <SelectValue placeholder="Select tier" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="platinum">Platinum Sponsor (₦1,000,000+)</SelectItem>
-                          <SelectItem value="gold">Gold Sponsor (₦500,000 – ₦999,999)</SelectItem>
-                          <SelectItem value="silver">Silver Sponsor (₦250,000 – ₦499,999)</SelectItem>
-                          <SelectItem value="in-kind">In-Kind Partner (Services/Goods)</SelectItem>
+                        <SelectContent className="bg-white text-black">
+                          <SelectItem value="platinum">Platinum Tier (₦2,000,000+)</SelectItem>
+                          <SelectItem value="gold">Gold Tier (₦1,000,000 – ₦1,999,999)</SelectItem>
+                          <SelectItem value="silver">Silver Tier (₦500,000 – ₦999,999)</SelectItem>
+                          <SelectItem value="grant-cofunder">Grant Co-Funder (Negotiable)</SelectItem>
+                          <SelectItem value="in-kind">In-Kind / Media Partner</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="sponsorshipAmount">Sponsorship Amount *</Label>
+                      <Label htmlFor="sponsorshipAmount" className="text-black">Proposed Investment Amount *</Label>
                       <Input
                         id="sponsorshipAmount"
                         value={formData.sponsorshipAmount}
                         onChange={(e) => handleInputChange("sponsorshipAmount", e.target.value)}
-                        placeholder="e.g., ₦500,000 or Services valued at ₦300,000"
+                        placeholder="e.g. ₦1,500,000 or Media coverage"
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
                       />
                     </div>
                   </div>
+
                   <div>
-                    <Label htmlFor="marketingObjectives">Marketing Objectives</Label>
+                    <Label htmlFor="industry" className="text-black">Industry Sector *</Label>
+                    <Input
+                      id="industry"
+                      value={formData.industry}
+                      onChange={(e) => handleInputChange("industry", e.target.value)}
+                      placeholder="e.g. Finance, Agribusiness, Telecommunications"
+                      required
+                      disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="marketingObjectives" className="text-black">What are your primary brand/CSR objectives?</Label>
                     <Textarea
                       id="marketingObjectives"
                       value={formData.marketingObjectives}
                       onChange={(e) => handleInputChange("marketingObjectives", e.target.value)}
-                      placeholder="What are your primary marketing objectives for this sponsorship?"
+                      placeholder="e.g. CSR youth empowerment, brand visibility, ecosystem connection"
                       rows={3}
                       disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black"
                     />
                   </div>
+
                   <div>
-                    <Label htmlFor="targetAudience">Target Audience</Label>
-                    <Textarea
-                      id="targetAudience"
-                      value={formData.targetAudience}
-                      onChange={(e) => handleInputChange("targetAudience", e.target.value)}
-                      placeholder="Who is your target audience? How can we help you reach them?"
-                      rows={3}
+                    <Label htmlFor="speakerNomination" className="text-black">Do you want to nominate an expert/facilitator for our sector pavilions?</Label>
+                    <Input
+                      id="speakerNomination"
+                      value={formData.speakerNomination}
+                      onChange={(e) => handleInputChange("speakerNomination", e.target.value)}
+                      placeholder="Name, role, sector expertise"
                       disabled={isSubmitting}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="previousSponsorship">Previous Sponsorship Experience</Label>
-                    <Textarea
-                      id="previousSponsorship"
-                      value={formData.previousSponsorship}
-                      onChange={(e) => handleInputChange("previousSponsorship", e.target.value)}
-                      placeholder="Tell us about your previous sponsorship experiences, if any"
-                      rows={3}
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="specialRequests">Special Requests or Requirements</Label>
-                    <Textarea
-                      id="specialRequests"
-                      value={formData.specialRequests}
-                      onChange={(e) => handleInputChange("specialRequests", e.target.value)}
-                      placeholder="Any special requests, requirements, or additional services you need?"
-                      rows={3}
-                      disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black"
                     />
                   </div>
                 </div>
@@ -502,9 +413,10 @@ export default function SponsorRegistrationPage() {
                       onCheckedChange={(checked) => handleInputChange("agreeToTerms", checked as boolean)}
                       required
                       disabled={isSubmitting}
+                      className="border-gray-400 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
                     />
-                    <Label htmlFor="terms" className="text-sm">
-                      I agree to the sponsorship terms and conditions *
+                    <Label htmlFor="terms" className="text-sm text-black">
+                      I agree to the sponsorship partnership terms *
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -513,19 +425,20 @@ export default function SponsorRegistrationPage() {
                       checked={formData.agreeToMarketing}
                       onCheckedChange={(checked) => handleInputChange("agreeToMarketing", checked as boolean)}
                       disabled={isSubmitting}
+                      className="border-gray-400 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
                     />
-                    <Label htmlFor="marketing" className="text-sm">
-                      I agree to receive communications about sponsorship opportunities
+                    <Label htmlFor="marketing" className="text-sm text-black">
+                      I agree to receive event communications
                     </Label>
                   </div>
                 </div>
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-red-600 hover:bg-red-700"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white rounded-full font-bold"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Submitting Application..." : "Submit Sponsorship Application"}
+                  {isSubmitting ? "Submitting Application..." : "Complete Sponsorship Application"}
                 </Button>
               </form>
             </CardContent>

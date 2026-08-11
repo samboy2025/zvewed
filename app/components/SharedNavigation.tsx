@@ -13,9 +13,11 @@ const menuItems = [
         href: '#',
         dropdown: [
             { name: 'WED Initiative Overview', href: '/wed-overview' },
-            { name: 'WED 1.0', href: '/wed-1' },
-            { name: 'WED 2.0', href: '/wed-2' },
+            { name: 'WED 5.0 (Anniversary)', href: '/wed-5' },
+            { name: 'WED 4.0', href: '/wed-4' },
             { name: 'WED 3.0', href: '/wed-3' },
+            { name: 'WED 2.0', href: '/wed-2' },
+            { name: 'WED 1.0', href: '/wed-1' },
         ]
     },
     { name: 'About', href: '/about' },
@@ -28,9 +30,11 @@ const menuItems = [
 const mobileMenuItems = [
     { name: 'Home', href: '/' },
     { name: 'WED Initiative Overview', href: '/wed-overview' },
-    { name: 'WED 1.0', href: '/wed-1', indent: true },
-    { name: 'WED 2.0', href: '/wed-2', indent: true },
+    { name: 'WED 5.0 (Anniversary)', href: '/wed-5', indent: true },
+    { name: 'WED 4.0', href: '/wed-4', indent: true },
     { name: 'WED 3.0', href: '/wed-3', indent: true },
+    { name: 'WED 2.0', href: '/wed-2', indent: true },
+    { name: 'WED 1.0', href: '/wed-1', indent: true },
     { name: 'About', href: '/about' },
     { name: 'Activities', href: '/activities' },
     { name: 'Sponsorship', href: '/sponsorship' },
@@ -44,7 +48,7 @@ const WEDLogo = ({ className }: { className?: string }) => {
             <div className="w-8 h-8 bg-gradient-to-br from-red-600 to-red-700 rounded-lg flex items-center justify-center">
                 <span className="text-white font-bold text-sm">W</span>
             </div>
-            <span className="text-xl font-bold text-red-600">WED 4.0</span>
+            <span className="text-xl font-bold text-red-600">WED 5.0</span>
         </div>
     )
 }
