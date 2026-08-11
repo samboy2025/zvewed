@@ -55,6 +55,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/wed-5" className="text-gray-300 hover:text-white">
+                  WED 5.0 (Anniversary)
+                </Link>
+              </li>
+              <li>
                 <Link href="/wed-4" className="text-gray-300 hover:text-white">
                   WED 4.0
                 </Link>
@@ -103,7 +108,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center">
-          <p className="text-gray-400">© 2025 World Entrepreneurship Day 4.0 - Organized by Zazzau Version Entrepreneurs (ZVE). All rights reserved.</p>
+          <p className="text-gray-400">© 2026 World Entrepreneurs Day 5.0 - Organized by Zazzau Version Entrepreneurs (ZVE). All rights reserved.</p>
         </div>
       </div>
     </footer>

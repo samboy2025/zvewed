@@ -99,26 +99,29 @@ export default function Navbar() {
                                 </NavigationMenuTrigger>
                                 <NavigationMenuContent>
                                     <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                                        <li className="row-span-4">
+                                        <li className="row-span-5">
                                             <NavigationMenuLink asChild>
                                                 <Link
-                                                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-red-500 to-red-600 p-6 no-underline outline-none focus:shadow-md"
+                                                    className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-red-600 to-red-700 p-6 no-underline outline-none focus:shadow-md"
                                                     href="/wed-overview"
                                                 >
                                                     <div className="mb-2 mt-4 text-lg font-medium text-white">
                                                         WED Journey
                                                     </div>
                                                     <p className="text-sm leading-tight text-red-100">
-                                                        Explore our entrepreneurship evolution from WED 1.0 through 3.0 to the upcoming 4.0
+                                                        Explore our entrepreneurship evolution from WED 1.0 to our milestone 5th Anniversary WED 5.0
                                                     </p>
                                                 </Link>
                                             </NavigationMenuLink>
                                         </li>
-                                        <ListItem href="/wed-4" title="WED 4.0 (Current)">
-                                            Rebuild, Reinvent, Rise - 400+ expected participants
+                                        <ListItem href="/wed-5" title="WED 5.0 (Anniversary)">
+                                            Building Resilient Enterprises for the Future (October 2026)
+                                        </ListItem>
+                                        <ListItem href="/wed-4" title="WED 4.0">
+                                            Rebuild, Reinvent, Rise - 400+ participants (2025)
                                         </ListItem>
                                         <ListItem href="/wed-3" title="WED 3.0">
-                                            Innovation focus - 300+ participants (Completed 2024)
+                                            Innovation focus - 350+ participants (Completed 2024)
                                         </ListItem>
                                         <ListItem href="/wed-2" title="WED 2.0">
                                             Growth phase with 200 entrepreneurs (Completed 2023)
@@ -165,27 +168,27 @@ export default function Navbar() {
                     <div className="flex items-center gap-4">
                         <Button
                             asChild
-                            className="bg-blue-600 hover:bg-blue-700 text-white">
+                            className="bg-red-700 hover:bg-red-800 text-white border-2 border-red-700">
                             <Link href="/login">Login</Link>
                         </Button>
                         <Button
                             asChild
                             className="hidden sm:flex bg-red-600 hover:bg-red-700 text-white">
-                            <Link href="/register">Register for WED 4.0</Link>
+                            <Link href="/register">Register for WED 5.0</Link>
                         </Button>
 
                         {/* Mobile Menu */}
                         <Sheet>
                             <SheetTrigger asChild>
-                                <Button variant="ghost" size="icon" className="lg:hidden">
+                                <Button variant="ghost" size="icon" className="lg:hidden text-black hover:bg-red-50">
                                     <Menu className="h-6 w-6" />
                                     <span className="sr-only">Toggle menu</span>
                                 </Button>
                             </SheetTrigger>
-                            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+                            <SheetContent side="right" className="w-[300px] sm:w-[400px] bg-white text-black border-l border-red-100">
                                 <SheetTitle className="sr-only">Mobile Menu</SheetTitle>
                                 <div className="flex flex-col gap-6 mt-6">
-                                    <Link href="/" className="flex items-center gap-3 pb-4 border-b">
+                                    <Link href="/" className="flex items-center gap-3 pb-4 border-b border-red-100">
                                         <Image src="/logo.png" alt="ZVE Logo" width={40} height={40} className="h-10 w-auto" />
                                     </Link>
                                     
@@ -199,8 +202,11 @@ export default function Navbar() {
                                             <Link href="/wed-overview" className="block text-gray-600 hover:text-red-600 transition-colors py-1">
                                                 WED Journey
                                             </Link>
-                                            <Link href="/wed-4" className="block text-red-600 font-medium hover:text-red-700 transition-colors py-1">
-                                                WED 4.0 (Current)
+                                            <Link href="/wed-5" className="block text-red-600 font-bold hover:text-red-700 transition-colors py-1">
+                                                WED 5.0 (Anniversary)
+                                            </Link>
+                                            <Link href="/wed-4" className="block text-gray-600 hover:text-red-600 transition-colors py-1">
+                                                WED 4.0 (Previous)
                                             </Link>
                                             <Link href="/wed-3" className="block text-gray-600 hover:text-red-600 transition-colors py-1">
                                                 WED 3.0 (Completed)
@@ -232,11 +238,11 @@ export default function Navbar() {
                                     </div>
                                     
                                     <div className="flex flex-col gap-3 mt-6">
-                                        <Button asChild className="bg-blue-600 hover:bg-blue-700 text-white">
+                                        <Button asChild className="bg-red-700 hover:bg-red-800 text-white">
                                             <Link href="/login">Login</Link>
                                         </Button>
                                         <Button asChild className="bg-red-600 hover:bg-red-700 text-white">
-                                            <Link href="/register">Register for WED 4.0</Link>
+                                            <Link href="/register">Register for WED 5.0</Link>
                                         </Button>
                                     </div>
                                 </div>

@@ -124,33 +124,29 @@ export default function RegisterPage() {
   }
 
   const interests = [
-    "Financial Management & Economic Resilience",
-    "Business Risk Management",
-    "Digital Transformation",
-    "Supply Chain Optimization",
-    "Investment Readiness",
-    "Market Research & Analysis",
-    "Leadership & Team Management",
-    "Export Development",
-    "Networking & Partnerships",
-    "Legal Compliance",
+    "Trade and Commerce (Traders, wholesalers, retailers)",
+    "Technology and Innovation (Tech startups, digital services, fintech)",
+    "Agribusiness and Food Processing (Farmers, food entrepreneurs, agro-processors)",
+    "Creative and Media (Fashion, photographers, content creators)",
+    "Business Resilience Strategies (Access to finance, operational strategies)",
+    "Business Pitch Competition & Grant Access",
   ]
 
   // Success message component
   if (submitStatus === "success") {
     return (
-      <div className="min-h-screen py-12 bg-gray-50">
+      <div className="min-h-screen py-12 bg-gray-50 text-black">
         <BackToTopButton />
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
-            <Card className="text-center">
+            <Card className="text-center bg-white border border-gray-100 shadow-xl">
               <CardHeader>
                 <div className="flex justify-center mb-4">
                   <CheckCircle className="h-16 w-16 text-green-500" />
                 </div>
                 <CardTitle className="text-2xl text-green-700">Registration Successful!</CardTitle>
                 <CardDescription className="text-lg">
-                  Thank you for registering for WED 4.0. We will contact you soon with further details.
+                  Thank you for registering for WED 5.0. We will contact you soon with further details.
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -158,7 +154,7 @@ export default function RegisterPage() {
                   <p className="text-gray-600">
                     Your registration has been submitted successfully. You will receive a confirmation email shortly.
                   </p>
-                  <Button asChild className="bg-blue-600 hover:bg-blue-700">
+                  <Button asChild className="bg-red-600 hover:bg-red-700 text-white rounded-full">
                     <Link href="/login">Login to Your Account</Link>
                   </Button>
                 </div>
@@ -171,23 +167,23 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 bg-gray-50">
+    <div className="min-h-screen py-12 bg-gray-50 text-black">
       <BackToTopButton />
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
-            <Badge className="mb-4 bg-red-600 text-white">WED 4.0 Registration</Badge>
-            <h1 className="text-3xl font-bold mb-4">Register for WED 4.0</h1>
-            <p className="text-gray-600">Join us for 2 days of learning economic resilience and building sustainable businesses</p>
+            <Badge className="mb-4 bg-red-600 text-white">WED 5.0 Anniversary Registration</Badge>
+            <h1 className="text-3xl font-bold mb-4 text-black">Register for WED 5.0</h1>
+            <p className="text-gray-600">Join us for the milestone 5th Anniversary (October 3–4, 2026) to build resilient enterprises for the future.</p>
           </div>
 
-          <Card>
+          <Card className="bg-white border border-gray-100 shadow-lg">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-black">
+                <User className="h-5 w-5 text-red-600" />
                 Participant Registration Form
               </CardTitle>
-              <CardDescription>Please fill out all required fields to complete your registration</CardDescription>
+              <CardDescription>Please fill out all required fields to complete your registration for the expanded two-day event.</CardDescription>
               
               {/* Error Message */}
               {submitStatus === "error" && (
@@ -201,32 +197,34 @@ export default function RegisterPage() {
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Personal Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold border-b pb-2">Personal Information</h3>
+                  <h3 className="text-lg font-semibold border-b pb-2 text-black border-red-100">Personal Information</h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="firstName">First Name *</Label>
+                      <Label htmlFor="firstName" className="text-black">First Name *</Label>
                       <Input
                         id="firstName"
                         value={formData.firstName}
                         onChange={(e) => handleInputChange("firstName", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black focus:border-red-600"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="lastName">Last Name *</Label>
+                      <Label htmlFor="lastName" className="text-black">Last Name *</Label>
                       <Input
                         id="lastName"
                         value={formData.lastName}
                         onChange={(e) => handleInputChange("lastName", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black focus:border-red-600"
                       />
                     </div>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="email">Email Address *</Label>
+                      <Label htmlFor="email" className="text-black">Email Address *</Label>
                       <Input
                         id="email"
                         type="email"
@@ -234,10 +232,11 @@ export default function RegisterPage() {
                         onChange={(e) => handleInputChange("email", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black focus:border-red-600"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="phone">Phone Number *</Label>
+                      <Label htmlFor="phone" className="text-black">Phone Number *</Label>
                       <Input
                         id="phone"
                         type="tel"
@@ -245,6 +244,7 @@ export default function RegisterPage() {
                         onChange={(e) => handleInputChange("phone", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black focus:border-red-600"
                       />
                     </div>
                   </div>
@@ -252,46 +252,50 @@ export default function RegisterPage() {
 
                 {/* Professional Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold border-b pb-2">Professional Information</h3>
+                  <h3 className="text-lg font-semibold border-b pb-2 text-black border-red-100">Professional Information</h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="organization">Organization/Company</Label>
+                      <Label htmlFor="organization" className="text-black">Organization/Company</Label>
                       <Input
                         id="organization"
                         value={formData.organization}
                         onChange={(e) => handleInputChange("organization", e.target.value)}
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black focus:border-red-600"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="position">Position/Title</Label>
+                      <Label htmlFor="position" className="text-black">Position/Title</Label>
                       <Input
                         id="position"
                         value={formData.position}
                         onChange={(e) => handleInputChange("position", e.target.value)}
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black focus:border-red-600"
                       />
                     </div>
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="city">City *</Label>
+                      <Label htmlFor="city" className="text-black">City *</Label>
                       <Input
                         id="city"
                         value={formData.city}
                         onChange={(e) => handleInputChange("city", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black focus:border-red-600"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="state">State *</Label>
+                      <Label htmlFor="state" className="text-black">State *</Label>
                       <Input
                         id="state"
                         value={formData.state}
                         onChange={(e) => handleInputChange("state", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black focus:border-red-600"
                       />
                     </div>
                   </div>
@@ -299,19 +303,19 @@ export default function RegisterPage() {
 
                 {/* Event-Specific Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold border-b pb-2">Event Information</h3>
+                  <h3 className="text-lg font-semibold border-b pb-2 text-black border-red-100">Event Information</h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="category">Participant Category *</Label>
+                      <Label htmlFor="category" className="text-black">Participant Category *</Label>
                       <Select onValueChange={(value) => handleInputChange("category", value)} disabled={isSubmitting}>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-white border-gray-300 text-black">
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white text-black">
                           <SelectItem value="aspiring-entrepreneur">Aspiring Entrepreneur</SelectItem>
                           <SelectItem value="established-business">Established Business Owner</SelectItem>
                           <SelectItem value="student">Student</SelectItem>
-                          <SelectItem value="academic">Academic Professional</SelectItem>
+                          <SelectItem value="academic">Academic/Educator</SelectItem>
                           <SelectItem value="investor">Investor</SelectItem>
                           <SelectItem value="government">Government Representative</SelectItem>
                           <SelectItem value="other">Other</SelectItem>
@@ -319,12 +323,12 @@ export default function RegisterPage() {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="experience">Entrepreneurship Experience</Label>
+                      <Label htmlFor="experience" className="text-black">Entrepreneurship Experience</Label>
                       <Select onValueChange={(value) => handleInputChange("experience", value)} disabled={isSubmitting}>
-                        <SelectTrigger>
+                        <SelectTrigger className="bg-white border-gray-300 text-black">
                           <SelectValue placeholder="Select experience level" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white text-black">
                           <SelectItem value="none">No experience</SelectItem>
                           <SelectItem value="beginner">Beginner (0-2 years)</SelectItem>
                           <SelectItem value="intermediate">Intermediate (2-5 years)</SelectItem>
@@ -335,8 +339,8 @@ export default function RegisterPage() {
                   </div>
 
                   <div>
-                    <Label>Areas of Interest (Select all that apply)</Label>
-                    <div className="grid md:grid-cols-2 gap-2 mt-2">
+                    <Label className="text-black">Enterprise Pavilion & Focus Interests (Select all that apply) *</Label>
+                    <div className="grid md:grid-cols-1 gap-2 mt-2">
                       {interests.map((interest) => (
                         <div key={interest} className="flex items-center space-x-2">
                           <Checkbox
@@ -344,8 +348,9 @@ export default function RegisterPage() {
                             checked={formData.interests.includes(interest)}
                             onCheckedChange={(checked) => handleInterestChange(interest, checked as boolean)}
                             disabled={isSubmitting}
+                            className="border-gray-400 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
                           />
-                          <Label htmlFor={interest} className="text-sm">
+                          <Label htmlFor={interest} className="text-sm text-gray-700 font-medium">
                             {interest}
                           </Label>
                         </div>
@@ -354,25 +359,27 @@ export default function RegisterPage() {
                   </div>
 
                   <div>
-                    <Label htmlFor="expectations">What do you hope to gain from WED 4.0?</Label>
+                    <Label htmlFor="expectations" className="text-black">What do you hope to gain from WED 5.0?</Label>
                     <Textarea
                       id="expectations"
                       value={formData.expectations}
                       onChange={(e) => handleInputChange("expectations", e.target.value)}
-                      placeholder="Share your expectations and goals for attending this event. How can we help you rebuild, reinvent, and rise?"
+                      placeholder="Share your expectations and goals for attending this milestone event. How can we help you build resilient enterprises?"
                       rows={3}
                       disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black focus:border-red-600"
                     />
                   </div>
 
                   <div>
-                    <Label htmlFor="dietaryRestrictions">Dietary Restrictions/Special Requirements</Label>
+                    <Label htmlFor="dietaryRestrictions" className="text-black">Dietary Restrictions/Special Requirements</Label>
                     <Input
                       id="dietaryRestrictions"
                       value={formData.dietaryRestrictions}
                       onChange={(e) => handleInputChange("dietaryRestrictions", e.target.value)}
                       placeholder="Please specify any dietary restrictions or special needs"
                       disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black focus:border-red-600"
                     />
                   </div>
                 </div>
@@ -386,8 +393,9 @@ export default function RegisterPage() {
                       onCheckedChange={(checked) => handleInputChange("agreeToTerms", checked as boolean)}
                       required
                       disabled={isSubmitting}
+                      className="border-gray-400 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
                     />
-                    <Label htmlFor="terms" className="text-sm">
+                    <Label htmlFor="terms" className="text-sm text-black">
                       I agree to the terms and conditions and privacy policy *
                     </Label>
                   </div>
@@ -397,8 +405,9 @@ export default function RegisterPage() {
                       checked={formData.agreeToMarketing}
                       onCheckedChange={(checked) => handleInputChange("agreeToMarketing", checked as boolean)}
                       disabled={isSubmitting}
+                      className="border-gray-400 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
                     />
-                    <Label htmlFor="marketing" className="text-sm">
+                    <Label htmlFor="marketing" className="text-sm text-black">
                       I agree to receive marketing communications about future events
                     </Label>
                   </div>
@@ -406,10 +415,10 @@ export default function RegisterPage() {
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-red-600 hover:bg-red-700"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white rounded-full font-bold"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Submitting Registration..." : "Complete Registration for WED 4.0"}
+                  {isSubmitting ? "Submitting Registration..." : "Complete Registration for WED 5.0"}
                 </Button>
               </form>
             </CardContent>

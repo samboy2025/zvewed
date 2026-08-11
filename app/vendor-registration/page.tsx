@@ -13,15 +13,16 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
-import { Store, Package, Users, Zap, CheckCircle, AlertCircle } from "lucide-react"
+import { Store, CheckCircle, AlertCircle } from "lucide-react"
+import BackToTopButton from "../components/BackToTopButton"
 import Link from "next/link"
 
 export default function VendorRegistrationPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle")
   const [errorMessage, setErrorMessage] = useState("")
-  
-  const createVendorRegistration = useMutation(api.vendors.createVendorRegistration)
+
+  const createVendor = useMutation(api.vendors.createVendor)
 
   const [formData, setFormData] = useState({
     companyName: "",
@@ -37,7 +38,7 @@ export default function VendorRegistrationPage() {
     yearsInBusiness: "",
     productServices: "",
     targetAudience: "",
-    boothSize: "",
+    boothSize: "standard", // default to standard
     specialRequirements: "",
     marketingMaterials: "",
     previousExperience: "",
@@ -48,7 +49,7 @@ export default function VendorRegistrationPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (!formData.agreeToTerms) {
       setErrorMessage("You must agree to the terms and conditions")
       setSubmitStatus("error")
@@ -57,9 +58,9 @@ export default function VendorRegistrationPage() {
 
     setIsSubmitting(true)
     setErrorMessage("")
-    
+
     try {
-      const vendorId = await createVendorRegistration({
+      const vendorId = await createVendor({
         companyName: formData.companyName,
         contactPerson: formData.contactPerson,
         email: formData.email,
@@ -81,10 +82,33 @@ export default function VendorRegistrationPage() {
         agreeToTerms: formData.agreeToTerms,
         agreeToMarketing: formData.agreeToMarketing,
       })
-      
-      console.log("Vendor registration created with ID:", vendorId)
+
+      console.log("Vendor created with ID:", vendorId)
       setSubmitStatus("success")
-      
+
+      // Reset form
+      setFormData({
+        companyName: "",
+        contactPerson: "",
+        email: "",
+        phone: "",
+        website: "",
+        address: "",
+        city: "",
+        state: "",
+        businessType: "",
+        industry: "",
+        yearsInBusiness: "",
+        productServices: "",
+        targetAudience: "",
+        boothSize: "standard",
+        specialRequirements: "",
+        marketingMaterials: "",
+        previousExperience: "",
+        objectives: "",
+        agreeToTerms: false,
+        agreeToMarketing: false,
+      })
     } catch (error) {
       console.error("Vendor registration error:", error)
       setErrorMessage("Failed to submit vendor registration. Please try again.")
@@ -106,29 +130,30 @@ export default function VendorRegistrationPage() {
     }
   }
 
-  // Success message component
   if (submitStatus === "success") {
     return (
-      <div className="min-h-screen py-12 bg-gray-50">
+      <div className="min-h-screen py-12 bg-gray-50 text-black">
+        <BackToTopButton />
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
-            <Card className="text-center">
+            <Card className="text-center bg-white border border-gray-100 shadow-xl">
               <CardHeader>
                 <div className="flex justify-center mb-4">
                   <CheckCircle className="h-16 w-16 text-green-500" />
                 </div>
-                <CardTitle className="text-2xl text-green-700">Vendor Registration Submitted!</CardTitle>
+                <CardTitle className="text-2xl text-green-700">Vendor Application Received!</CardTitle>
                 <CardDescription className="text-lg">
-                  Thank you for your interest in exhibiting at WED 4.0. We will contact you soon with booth details.
+                  Thank you for your interest in exhibiting at WED 5.0. We will contact you soon with booth details.
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   <p className="text-gray-600">
-                    Your vendor registration has been submitted successfully. We will review your application and contact you with booth assignment and payment details.
+                    Your vendor application has been submitted successfully. Our team will review your application and
+                    contact you within 48 hours to confirm your booth assignment and guide you on the next steps.
                   </p>
-                  <Button asChild className="bg-blue-600 hover:bg-blue-700">
-                    <Link href="/login">Login to Your Account</Link>
+                  <Button asChild className="bg-red-600 hover:bg-red-700 text-white rounded-full">
+                    <Link href="/login">Login to Your Vendor Portal</Link>
                   </Button>
                 </div>
               </CardContent>
@@ -140,27 +165,31 @@ export default function VendorRegistrationPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 bg-gray-50">
+    <div className="min-h-screen py-12 bg-gray-50 text-black">
+      <BackToTopButton />
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto">
           <div className="text-center mb-8">
-            <Badge className="mb-4 bg-red-600 text-white">WED 4.0 Vendor Registration</Badge>
-            <h1 className="text-3xl font-bold mb-4">WED 4.0 Vendor Exhibition Registration</h1>
+            <Badge className="mb-4 bg-red-600 text-white">WED 5.0 Vendor Registration</Badge>
+            <h1 className="text-3xl font-bold mb-4 text-black">WED 5.0 Vendor Exhibition Registration</h1>
             <p className="text-gray-600">
-              Showcase your products and services to 500+ entrepreneurs and industry professionals at our 2-day event focused on business resilience
+              Join our WED 5.0 vendor exhibition and connect with potential customers and partners focused on building resilient enterprises.
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              <strong>Event Dates:</strong> October 3–4, 2026 | <strong>Venue:</strong> NAERLS Ultra Modern Hall, ABU Zaria
             </p>
           </div>
 
-          <Card>
+          <Card className="bg-white border border-gray-100 shadow-lg">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Store className="h-5 w-5" />
-                Vendor Registration Form
+              <CardTitle className="flex items-center gap-2 text-black">
+                <Store className="h-5 w-5 text-red-600" />
+                Exhibitor Application Form
               </CardTitle>
               <CardDescription>
-                Join our WED 4.0 vendor exhibition and connect with potential customers and partners focused on business resilience
+                Expose your business to 400-500 participants across both days of the anniversary edition.
               </CardDescription>
-              
+
               {/* Error Message */}
               {submitStatus === "error" && (
                 <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-md">
@@ -171,37 +200,34 @@ export default function VendorRegistrationPage() {
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit} className="space-y-6">
-                {/* Company Information */}
+                {/* Business Information */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold border-b pb-2 flex items-center gap-2">
-                    <Package className="h-5 w-5" />
-                    Company Information
-                  </h3>
+                  <h3 className="text-lg font-semibold border-b pb-2 border-red-100 text-black">Business Information</h3>
+                  <div>
+                    <Label htmlFor="companyName" className="text-black">Company/Business Name *</Label>
+                    <Input
+                      id="companyName"
+                      value={formData.companyName}
+                      onChange={(e) => handleInputChange("companyName", e.target.value)}
+                      required
+                      disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black"
+                    />
+                  </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="companyName">Company Name *</Label>
-                      <Input
-                        id="companyName"
-                        value={formData.companyName}
-                        onChange={(e) => handleInputChange("companyName", e.target.value)}
-                        required
-                        disabled={isSubmitting}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="contactPerson">Contact Person *</Label>
+                      <Label htmlFor="contactPerson" className="text-black">Contact Person *</Label>
                       <Input
                         id="contactPerson"
                         value={formData.contactPerson}
                         onChange={(e) => handleInputChange("contactPerson", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
                       />
                     </div>
-                  </div>
-                  <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="email">Email Address *</Label>
+                      <Label htmlFor="email" className="text-black">Email Address *</Label>
                       <Input
                         id="email"
                         type="email"
@@ -209,10 +235,13 @@ export default function VendorRegistrationPage() {
                         onChange={(e) => handleInputChange("email", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
                       />
                     </div>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="phone">Phone Number *</Label>
+                      <Label htmlFor="phone" className="text-black">Phone Number *</Label>
                       <Input
                         id="phone"
                         type="tel"
@@ -220,49 +249,53 @@ export default function VendorRegistrationPage() {
                         onChange={(e) => handleInputChange("phone", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="website" className="text-black">Website/Social Media Link</Label>
+                      <Input
+                        id="website"
+                        value={formData.website}
+                        onChange={(e) => handleInputChange("website", e.target.value)}
+                        placeholder="https://..."
+                        disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
                       />
                     </div>
                   </div>
                   <div>
-                    <Label htmlFor="website">Website URL</Label>
-                    <Input
-                      id="website"
-                      type="url"
-                      value={formData.website}
-                      onChange={(e) => handleInputChange("website", e.target.value)}
-                      placeholder="https://www.yourcompany.com"
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="address">Business Address *</Label>
+                    <Label htmlFor="address" className="text-black">Business Address *</Label>
                     <Input
                       id="address"
                       value={formData.address}
                       onChange={(e) => handleInputChange("address", e.target.value)}
                       required
                       disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black"
                     />
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="city">City *</Label>
+                      <Label htmlFor="city" className="text-black">City *</Label>
                       <Input
                         id="city"
                         value={formData.city}
                         onChange={(e) => handleInputChange("city", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="state">State *</Label>
+                      <Label htmlFor="state" className="text-black">State *</Label>
                       <Input
                         id="state"
                         value={formData.state}
                         onChange={(e) => handleInputChange("state", e.target.value)}
                         required
                         disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
                       />
                     </div>
                   </div>
@@ -270,133 +303,123 @@ export default function VendorRegistrationPage() {
 
                 {/* Business Details */}
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold border-b pb-2 flex items-center gap-2">
-                    <Zap className="h-5 w-5" />
-                    Business Details
-                  </h3>
+                  <h3 className="text-lg font-semibold border-b pb-2 border-red-100 text-black">Business Details</h3>
                   <div className="grid md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="businessType">Business Type *</Label>
+                      <Label htmlFor="businessType" className="text-black">Type of Business *</Label>
                       <Select onValueChange={(value) => handleInputChange("businessType", value)} disabled={isSubmitting}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select business type" />
+                        <SelectTrigger className="bg-white border-gray-300 text-black">
+                          <SelectValue placeholder="Select type" />
                         </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="startup">Startup</SelectItem>
-                          <SelectItem value="sme">Small/Medium Enterprise</SelectItem>
-                          <SelectItem value="corporation">Corporation</SelectItem>
-                          <SelectItem value="nonprofit">Non-Profit</SelectItem>
-                          <SelectItem value="freelancer">Freelancer/Consultant</SelectItem>
+                        <SelectContent className="bg-white text-black">
+                          <SelectItem value="retail">Retail/Wholesale</SelectItem>
+                          <SelectItem value="manufacturer">Manufacturing</SelectItem>
+                          <SelectItem value="service">Service Provider</SelectItem>
+                          <SelectItem value="agro">Agribusiness/Food Processing</SelectItem>
+                          <SelectItem value="tech">Tech Startup</SelectItem>
+                          <SelectItem value="creative">Creative/Media/Fashion</SelectItem>
                           <SelectItem value="other">Other</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="industry">Industry *</Label>
-                      <Select onValueChange={(value) => handleInputChange("industry", value)} disabled={isSubmitting}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select industry" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="technology">Technology</SelectItem>
-                          <SelectItem value="fintech">FinTech</SelectItem>
-                          <SelectItem value="healthcare">Healthcare</SelectItem>
-                          <SelectItem value="education">Education</SelectItem>
-                          <SelectItem value="agriculture">Agriculture</SelectItem>
-                          <SelectItem value="manufacturing">Manufacturing</SelectItem>
-                          <SelectItem value="retail">Retail/E-commerce</SelectItem>
-                          <SelectItem value="consulting">Consulting</SelectItem>
-                          <SelectItem value="marketing">Marketing/Advertising</SelectItem>
-                          <SelectItem value="other">Other</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="yearsInBusiness">Years in Business *</Label>
+                      <Label htmlFor="yearsInBusiness" className="text-black">Years in Business *</Label>
                       <Select onValueChange={(value) => handleInputChange("yearsInBusiness", value)} disabled={isSubmitting}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select years in business" />
+                        <SelectTrigger className="bg-white border-gray-300 text-black">
+                          <SelectValue placeholder="Select duration" />
                         </SelectTrigger>
-                        <SelectContent>
+                        <SelectContent className="bg-white text-black">
                           <SelectItem value="less-than-1">Less than 1 year</SelectItem>
                           <SelectItem value="1-3">1-3 years</SelectItem>
                           <SelectItem value="3-5">3-5 years</SelectItem>
-                          <SelectItem value="5-10">5-10 years</SelectItem>
-                          <SelectItem value="10-plus">10+ years</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="boothSize">Preferred Booth Size *</Label>
-                      <Select onValueChange={(value) => handleInputChange("boothSize", value)} disabled={isSubmitting}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select booth size" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="small">Small (3m x 2m)</SelectItem>
-                          <SelectItem value="medium">Medium (3m x 3m)</SelectItem>
-                          <SelectItem value="large">Large (3m x 4m)</SelectItem>
-                          <SelectItem value="custom">Custom Size</SelectItem>
+                          <SelectItem value="more-than-5">More than 5 years</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                   </div>
+
                   <div>
-                    <Label htmlFor="productServices">Products/Services Description *</Label>
+                    <Label htmlFor="industry" className="text-black">Industry Category *</Label>
+                    <Input
+                      id="industry"
+                      value={formData.industry}
+                      onChange={(e) => handleInputChange("industry", e.target.value)}
+                      placeholder="e.g. Agriculture, Fashion, Technology, Food"
+                      required
+                      disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black"
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="productServices" className="text-black">Description of Products/Services to Exhibit *</Label>
                     <Textarea
                       id="productServices"
                       value={formData.productServices}
                       onChange={(e) => handleInputChange("productServices", e.target.value)}
-                      placeholder="Describe your products or services in detail"
-                      rows={3}
+                      placeholder="What products or services will you showcase at your booth?"
                       required
                       disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black"
                     />
                   </div>
+
                   <div>
-                    <Label htmlFor="targetAudience">Target Audience</Label>
-                    <Textarea
+                    <Label htmlFor="targetAudience" className="text-black">Who is your target audience?</Label>
+                    <Input
                       id="targetAudience"
                       value={formData.targetAudience}
                       onChange={(e) => handleInputChange("targetAudience", e.target.value)}
-                      placeholder="Who is your target audience? What type of customers are you looking for?"
-                      rows={3}
+                      placeholder="e.g. Students, youth entrepreneurs, corporate partners"
                       disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black"
                     />
                   </div>
+                </div>
+
+                {/* Booth Preferences */}
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold border-b pb-2 border-red-100 text-black">Booth Information</h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="boothSize" className="text-black">Booth Size Preference *</Label>
+                      <Select
+                        value={formData.boothSize}
+                        onValueChange={(value) => handleInputChange("boothSize", value)}
+                        disabled={isSubmitting}
+                      >
+                        <SelectTrigger className="bg-white border-gray-300 text-black">
+                          <SelectValue placeholder="Select booth size" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-white text-black">
+                          <SelectItem value="standard">Standard Booth (₦25,000)</SelectItem>
+                          <SelectItem value="premium">Premium Booth (Custom Setup)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="specialRequirements" className="text-black">Special Requirements</Label>
+                      <Input
+                        id="specialRequirements"
+                        value={formData.specialRequirements}
+                        onChange={(e) => handleInputChange("specialRequirements", e.target.value)}
+                        placeholder="e.g. Power outlet, extra chairs, near entrance"
+                        disabled={isSubmitting}
+                        className="bg-white border-gray-300 text-black"
+                      />
+                    </div>
+                  </div>
+
                   <div>
-                    <Label htmlFor="objectives">Exhibition Objectives</Label>
+                    <Label htmlFor="objectives" className="text-black">What are your primary goals for exhibiting at WED 5.0?</Label>
                     <Textarea
                       id="objectives"
                       value={formData.objectives}
                       onChange={(e) => handleInputChange("objectives", e.target.value)}
-                      placeholder="What do you hope to achieve by participating in this exhibition?"
+                      placeholder="e.g. Direct sales, lead generation, brand awareness"
                       rows={3}
                       disabled={isSubmitting}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="previousExperience">Previous Exhibition Experience</Label>
-                    <Textarea
-                      id="previousExperience"
-                      value={formData.previousExperience}
-                      onChange={(e) => handleInputChange("previousExperience", e.target.value)}
-                      placeholder="Tell us about your previous exhibition experience, if any"
-                      rows={3}
-                      disabled={isSubmitting}
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="specialRequirements">Special Requirements</Label>
-                    <Textarea
-                      id="specialRequirements"
-                      value={formData.specialRequirements}
-                      onChange={(e) => handleInputChange("specialRequirements", e.target.value)}
-                      placeholder="Any special requirements for your booth (electrical, internet, etc.)"
-                      rows={3}
-                      disabled={isSubmitting}
+                      className="bg-white border-gray-300 text-black"
                     />
                   </div>
                 </div>
@@ -410,9 +433,10 @@ export default function VendorRegistrationPage() {
                       onCheckedChange={(checked) => handleInputChange("agreeToTerms", checked as boolean)}
                       required
                       disabled={isSubmitting}
+                      className="border-gray-400 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
                     />
-                    <Label htmlFor="terms" className="text-sm">
-                      I agree to the vendor exhibition terms and conditions *
+                    <Label htmlFor="terms" className="text-sm text-black">
+                      I agree to the exhibitor terms and conditions *
                     </Label>
                   </div>
                   <div className="flex items-center space-x-2">
@@ -421,19 +445,20 @@ export default function VendorRegistrationPage() {
                       checked={formData.agreeToMarketing}
                       onCheckedChange={(checked) => handleInputChange("agreeToMarketing", checked as boolean)}
                       disabled={isSubmitting}
+                      className="border-gray-400 data-[state=checked]:bg-red-600 data-[state=checked]:border-red-600"
                     />
-                    <Label htmlFor="marketing" className="text-sm">
-                      I agree to receive communications about future exhibitions
+                    <Label htmlFor="marketing" className="text-sm text-black">
+                      I agree to receive communications from the organizers
                     </Label>
                   </div>
                 </div>
 
                 <Button 
                   type="submit" 
-                  className="w-full bg-red-600 hover:bg-red-700"
+                  className="w-full bg-red-600 hover:bg-red-700 text-white rounded-full font-bold"
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Submitting Registration..." : "Submit Vendor Registration"}
+                  {isSubmitting ? "Submitting Application..." : "Complete Exhibitor Registration"}
                 </Button>
               </form>
             </CardContent>
